@@ -25,9 +25,17 @@ function greeting(): string {
   return h < 12 ? "صباح الخير" : "مساء الخير";
 }
 
-function ProgressBar({ ratio, color = colors.gold500 }: { ratio: number; color?: string }) {
+function ProgressBar({
+  ratio,
+  color = colors.gold500,
+  track = colors.whiteAlpha14,
+}: {
+  ratio: number;
+  color?: string;
+  track?: string;
+}) {
   return (
-    <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.whiteAlpha14, overflow: "hidden" }}>
+    <View style={{ height: 8, borderRadius: 4, backgroundColor: track, overflow: "hidden" }}>
       <View style={{ height: 8, width: `${Math.min(100, ratio * 100)}%`, backgroundColor: color, borderRadius: 4 }} />
     </View>
   );
@@ -155,7 +163,11 @@ export default function Home() {
           >
             <Icon name="sun.max.fill" size={30} color={colors.gold700} />
             <Txt size={16} weight="bold" color={colors.green800}>أذكار الصباح</Txt>
-            <ProgressBar ratio={morning.total ? morning.done / morning.total : 0} color={colors.sage} />
+            <ProgressBar
+              ratio={morning.total ? morning.done / morning.total : 0}
+              color={colors.sage}
+              track={colors.borderWarm}
+            />
             <Txt size={12} color={colors.muted1}>
               {morning.isDone ? "اكتمل ✓" : `${toArabicNumerals(morning.done)} من ${toArabicNumerals(morning.total)}`}
             </Txt>
