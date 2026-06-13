@@ -1,0 +1,143 @@
+import { useState } from "react";
+import { Pressable, ScrollView, Switch, TextInput, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors, fonts, radii, spacing } from "@/theme/tokens";
+import { Txt } from "@/components/txt";
+import { Icon } from "@/components/icon";
+import { toArabicNumerals } from "@/utils/numerals";
+import { adhkarData } from "@/data/adhkar";
+import { ensureReminders, cancelReminders } from "@/utils/notifications";
+import { useSettings } from "@/store/store";
+
+export default function Profile() {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { settings, update } = useSettings();
+  const [name, setName] = useState(settings.name);
+
+  function saveName() {
+    const t = name.trim();
+    if (t && t !== settings.name) update({ name: t });
+  }
+
+  async function toggleReminders(value: boolean) {
+    if (value) {
+      const ok = await ensureReminders(settings.morningTime, settings.eveningTime);
+      update({ remindersEnabled: ok });
+    } else {
+      await cancelReminders();
+      update({ remindersEnabled: false });
+    }
+  }
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.green800,
+        experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+      }}
+    >
+      <ScrollView
+        contentContainerStyle={{
+          paddingTop: insets.top + spacing.lg,
+          paddingBottom: spacing.xxl,
+          paddingHorizontal: spacing.xl,
+          gap: spacing.lg,
+        }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Txt size={22} weight="bold">ملفي</Txt>
+
+        {/* الاسم */}
+        <View style={{ gap: spacing.sm }}>
+          <Txt size={14} weight="medium" color={colors.muted3}>الاسم</Txt>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            onBlur={saveName}
+            onSubmitEditing={saveName}
+            returnKeyType="done"
+            placeholder="اكتب اسمك"
+            placeholderTextColor={colors.muted2}
+            style={{
+              backgroundColor: colors.whiteAlpha08,
+              borderRadius: radii.tile,
+              borderCurve: "continuous",
+              paddingHorizontal: spacing.lg,
+              paddingVertical: 14,
+              fontFamily: fonts.sansMedium,
+              fontSize: 18,
+              color: colors.creamText,
+              textAlign: "right",
+              writingDirection: "rtl",
+            }}
+          />
+        </View>
+
+        {/* التنبيهات */}
+        <View
+          style={{
+            backgroundColor: colors.whiteAlpha06,
+            borderRadius: radii.card,
+            borderCurve: "continuous",
+            overflow: "hidden",
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: spacing.lg }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
+              <Icon name="bell.fill" size={20} color={colors.gold300} />
+              <Txt size={15} weight="medium">تذكير الصباح والمساء</Txt>
+            </View>
+            <Switch
+              value={settings.remindersEnabled}
+              onValueChange={toggleReminders}
+              trackColor={{ true: colors.gold500, false: colors.whiteAlpha14 }}
+              thumbColor="#fff"
+            />
+          </View>
+          <Pressable
+            onPress={() => router.push("/settings/reminders")}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: spacing.lg,
+              borderTopWidth: 1,
+              borderTopColor: colors.whiteAlpha08,
+            }}
+          >
+            <Txt size={15} weight="medium">أوقات التذكير</Txt>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+              <Txt size={13} color={colors.muted3}>
+                {toArabicNumerals(settings.morningTime)} · {toArabicNumerals(settings.eveningTime)}
+              </Txt>
+              <Icon name="chevron.forward" size={16} color={colors.muted2} />
+            </View>
+          </Pressable>
+        </View>
+
+        {/* عن التطبيق */}
+        <View
+          style={{
+            backgroundColor: colors.whiteAlpha06,
+            borderRadius: radii.card,
+            borderCurve: "continuous",
+            padding: spacing.lg,
+            gap: spacing.sm,
+          }}
+        >
+          <Txt size={15} weight="bold">عن وِرْد</Txt>
+          <Txt size={13} color={colors.muted3} style={{ lineHeight: 24 }}>
+            المصدر: {adhkarData.source}
+          </Txt>
+          <Txt size={13} color={colors.muted3} style={{ lineHeight: 24 }}>
+            كل بياناتك محفوظة على جهازك فقط — لا اتصال بالشبكة.
+          </Txt>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
