@@ -1,9 +1,9 @@
 /**
- * تخزين محلي مفتاح-قيمة عبر polyfill الخاص بـ expo-sqlite (نمط Expo 55 الموصى به).
- * كل البيانات تُحفظ على الجهاز فقط — لا اتصال بالشبكة إطلاقاً.
+ * Local key-value storage via the expo-sqlite polyfill (the recommended Expo 55 pattern).
+ * All data is stored on the device only — no network connection whatsoever.
  *
- * نحتفظ بـ cache للقيم المُفكَّكة (parsed) كي يُعيد get() نفس المرجع ما لم تتغيّر
- * القيمة الخام — وهذا شرط أساسي لعمل useSyncExternalStore بلا حلقات لا نهائية.
+ * We keep a cache of parsed values so that get() returns the same reference unless the
+ * raw value changes — this is essential for useSyncExternalStore to work without infinite loops.
  */
 import "./sqlite-install";
 
@@ -48,7 +48,7 @@ export const storage = {
   },
 };
 
-/** مفاتيح التخزين الموحّدة. */
+/** Unified storage keys. */
 export const StorageKeys = {
   settings: "werd.settings",
   progress: "werd.progress",
@@ -56,4 +56,5 @@ export const StorageKeys = {
   score: "werd.score",
   customAwrad: "werd.customAwrad",
   partialCounts: "werd.partialCounts",
+  challenges: "werd.challenges",
 } as const;

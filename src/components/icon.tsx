@@ -1,9 +1,9 @@
 import { Text } from "react-native";
 import { SymbolView, type SFSymbol } from "expo-symbols";
 
-/** بدائل Unicode لغير iOS (التطبيق محسّن لـ iOS لكن يبقى مقروءاً على غيره). */
+/** Unicode fallbacks for non-iOS (the app is optimized for iOS but stays readable elsewhere). */
 const FALLBACK: Record<string, string> = {
-  "chevron.backward": "›", // RTL: الرجوع يشير لليمين
+  "chevron.backward": "›", // RTL: back points to the right
   "chevron.forward": "‹",
   "chevron.left": "‹",
   "chevron.right": "›",

@@ -20,7 +20,7 @@ export function completedCount(category: Category, completedIds: string[]): numb
   return category.adhkar.filter((d) => completedIds.includes(d.id)).length;
 }
 
-/** عدد التكرارات الكلي في تصنيف (لإحصائية «مجموع الأذكار»). */
+/** Total repetition count within a category (for the "total adhkar" stat). */
 export function totalRepetitions(category: Category): number {
   return category.adhkar.reduce((sum, d: Dhikr) => sum + d.count, 0);
 }

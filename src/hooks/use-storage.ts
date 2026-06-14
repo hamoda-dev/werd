@@ -1,10 +1,9 @@
-import { useCallback } from "react";
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import { storage } from "@/utils/storage";
 
 /**
- * Hook تفاعلي للتخزين المحلي. يعيد القيمة ودالة لتحديثها،
- * ويُعيد التصيير تلقائياً عند تغيّر المفتاح من أي مكان في التطبيق.
+ * A reactive hook for local storage. Returns the value and a function to update it,
+ * and re-renders automatically when the key changes from anywhere in the app.
  */
 export function useStorage<T>(
   key: string,

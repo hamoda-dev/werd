@@ -1,0 +1,473 @@
+# وِرْد — Design System
+
+> The single, **self-contained** source of truth for how **Wird (وِرْد)** looks, feels, and moves.
+> This document fully absorbs the original `design_handoff_werd_app/` package (its README, the HTML prototypes, the logo system, and the prototype logic) and reconciles it with the **shipped** implementation in [src/](src/). The handoff folder has been retired — **nothing here depends on it**.
+> Code values below are real — lifted from the codebase, not the prototype. When the two disagree, **the code wins** and this file follows it.
+
+**Wird** is a **cross-platform mobile app (Android + iOS)**, fully **offline**, for morning & evening *adhkar* (Islamic remembrances). It's built with **Expo SDK 55 / React Native / TypeScript / expo-router**. It pairs a calm, spiritual surface with light gamification — an interactive digital tasbih (counter), a daily streak, points/levels, and gentle reminders — to help users keep their daily *wird* without breaking the chain. Everything is Arabic, right‑to‑left, with Eastern‑Arabic numerals.
+
+---
+
+## 1. Design Direction
+
+Three home directions were explored during design (A — Calm & Spiritual, B — Playful & Motivating, C — Elegant & Focused). **Direction B is the locked, shipped direction** and everything in this document assumes it.
+
+> **B — Playful & Motivating.** A deep‑green night surface where the **streak is the hero**, progress is always visible, and every completed dhikr is rewarded with motion, haptics, points, and level‑up momentum.
+
+This decision is final — do not re‑introduce A or C surfaces. See the recorded rationale in project memory (*Werd key decisions*).
+
+### Principles
+
+1. **Calm first, game second.** Gamification motivates; it never shouts. Warm gold rewards over a still green night, not confetti everywhere.
+2. **The word is sacred.** Dhikr text is set in Amiri (Naskh) with generous line‑height and breathing room — never cramped, never decorated.
+3. **Arabic‑native, not translated.** Hard RTL, Eastern‑Arabic numerals everywhere (٠١٢٣٤٥٦٧٨٩), Arabic‑first type. The layout was born right‑to‑left.
+4. **One core, reused.** The tasbih counter is the heart. Built‑in adhkar and the user's own *awrad* run through the **same** [TasbihCounter](src/components/tasbih-counter.tsx) with identical behavior.
+5. **Offline & instant.** No network in the core loop. Everything is local; the UI never waits on a request.
+6. **One app, both platforms.** Identical UX on Android and iOS, with platform‑native touches that degrade gracefully: SF Symbols + haptics on iOS, readable Unicode/flat equivalents on Android. Nothing iOS‑only is load‑bearing.
+
+---
+
+## 2. Color
+
+All colors live in [`src/theme/tokens.ts`](src/theme/tokens.ts) as `colors`. Reference them by token — never hard‑code a hex in a component (the few literal `#fff`/rgba values that remain are intentional one‑offs noted below).
+
+### Greens — the surface
+| Token | Hex | Role |
+|-------|-----|------|
+| `green900` | `#0e2d22` | Darkest background; gradient end; adaptive‑icon & splash background |
+| `green800` | `#16352a` | Primary dark surface; default screen `backgroundColor`; gradient start |
+| `green700` | `#1c4a3a` | Brand green; evening card; brand‑card gradient start |
+| `sage` | `#3f8268` | Success / completed states; done segments & progress fills |
+
+### Gold — the reward
+| Token | Hex | Role |
+|-------|-----|------|
+| `gold500` | `#d8b46a` | Primary accent: progress rings, primary buttons, sun, active streak dots, notification accent |
+| `gold300` | `#f4d68a` | Light gold: glow, active icons, secondary accent text on dark |
+| `gold700` | `#bf9648` | Gold depth: morning sun glyph, gradient end |
+
+### Terracotta — the streak / warmth
+| Token | Hex | Role |
+|-------|-----|------|
+| `terracotta500` | `#c8784e` | Streak hero card; warm alerts; gradient start |
+| `terracotta700` | `#a85733` | Streak gradient end; streak shadow tint |
+
+### Cream — light surfaces & text on dark
+| Token | Hex | Role |
+|-------|-----|------|
+| `cream50` | `#fffdf7` | Cards on dark (e.g. morning card) |
+| `cream100` | `#faf7f0` | Light screen background (used on light surfaces) |
+| `cream200` | `#f6efe2` | Subtle fills / tiles |
+| `creamText` | `#f4ede0` | **Default text/icon color on the dark theme** (the `Txt` default) |
+
+### Muted text & borders
+| Token | Hex | Role |
+|-------|-----|------|
+| `muted1` | `#6b7a72` | Secondary text on cream |
+| `muted2` | `#8a9389` | Tertiary text; inactive tab icon/label |
+| `muted3` | `#9fb3a8` | Captions on dark surfaces |
+| `borderWarm` | `#e7e0d0` | Hairline borders & progress tracks on cream |
+
+### Translucent layers (on dark)
+These build depth on the green night without new opaque colors:
+| Token | Value | Role |
+|-------|-------|------|
+| `whiteAlpha06` | `rgba(255,255,255,0.06)` | Default raised card on dark (level card, awrad tiles, dhikr card) |
+| `whiteAlpha08` | `rgba(255,255,255,0.08)` | Reset button; ring track; tab top hairline; empty‑day dots |
+| `whiteAlpha14` | `rgba(255,255,255,0.14)` | Progress track on dark; dashed empty‑state border; upcoming segments |
+| `goldAlpha25` | `rgba(216,180,106,0.25)` | Gold hairline border on the dhikr card |
+
+**Intentional literals** (not tokens): pure `#fff` and `rgba(255,255,255,0.85)` for text on the terracotta hero ([index.tsx](src/app/(tabs)/index.tsx)), `#cfe0d6` for the reset‑button label, and the tab bar's `rgba(14,45,34,0.96)` translucent fill ([tab-bar.tsx](src/components/tab-bar.tsx)).
+
+### Gradients
+Defined in `tokens.gradients`, but **applied via CSS gradient strings** in `experimental_backgroundImage` (the Expo 55 idiom — see §6), not the `LinearGradient` component. `darkScreen` and `streak` are in active use; `brandCard` and `gold` are available for brand cards / featured surfaces.
+
+| Name | Stops | Where |
+|------|-------|-------|
+| `darkScreen` | `#16352a → #0e2d22` (180°) | Home & session screen backgrounds |
+| `brandCard` | `#1c4a3a → #0e2d22` | Brand cards (available) |
+| `streak` | `#c8784e → #a85733` (150°) | Streak hero card |
+| `gold` | `#d8b46a → #bf9648` | Gold buttons / featured challenge (available) |
+
+---
+
+## 3. Typography
+
+Two families, loaded in [`app/_layout.tsx`](src/app/_layout.tsx) via `@expo-google-fonts/*` and named in `tokens.fonts`. **Never** render Arabic text with a raw `<Text>` — always use [`<Txt>`](src/components/txt.tsx), which guarantees the right family, RTL writing direction, and theme‑correct default color.
+
+### Families
+- **IBM Plex Sans Arabic** — UI, numbers, labels, buttons. Weights **400 / 500 / 600 / 700** (700 is the heaviest available).
+- **Amiri (Naskh)** — dhikr / Qur'an text and the wordmark. Weights **400 / 700**. Opt in with `<Txt naskh>`.
+
+```ts
+fonts = {
+  sans: "IBMPlexSansArabic_400Regular",
+  sansMedium: "IBMPlexSansArabic_500Medium",
+  sansSemiBold: "IBMPlexSansArabic_600SemiBold",
+  sansBold: "IBMPlexSansArabic_700Bold",
+  naskh: "Amiri_400Regular",
+  naskhBold: "Amiri_700Bold",
+}
+```
+
+### The `Txt` component — the only text primitive
+```tsx
+<Txt weight="bold" size={26} color={colors.creamText}>{name} 👋</Txt>
+<Txt naskh size={26} align="center" style={{ lineHeight: 46 }} selectable>{dhikr}</Txt>
+```
+Defaults: `weight="regular"`, `size={15}`, `color={colors.creamText}`, `align="right"`, `writingDirection: "rtl"`. Weights map `regular→400, medium→500, semibold→600, bold→700`. With `naskh`, only `regular`/`bold` exist (other weights fall back to regular).
+
+### Type scale (as shipped)
+| Role | Size / Weight | Family | Example |
+|------|---------------|--------|---------|
+| Tasbih counter | **78 / bold**, tabular‑nums | Sans | `٣` |
+| Streak hero number | 52 / bold, tabular‑nums | Sans | `٧` |
+| Greeting name / screen title | 26 / bold | Sans | `محمد 👋` |
+| Dhikr text | **26 / regular, line‑height 46** | **Naskh** | أذكار |
+| Section heading | 18 / bold | Sans | `أورادي` |
+| Card title | 16–17 / bold | Sans | `أذكار الصباح` |
+| Body / button | 15 / semibold–bold | Sans | `الذكر التالي ←` |
+| Caption | 11–13 / regular–semibold | Sans | `٧ من ١٢` |
+| Counter sub‑label | 15 / regular, `muted3` | Sans | `من ١٢` |
+
+> Prototype reference sizing (380‑wide frame): dhikr text rendered at 24–27/700 Amiri with line‑height ~1.9; the shipped app settles on 26 / line‑height 46.
+
+### Numerals — always Eastern Arabic
+Every number a user sees passes through `toArabicNumerals()` ([src/utils/numerals.ts](src/utils/numerals.ts)) → ٠١٢٣٤٥٦٧٨٩ (the same `String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d])` mapping the prototype used). Counters and large numerals additionally set `fontVariant: ["tabular-nums"]` so digits don't jitter while counting. Never print a Western digit in the UI.
+
+---
+
+## 4. Spacing, Radius, Borders, Shadows
+
+### Spacing — `tokens.spacing`
+A 6‑step scale. Use tokens, not raw numbers, for padding/gap/margins.
+
+| Token | px | Typical use |
+|-------|----|-------------|
+| `xs` | 6 | Tight inner gaps |
+| `sm` | 10 | Card inner gaps, tab padding |
+| `md` | 14 | Gaps between cards in a row |
+| `lg` | 18 | Standard card padding; vertical rhythm between sections |
+| `xl` | 22 | Screen horizontal padding; hero padding |
+| `xxl` | 28 | Large card vertical padding; bottom scroll padding |
+
+Conventions: **screen horizontal padding = `xl` (22)**; **vertical gap between stacked sections = `lg` (18)**; small inline gaps use raw `4`/`6` where below the scale. (Prototype source ranges: card padding 16–26, card gaps 12–18, screen padding 22–30 — the tokens above are the codified subset.)
+
+### Radius — `tokens.radii`
+`tile: 18` (list rows, buttons) · `card: 24` (standard cards) · `cardLg: 28` (hero cards) · `pill: 30` (pills). Full circles use `borderRadius: size/2`.
+**Always pair a radius with `borderCurve: "continuous"`** for iOS‑smooth (squircle) corners — applied on every rounded surface in the app.
+
+### Borders
+Hairlines carry hierarchy on the dark theme:
+- Dhikr card: `1px` `goldAlpha25` (gold hairline — signals "this is the sacred text").
+- Morning (cream) card: `1.5px` `gold500` (the only emphasized colored border).
+- Empty‑state awrad: `1px` `whiteAlpha14`, **dashed**.
+- Tab bar top: `1px` `whiteAlpha08`.
+
+### Shadows / elevation — `tokens.shadows`
+Expressed as **`boxShadow` strings** (Expo 55 idiom — no legacy `shadow*`/`elevation`). Three elevations only:
+| Token | Value | Use |
+|-------|-------|-----|
+| `cardOnCream` | `0 8px 20px -12px rgba(20,57,46,.3)` | Cards on a light surface |
+| `darkElevated` | `0 18px 36px -16px rgba(14,45,34,.6)` | Raised dark cards |
+| `terracotta` | `0 16px 32px -16px rgba(168,87,51,.6)` | Streak hero (warm‑tinted shadow) |
+
+Depth on the dark theme comes **primarily from translucent white layers**, not shadow. Reserve shadows for hero moments.
+
+---
+
+## 5. RTL & Internationalization
+
+- **Hard RTL.** [`app/_layout.tsx`](src/app/_layout.tsx) calls `I18nManager.allowRTL(true)` + `forceRTL(true)` at module load. The whole layout mirrors; design and review everything right‑to‑left. (RN applies a forced‑RTL flip after the first relaunch — expected behavior.)
+- **Directional glyphs flip meaning.** "Back" points **right** (`chevron.backward` → `›`), "next" points **left** (`←` in `الذكر التالي ←`). The [Icon](src/components/icon.tsx) fallbacks already encode this.
+- **All copy is Arabic.** No i18n framework — strings are inline Arabic literals. There is no English UI surface to maintain.
+- **Numerals** are Eastern‑Arabic everywhere (§3).
+
+---
+
+## 6. Platform Idioms (Expo SDK 55)
+
+> Per [AGENTS.md](AGENTS.md): **read the exact Expo 55 docs (`https://docs.expo.dev/versions/v55.0.0/`) before writing any code.** Expo's styling story changed — these are the idioms this app standardizes on.
+
+- **Gradients → `experimental_backgroundImage`.** Backgrounds use a CSS gradient string on the `View` style, e.g.
+  ```tsx
+  experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)"
+  ```
+  with a solid `backgroundColor` fallback underneath. We do **not** wrap screens in `<LinearGradient>`. (`tokens.gradients` holds the stop arrays for reference / future use.)
+- **Shadows → `boxShadow`** string (see §4), never `shadowColor`/`elevation`.
+- **Corners → `borderRadius` + `borderCurve: "continuous"`** on every rounded surface.
+- **React Compiler is on** (`app.json` → `experiments.reactCompiler`). Don't hand‑add `useMemo`/`useCallback` for render perf unless profiling demands it; write straightforward components.
+- **Typed routes are on** — navigate with typed `router.push("/session/morning")` paths.
+
+---
+
+## 7. Iconography
+
+[`<Icon name size color />`](src/components/icon.tsx) is the single icon primitive. It renders **SF Symbols via `expo-symbols`** on iOS and a curated **Unicode fallback** on Android/web, so layouts stay readable cross‑platform. The handoff's small inline geometric icons were intentionally replaced by this system.
+
+| Purpose | SF Symbol | Fallback |
+|---------|-----------|----------|
+| Home tab | `house.fill` | ⌂ |
+| Tasbih tab | `circle.fill` | ● |
+| Achievements tab | `star.fill` | ★ |
+| Profile tab | `person.fill` | ☻ |
+| Morning | `sun.max.fill` | ☀ |
+| Evening | `moon.fill` | ☾ |
+| Streak | `flame.fill` | 🔥 |
+| Done | `checkmark` | ✓ |
+| Add | `plus` | + |
+| Back (RTL) | `chevron.backward` | › |
+| Forward | `chevron.forward` | ‹ |
+| Reminders | `bell.fill` | 🔔 |
+| Settings | `gearshape.fill` | ⚙ |
+| Edit / Delete | `pencil` / `trash` | ✎ / 🗑 |
+| Reset | `arrow.counterclockwise` | ↺ |
+| Locked | `lock.fill` | 🔒 |
+
+Keep icons **minimal and geometric**. To add one: pick the SF Symbol name and add a matching Unicode fallback entry in [icon.tsx](src/components/icon.tsx) — never import a third‑party icon set.
+
+---
+
+## 8. Motion
+
+Animation is **purposeful and gentle** — entrance reveals and reward moments, nothing decorative. Powered by `react-native-reanimated`.
+
+### Entrance
+- Screens & cards reveal with `FadeInDown` / `FadeInUp` / `FadeIn`, **300–400 ms**. The streak hero uses `FadeInDown.duration(400)`; the dhikr card `FadeInUp.duration(350)`; the counter `FadeIn.duration(300)`.
+- The dhikr card is **re‑keyed by `current.id`** so it re‑animates on every advance — each new remembrance "rises" in.
+
+### Tasbih reward sequence (the signature interaction)
+On each tap of the [TasbihCounter](src/components/tasbih-counter.tsx):
+1. **Ring fills** — `strokeDashoffset = C × (1 − count/target)`, `withTiming(…, { duration: 320 })`.
+2. **Haptic** — light impact (`Haptics.impactAsync(Light)`), iOS only.
+
+On reaching the target:
+3. **Success haptic** — `notificationAsync(Success)`.
+4. **Celebration ring** — a stroked ring scales `0.9 → 1.5` while fading `0.65 → 0` over **900 ms**.
+5. **Auto‑advance** — after `ADVANCE_DELAY = 950 ms`, advance to the next dhikr and reset the count. Taps are locked (`disabled`) while `done`.
+
+Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, track `whiteAlpha08`, progress `accent` (default `gold500`), `strokeLinecap="round"`, ring rotated `-90°` to start at top. (The prototype used a 240px circle, `r=104`; the same offset math — `circ × (1 − count/target)` — drives both.)
+
+**Timing vocabulary:** micro‑feedback ~320 ms · entrances 300–400 ms · celebration ~900 ms · advance ~950 ms. Easing is gentle (`withTiming` defaults). Don't exceed ~1 s for any single beat. The prototype also defined optional breathing/entrance keyframes (`wd-pulse`, `wd-rise`, `wd-pop`) at 0.9–2.4 s — reach for these tones only for ambient effects, not core feedback.
+
+---
+
+## 9. Component Catalog
+
+| Component | File | Notes |
+|-----------|------|-------|
+| `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, RTL, theme color. |
+| `Icon` | [icon.tsx](src/components/icon.tsx) | SF Symbols + Unicode fallback. |
+| `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. Reused for built‑in adhkar **and** custom awrad. |
+| `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
+| `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |
+| `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a custom wird. |
+
+### Card vocabulary
+A small, consistent set of surface treatments — reuse these, don't invent new ones:
+
+| Card | Fill | Border / Shadow | Used for |
+|------|------|------------------|----------|
+| **Streak hero** | `streak` gradient | `terracotta` boxShadow | The streak number — the loudest element on screen |
+| **Morning (light)** | `cream50` | `1.5px gold500` border | Morning adhkar entry on dark home |
+| **Evening (dark)** | `green700` | — | Evening adhkar entry |
+| **Brand card** | `brandCard` gradient | `darkElevated` | Featured "Today's Wird"‑style cards |
+| **Raised dark** | `whiteAlpha06` | — | Level card, awrad tiles |
+| **Dhikr card** | `whiteAlpha06` | `1px goldAlpha25` border | The sacred text in a session |
+| **Empty state** | transparent | `1px whiteAlpha14` dashed | "Add your first wird" |
+
+### Buttons
+- **Primary** — `gold500` fill, label `green800` bold, `radii.tile` (e.g. "الذكر التالي ←", `flex: 2`). Pills use `radii.pill`.
+- **Secondary / neutral** — `whiteAlpha08` fill, light label `#cfe0d6` (e.g. "تصفير", `flex: 1`).
+- **Text link** — gold label only (e.g. "+ إضافة وِرد" in `gold300`).
+- All buttons are `Pressable`, ~15px vertical padding, continuous corners.
+
+### Progress indicators
+- **Linear bar** — 8px (4px radius) track + fill; `gold500`/`sage` on `whiteAlpha14` (dark) or `borderWarm` (cream).
+- **Segmented session bars** — one 5px segment per dhikr: `sage` (done) · `gold500` (current) · `whiteAlpha14` (upcoming).
+- **Circular ring** — the tasbih counter (§8).
+- **Week dots** — 30px circles: `gold500` + `checkmark` (a day with progress) · `whiteAlpha08` + weekday letter (empty) · `2px gold300` ring marks today.
+
+### iOS‑style toggle (reminders)
+On = `gold500` track + white knob; off = muted track. Used on the reminder rows.
+
+---
+
+## 10. Screens (v1 — shipped)
+
+Routes use `expo-router`; the shell is custom (no default headers — `headerShown: false` globally, default `contentStyle` background `green800`).
+
+### Navigation shell — [TabBar](src/components/tab-bar.tsx)
+Four tabs, RTL order: **الرئيسية · التسبيح · إنجازاتي · ملفي**. Translucent fill `rgba(14,45,34,0.96)`, `1px whiteAlpha08` top hairline, safe‑area aware bottom padding. Each tab = a **6px gold dot** (active only) + icon (`gold300` active / `muted2` inactive) + 11px label (`creamText`+semibold active / `muted2` regular inactive). The active state is the gold dot — quiet, not a pill.
+
+### Onboarding — [onboarding.tsx](src/app/onboarding.tsx)
+First run only. Asks the name, nothing else; stored locally. The tabs layout redirects here while `settings.name` is empty ([(tabs)/_layout.tsx](src/app/(tabs)/_layout.tsx)).
+
+### Home — [(tabs)/index.tsx](src/app/(tabs)/index.tsx)
+`darkScreen` gradient, vertical scroll, `xl` horizontal padding, `lg` gaps. Top‑down:
+1. **Greeting** — time‑aware (`صباح الخير` / `مساء الخير`) + name (26/bold).
+2. **Streak hero** — terracotta gradient card, 52px tabular number, "أيام متتالية! 🎉" (or a start prompt at 0), longest‑streak caption. `FadeInDown`.
+3. **Week dots** — last 7 days as completion dots, today ringed.
+4. **Morning / Evening cards** — side‑by‑side; light gold‑bordered vs dark green; each shows a progress bar and "x من y" / "اكتمل ✓", taps into its session.
+5. **Level card** — raised translucent: "المستوى N · {title}" + points `inLevel/500` + gold progress bar.
+6. **أورادي (My Awrad)** — section header + "إضافة وِرد" link; either a dashed empty state or rows (tap → session, long‑press → edit).
+
+### Tasbih tab — [(tabs)/tasbih.tsx](src/app/(tabs)/tasbih.tsx)
+A **free** counter — the same ring, unbound to any list, for ad‑hoc dhikr.
+
+### Session (the core) — [session/[category].tsx](src/app/session/[category].tsx)
+`darkScreen` gradient. **Header** (back ‹ / centered title + "الذكر i من n" / spacer) → **segmented progress bars** → centered **dhikr card** (gold‑hairline, Amiri 26/lh46, optional title in `gold300` + note in `muted3`) → **TasbihCounter** → hint "اضغط الدائرة للعدّ" → **controls** ("تصفير" neutral `flex:1` + "الذكر التالي ←" / "إنهاء ✓" primary `flex:2`). Resumes from the first incomplete dhikr; partial counts persist per‑dhikr so a tap‑count survives leaving the screen. Drives the same component for built‑in categories and single‑item custom awrad.
+
+### Adhkar list — [list/[category].tsx](src/app/list/[category].tsx)
+Overview of a category: each row a status circle (sage ✓ done / gold number current / outlined upcoming) + Amiri title + repetition caption; current row emphasized (dark green gradient + ▶ glyph), completed rows dimmed (opacity ~0.7).
+
+### Achievements — [(tabs)/achievements.tsx](src/app/(tabs)/achievements.tsx)
+Streak banner + simple stat chips (v1). The full badge grid & calendar are deferred — see §11.
+
+### Profile — [(tabs)/profile.tsx](src/app/(tabs)/profile.tsx)
+Name, reminder access, awrad management, about.
+
+### Custom wird — [awrad/new.tsx](src/app/awrad/new.tsx) · [awrad/[id].tsx](src/app/awrad/[id].tsx)
+Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal wird (title + text + repeat count) via [WardForm](src/components/ward-form.tsx); it then runs through the shared session/counter.
+
+### Reminders — [settings/reminders.tsx](src/app/settings/reminders.tsx)
+Morning (default **07:00**) / evening (default **18:30**) local‑notification times with iOS‑style toggles (on = `gold500` track). Scheduled via `expo-notifications`; re‑scheduled on launch ([app/_layout.tsx](src/app/_layout.tsx)). No push/server — fully local.
+
+---
+
+## 11. Deferred Surfaces (v2 — specced, not yet built)
+
+These were fully designed in the prototype and are preserved here so they can be built without the handoff. v1 deliberately ships the core (streak + morning/evening + tasbih + awrad + reminders); the following are next.
+
+### Stats & Calendar
+- **Month switcher** — `‹ رمضان ١٤٤٧ ›`.
+- **Calendar grid** — 7 columns, weekday headers **س ح ن ث ر خ ج**. Each day cell colored by state:
+  | State | Background | Text |
+  |-------|-----------|------|
+  | Complete | `#1c4a3a` | `#fff` |
+  | Partial | `#bfd8c9` | `#2a5444` |
+  | Today | `#d8b46a` | `#16352a` |
+  | Future | `#f3eee2` | `#cdc6b5` |
+  | Empty / missed | `#ece6d8` | `#b3bcb4` |
+- **Legend** — مكتمل / جزئي / فائت.
+- **Weekly bar chart card** — "هذا الأسبوع", delta caption "+١٢٪ عن السابق", 7 bars of varying height; the highest bar is gold.
+
+### Challenges
+- Dark green screen. **Featured weekly challenge** — `gold` gradient card: "تحدي الأسبوع / لا تفوّت ذِكراً ٧ أيام", progress bar 5/7, reward "+٥٠ نقطة".
+- **Daily challenge rows** — icon + title + progress/Done state + point reward (e.g. +٢٠ / +١٥ / +٢٠). Completed row uses a `sage` check + `sage` text.
+
+### Achievements & Badges (full)
+- **Terracotta streak banner** — big `٧`, "يوماً متتالياً 🔥", "أطول سلسلة لك: ٢١ يوماً".
+- **Stat chips** (3) — إجمالي الأذكار ٤٢٠ / يوم نشِط ٣٨ / شارة ٩.
+- **Badge grid** (3‑col) — unlocked badges use gold/sage/terracotta gradient tiles; locked use muted `#ece6d8`, each with a label.
+
+### Notifications & Reminders (design intent)
+- iOS lock‑screen mock: dark slate gradient, large time `7:00`, date.
+- Two notification cards (translucent): a morning greeting and a streak‑risk warning ("لا تكسرها") — each with the app icon, title "وِرْد", timestamp, body copy.
+- Tone is gentle and motivating: e.g. «صباح النور 🌤 — لا تنسَ أذكار الصباح» / «لا تكسر سلسلتك 🔥».
+- Reminder settings: rows for أذكار الصباح ٧:٠٠ صباحاً / أذكار المساء ٦:٣٠ مساءً with the gold iOS toggle (the v1 reminders screen already implements this).
+
+---
+
+## 12. Content Model & Data Shape
+
+The app is local‑only; persistence keys (AsyncStorage / local DB) and their shapes:
+
+```ts
+settings    = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30" }
+progress    = { [date: "YYYY-MM-DD"]: { morningDone: bool, eveningDone: bool, completedIds: string[] } }
+streak      = { current: number, longest: number, lastCompletedDate: string }
+score       = { points: number, level: number }   // level bar fills every 500 pts
+customAwrad = [ { id, title, text, count, createdAt } ]
+```
+
+### Dhikr shape — the unit every view renders
+Built‑in adhkar and custom awrad normalize to the **same** shape so [TasbihCounter](src/components/tasbih-counter.tsx) and the session screen treat them identically:
+
+```ts
+Dhikr = { id, text, count, note?, title? }
+```
+
+- `count` is the repetition **target** (the ring's denominator). `note` is the virtue/benefit caption shown under the text. `title` is an optional label above it.
+- **Built‑in content** ships bundled and read‑only in [src/data/adhkar.ts](src/data/adhkar.ts): morning (١٣) and evening (١٢), sourced from *الخلاصة الحسناء*. No network is required.
+- **Deliberate count:** «أعوذ بكلمات الله التامات» (evening) is set to **1** as in the source PDF — this is intentional; do not "fix" it to the commonly‑cited 3 (see *Werd key decisions* in memory).
+
+> **Prototype sample set** (illustrative, not the shipped content — the real list lives in `adhkar.ts`). It documents the `{ text, target, virtue }` shape and a representative target pattern `1, 3, 33, 100, 10, 3`:
+>
+> | Dhikr | Target | Virtue (note) |
+> |-------|--------|---------------|
+> | اللّٰهُ لَا إِلَٰهَ إِلَّا هُوَ الحَيُّ القَيُّوم | 1 | آية الكرسي · حِفظٌ إلى الصباح |
+> | قُلْ هُوَ اللّٰهُ أَحَد | 3 | المعوّذات · حِرزٌ من كل شيء |
+> | سُبْحَانَ اللّٰهِ وَبِحَمْدِهِ | 33 | حُطَّت خطاياه وإن كانت مثل زبد البحر |
+> | أَسْتَغْفِرُ اللّٰهَ وَأَتُوبُ إِلَيْه | 100 | مفتاحُ كل خير |
+> | اللّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّد | 10 | صلّى اللهُ عليه بها عشراً |
+> | رَضِيتُ بِاللّٰهِ رَبًّا | 3 | حقٌّ على اللهِ أن يُرضيه |
+
+### Streak & scoring logic
+- **Streak** increments on a day whose wird is completed; show a warning notification as the day ends if it's still incomplete ("لا تكسرها"). Track `current` + `longest`.
+- **Evening adhkar** are conceptually gated until after ʿAsr (lock state) in the gamified design.
+- **Points/level** accrue on completion; the home level bar fills per 500 points and shows a level title.
+
+---
+
+## 13. Logo & Brand System
+
+The mark is a **rising sun (الفجر) over a hill**, with the wordmark **«وِرْد»** in Amiri 700. It says *dawn, beginning, the morning wird* — the app's whole reason for being.
+
+### Mark construction
+- **Sun:** a filled gold semicircle (`#d8b46a`) sitting on the horizon, with **5 radiating rays** (`stroke #d8b46a`, ~6–7px, rounded caps) — one vertical, two mid, two outer.
+- **Horizon:** a single cream line (`#f4ede0`, ~6px, rounded) separating sun from wordmark; or a dark hill silhouette (`#0a241b`) for the scenic variants.
+- **Wordmark:** «وِرْد» in **Amiri 700**, cream `#f4ede0`.
+- **Field:** dark‑green gradient **`linear-gradient(155deg, #1c4a3a → #0e2d22)`** (the primary, and only, treatment) — app‑icon shape uses a `~38px` rounded square; the badge variant uses a full circle.
+- **Tagline** (optional, in lockups): «أذكار الصباح والمساء».
+
+### Lockups (6 configurations)
+| # | Name | Description | Best for |
+|---|------|-------------|----------|
+| 1 | **مكدّس** (Stacked) | Sun on top, horizon line, name below. Balanced, classic. | **The app icon** — `wird-logo.png` is this dawn/hill composition |
+| 2 | **الشروق خلف الاسم** (Sunrise behind name) | Sun rises behind the name as if it were the horizon. Scenic, warm. | Splash / hero |
+| 3 | **الشمس زخرفةً فوق الاسم** (Sun as a crown) | Small sun crowning a large name; the name is the hero. | Wordmark‑forward contexts |
+| 4 | **أفقي** (Horizontal) | Mark + name side‑by‑side, with tagline. | Headers, wide screens |
+| 5 | **شارة دائرية** (Circular badge) | Elegant circular seal, double gold hairline ring, micro‑text «الصباح والمساء». | In‑app badges / streak medallions |
+| 6 | **الاسم على التل** (Name on the hill) | Full dawn scene: sun top‑right, dark hill, name centered. Most narrative. | Storytelling / marketing |
+
+> The shipped app icon corresponds to the stacked dawn‑over‑hill direction, exported as `assets/images/wird-logo.png`. All variants are presented on the dark green field (the primary treatment); for small sizes, drop the tagline and lean on the stacked or circular‑badge forms.
+
+---
+
+## 14. App Identity
+
+From [`app.json`](app.json) and `assets/`:
+- **Icon** — `wird-logo.png` (the dawn/hill mark above).
+- **Adaptive icon (Android)** — foreground = logo on `green900` `#0e2d22` background; a monochrome variant is supplied.
+- **Splash** — logo centered on `green900`, `imageWidth 140` (120 on Android).
+- **Notification accent** — `gold500` `#d8b46a`.
+- **Status bar** — `light` (the app is dark‑themed throughout).
+- **Bundle id** — `com.hamodadev.werd` (Android); scheme `werd`.
+
+---
+
+## 15. Accessibility & Quality Notes
+
+- **Contrast** — `creamText` on the green night and `green800` on gold buttons both clear AA for body text. Keep captions at `muted3` or lighter only for non‑essential text.
+- **Tap targets** — interactive rows/buttons run full‑width or use `hitSlop` (10–12) for small controls; the counter is a 248px target.
+- **Haptics are additive** — every important state change pairs visual + haptic (iOS), but the UI is fully legible and functional without them (Android).
+- **Selectable scripture** — dhikr text is `selectable` so users can copy it.
+- **Reduced motion** — animations are short and non‑essential; the app is fully usable if they're skipped. Honor the OS reduce‑motion setting if you extend motion.
+
+---
+
+## 16. Working With This System
+
+**Source of truth:** [`src/theme/tokens.ts`](src/theme/tokens.ts). Change a value there, not in a component.
+
+**Adding UI — the checklist:**
+1. Text → `<Txt>` (never raw `<Text>`). Numbers → `toArabicNumerals()`. Icons → `<Icon>`.
+2. Colors / spacing / radii / shadows → `tokens.*`. No new hex without a token.
+3. Rounded surface → set `borderCurve: "continuous"`.
+4. Background gradient → `experimental_backgroundImage` + solid fallback. Shadow → `boxShadow` string.
+5. Reuse a card from §9 and a button from §9 before inventing a new one.
+6. Design and test **RTL on both platforms**; verify glyph direction for any new directional icon, and confirm the Unicode fallback for any new SF Symbol.
+7. Read the **Expo 55** docs before adopting any new native/styling API ([AGENTS.md](AGENTS.md)).
+
+*This document is the complete record of the Wird design system — the original `design_handoff_werd_app/` prototypes have been fully absorbed here. Keep it in sync with [`src/theme/tokens.ts`](src/theme/tokens.ts) and the planning record in [DESIGN_PLAN.md](DESIGN_PLAN.md).*

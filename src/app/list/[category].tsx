@@ -43,7 +43,7 @@ export default function ListScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* الترويسة */}
+        {/* Header */}
         <View
           style={{
             flexDirection: "row",
@@ -113,7 +113,7 @@ export default function ListScreen() {
         })}
       </ScrollView>
 
-      {/* زر بدء المسبحة */}
+      {/* Start tasbih button */}
       <View style={{ position: "absolute", left: 0, right: 0, bottom: insets.bottom + spacing.md, paddingHorizontal: spacing.xl }}>
         <Pressable
           onPress={() => router.push(`/session/${cat.id}`)}

@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { I18nManager } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
@@ -16,13 +15,13 @@ import { colors } from "@/theme/tokens";
 import { storage, StorageKeys } from "@/utils/storage";
 import { scheduleReminders } from "@/utils/notifications";
 import { DEFAULT_SETTINGS } from "@/store/store";
+import { APP_LANGUAGE, applyLayoutDirection } from "@/i18n/direction";
 import type { Settings } from "@/types";
 
-// فرض RTL — التطبيق عربي بالكامل. (يُطبَّق التخطيط بعد أول إعادة تشغيل، وهو سلوك RN المعتاد.)
-if (!I18nManager.isRTL) {
-  I18nManager.allowRTL(true);
-  I18nManager.forceRTL(true);
-}
+// Layout direction is derived from the language (Arabic → RTL for now). It takes
+// effect after the first restart, which is the usual RN behavior. To add English
+// later: change the language here, then restart.
+applyLayoutDirection(APP_LANGUAGE);
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,7 +38,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (!loaded) return;
     SplashScreen.hideAsync();
-    // إعادة جدولة التذكيرات عند الإقلاع لضمان بقائها مضبوطة.
+    // Reschedule reminders on launch to make sure they stay set.
     const s = storage.get<Settings>(StorageKeys.settings, DEFAULT_SETTINGS);
     if (s.remindersEnabled) {
       scheduleReminders(s.morningTime, s.eveningTime).catch(() => {});
@@ -70,6 +69,8 @@ export default function RootLayout() {
           options={{ presentation: "modal" }}
         />
         <Stack.Screen name="settings/reminders" />
+        <Stack.Screen name="challenges" />
+        <Stack.Screen name="stats" />
       </Stack>
     </GestureHandlerRootView>
   );

@@ -2,8 +2,21 @@ import { useCallback } from "react";
 import { useStorage } from "@/hooks/use-storage";
 import { storage, StorageKeys } from "@/utils/storage";
 import { todayKey, previousDayKey } from "@/store/dates";
+import { deriveBadges } from "@/store/badges";
+import {
+  DEFAULT_CHALLENGES,
+  WEEKLY_TARGET,
+  claimDaily,
+  claimWeekly,
+  dailyDone,
+  rolloverIfNeeded,
+  weeklyProgress,
+} from "@/store/challenges";
+import { DAILY_CHALLENGES, WEEKLY_CHALLENGE } from "@/data/challenges";
 import type {
+  BadgeId,
   CategoryId,
+  ChallengeState,
   CustomWard,
   DayProgress,
   ProgressMap,
@@ -12,12 +25,12 @@ import type {
   Streak,
 } from "@/types";
 
-// قيم النقاط والمستويات
+// Points and level constants
 export const POINTS_PER_CATEGORY = 50;
 export const POINTS_PER_WARD = 20;
 export const POINTS_PER_LEVEL = 500;
 
-// قيم افتراضية ثابتة المرجع (مهم لـ useSyncExternalStore)
+// Reference-stable default values (important for useSyncExternalStore)
 export const DEFAULT_SETTINGS: Settings = {
   name: "",
   remindersEnabled: false,
@@ -26,7 +39,7 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 const DEFAULT_PROGRESS: ProgressMap = {};
 const DEFAULT_STREAK: Streak = { current: 0, longest: 0, lastCompletedDate: null };
-const DEFAULT_SCORE: Score = { points: 0, level: 1 };
+const DEFAULT_SCORE: Score = { points: 0 };
 const DEFAULT_AWRAD: CustomWard[] = [];
 const EMPTY_DAY: DayProgress = {
   morningDone: false,
@@ -34,7 +47,7 @@ const EMPTY_DAY: DayProgress = {
   completedIds: [],
 };
 
-// ————— حسابات مشتقّة —————
+// ————— Derived computations —————
 
 export function levelInfo(score: Score) {
   const level = Math.floor(score.points / POINTS_PER_LEVEL) + 1;
@@ -52,7 +65,7 @@ export function levelTitle(level: number): string {
   return titles[Math.min(level - 1, titles.length - 1)] ?? "ذاكِر";
 }
 
-// ————— أفعال تُعدّل أكثر من مفتاح (تُخطر المشتركين تلقائياً) —————
+// ————— Actions that mutate more than one key (subscribers are notified automatically) —————
 
 function getDay(progress: ProgressMap, key: string): DayProgress {
   return progress[key] ?? EMPTY_DAY;
@@ -69,14 +82,14 @@ function applyStreakOnComplete(streak: Streak, today: string): Streak {
   };
 }
 
-/** معرّفات الأذكار المكتملة اليوم (لاستئناف الجلسة من حيث توقّف المستخدم). */
+/** IDs of adhkar completed today (to resume the session where the user left off). */
 export function getTodayCompletedIds(): string[] {
   const progress = storage.get<ProgressMap>(StorageKeys.progress, DEFAULT_PROGRESS);
   return progress[todayKey()]?.completedIds ?? [];
 }
 
-// العدّ الجزئي للذكر الحالي — مفتاح منفصل لا تشترك فيه الرئيسية (تفادي إعادة
-// التصيير مع كل ضغطة). يُربط بتاريخ اليوم فيُهمَل تلقائياً في يوم جديد.
+// Partial count for the current dhikr — a separate key that the main screen does not
+// subscribe to (avoids re-rendering on every tap). Tied to today's date so it's auto-discarded on a new day.
 interface PartialState {
   date: string;
   counts: Record<string, number>;
@@ -97,7 +110,7 @@ export function setPartialCount(dhikrId: string, count: number): void {
   storage.set(StorageKeys.partialCounts, { date: today, counts });
 }
 
-/** تعليم ذكر واحد كمكتمل في يوم اليوم (لتتبّع التقدّم الجزئي). */
+/** Mark a single dhikr as completed for today (to track partial progress). */
 export function markDhikrCompleted(dhikrId: string): void {
   const today = todayKey();
   const progress = storage.get<ProgressMap>(StorageKeys.progress, DEFAULT_PROGRESS);
@@ -109,7 +122,7 @@ export function markDhikrCompleted(dhikrId: string): void {
   });
 }
 
-/** إكمال تصنيف (صباح/مساء): يضبط العلَم، ويمنح نقاطاً ويحدّث السلسلة أول مرة فقط في اليوم. */
+/** Complete a category (morning/evening): sets the flag, awards points, and updates the streak only the first time that day. */
 export function completeCategory(categoryId: CategoryId): void {
   const today = todayKey();
   const progress = storage.get<ProgressMap>(StorageKeys.progress, DEFAULT_PROGRESS);
@@ -128,27 +141,72 @@ export function completeCategory(categoryId: CategoryId): void {
   if (already) return;
 
   const score = storage.get<Score>(StorageKeys.score, DEFAULT_SCORE);
-  const points = score.points + POINTS_PER_CATEGORY;
-  storage.set(StorageKeys.score, {
-    points,
-    level: Math.floor(points / POINTS_PER_LEVEL) + 1,
-  });
+  storage.set(StorageKeys.score, { points: score.points + POINTS_PER_CATEGORY });
 
   const streak = storage.get<Streak>(StorageKeys.streak, DEFAULT_STREAK);
   storage.set(StorageKeys.streak, applyStreakOnComplete(streak, today));
+
+  // Grant challenge rewards at completion time (not only when opening the challenges screen)
+  // so a completed-week reward isn't lost if the week rolls over before the screen is visited.
+  syncChallengeClaims();
 }
 
-/** إكمال وِرد خاص: يمنح نقاطاً (دون التأثير على سلسلة الصباح/المساء). */
+/**
+ * Complete a custom ward: awards points (without affecting the morning/evening streak), and marks
+ * wardDone for today once (a signal for the "complete a ward" challenge).
+ */
 export function completeWard(): void {
+  const today = todayKey();
+  const progress = storage.get<ProgressMap>(StorageKeys.progress, DEFAULT_PROGRESS);
+  const day = getDay(progress, today);
+  if (!day.wardDone) {
+    storage.set(StorageKeys.progress, {
+      ...progress,
+      [today]: { ...day, wardDone: true },
+    });
+  }
+
   const score = storage.get<Score>(StorageKeys.score, DEFAULT_SCORE);
-  const points = score.points + POINTS_PER_WARD;
-  storage.set(StorageKeys.score, {
-    points,
-    level: Math.floor(points / POINTS_PER_LEVEL) + 1,
-  });
+  storage.set(StorageKeys.score, { points: score.points + POINTS_PER_WARD });
+
+  syncChallengeClaims(); // grant the ward challenge reward at completion time
 }
 
-// ————— Hooks تفاعلية —————
+/**
+ * Automatically claim rewards for completed challenges (idempotent). Called from the
+ * challenges screen inside useEffect (not during render). Resets the week window when needed.
+ */
+export function syncChallengeClaims(): void {
+  const today = todayKey();
+  const progress = storage.get<ProgressMap>(StorageKeys.progress, DEFAULT_PROGRESS);
+  const day = progress[today] ?? EMPTY_DAY;
+
+  const original = storage.get<ChallengeState>(StorageKeys.challenges, DEFAULT_CHALLENGES);
+  let state = rolloverIfNeeded(original, today);
+  let granted = 0;
+
+  for (const def of DAILY_CHALLENGES) {
+    if (dailyDone(def.id, day)) {
+      const r = claimDaily(state, def.id, today, def.reward);
+      state = r.next;
+      granted += r.granted;
+    }
+  }
+
+  if (state.weekStart && weeklyProgress(progress, state.weekStart) >= WEEKLY_TARGET) {
+    const r = claimWeekly(state, WEEKLY_CHALLENGE.reward);
+    state = r.next;
+    granted += r.granted;
+  }
+
+  if (state !== original) storage.set(StorageKeys.challenges, state);
+  if (granted > 0) {
+    const score = storage.get<Score>(StorageKeys.score, DEFAULT_SCORE);
+    storage.set(StorageKeys.score, { points: score.points + granted });
+  }
+}
+
+// ————— Reactive hooks —————
 
 export function useSettings() {
   const [settings, setSettings] = useStorage<Settings>(
@@ -180,6 +238,19 @@ export function useStreak(): Streak {
 export function useScore(): Score {
   const [score] = useStorage<Score>(StorageKeys.score, DEFAULT_SCORE);
   return score;
+}
+
+/** Unlocked badges — derived at read time from progress/streak/level (not stored). */
+export function useBadges(): Set<BadgeId> {
+  const progress = useProgressMap();
+  const streak = useStreak();
+  const score = useScore();
+  return deriveBadges(progress, streak.longest, levelInfo(score).level);
+}
+
+export function useChallenges(): ChallengeState {
+  const [state] = useStorage<ChallengeState>(StorageKeys.challenges, DEFAULT_CHALLENGES);
+  return state;
 }
 
 export function useCustomAwrad() {

@@ -39,7 +39,7 @@ export default function SessionScreen() {
   const title = builtin ? builtin.title : (ward?.title ?? "وِرد");
   const isBuiltin = !!builtin;
 
-  // نستأنف من أول ذكر لم يكتمل بعد اليوم (للأذكار المدمجة). يُحسب مرة عند الفتح فقط.
+  // Resume from the first dhikr not yet completed today (for built-in adhkar). Computed once on open.
   const [index, setIndex] = useState(() => {
     if (!builtin) return 0;
     const completed = getTodayCompletedIds();
@@ -63,7 +63,7 @@ export default function SessionScreen() {
   function finish() {
     if (isBuiltin && builtin) {
       completeCategory(builtin.id);
-      // تنظيف العدّ الجزئي حتى تبدأ الإعادة لاحقاً من الصفر.
+      // Clear the partial counts so a later repeat starts from zero.
       builtin.adhkar.forEach((d) => setPartialCount(d.id, 0));
     } else {
       completeWard();
@@ -89,7 +89,7 @@ export default function SessionScreen() {
         paddingBottom: insets.bottom + spacing.lg,
       }}
     >
-      {/* الترويسة */}
+      {/* Header */}
       <View
         style={{
           flexDirection: "row",
@@ -114,7 +114,7 @@ export default function SessionScreen() {
         <View style={{ width: 38, height: 38 }} />
       </View>
 
-      {/* أشرطة التقدّم */}
+      {/* Progress bars */}
       <View
         style={{ flexDirection: "row", gap: 5, paddingHorizontal: spacing.xl, marginTop: spacing.md }}
       >
@@ -143,7 +143,7 @@ export default function SessionScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* بطاقة الذكر */}
+        {/* Dhikr card */}
         <Animated.View
           key={current.id}
           entering={FadeInUp.duration(350)}
@@ -175,7 +175,7 @@ export default function SessionScreen() {
           ) : null}
         </Animated.View>
 
-        {/* العدّاد */}
+        {/* Counter */}
         <Animated.View entering={FadeIn.duration(300)}>
           <TasbihCounter
             itemKey={current.id}
@@ -192,7 +192,7 @@ export default function SessionScreen() {
         </Txt>
       </ScrollView>
 
-      {/* أزرار التحكم */}
+      {/* Control buttons */}
       <View
         style={{ flexDirection: "row", gap: spacing.md, paddingHorizontal: spacing.xl, marginTop: spacing.sm }}
       >
