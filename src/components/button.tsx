@@ -14,6 +14,8 @@ interface Props {
   icon?: string;
   haptic?: boolean;
   disabled?: boolean;
+  /** Extra tap area. Defaults to 10 for the padding-less `link` variant. */
+  hitSlop?: number;
   style?: ViewStyle;
 }
 
@@ -43,7 +45,7 @@ const TEXT_COLOR: Record<ButtonVariant, string> = {
 };
 
 /** Unified button. Variants match the app's existing CTAs; text always renders through Txt. */
-export function Button({ children, onPress, variant = "primary", icon, haptic = true, disabled = false, style }: Props) {
+export function Button({ children, onPress, variant = "primary", icon, haptic = true, disabled = false, hitSlop, style }: Props) {
   function handlePress() {
     if (disabled) return;
     if (haptic && process.env.EXPO_OS === "ios") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -51,10 +53,13 @@ export function Button({ children, onPress, variant = "primary", icon, haptic = 
   }
 
   const color = TEXT_COLOR[variant];
+  // `link` has no padding to absorb taps, so give it the same tap area the inline links had.
+  const resolvedHitSlop = hitSlop ?? (variant === "link" ? 10 : undefined);
 
   return (
     <Pressable
       accessibilityRole="button"
+      hitSlop={resolvedHitSlop}
       onPress={handlePress}
       disabled={disabled}
       style={({ pressed }) => [
