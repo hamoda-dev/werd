@@ -1,7 +1,7 @@
 # وِرْد v2 — Achievements/Badges, Challenges, Stats & Calendar
 
 Implementation plan for the deferred v2 surfaces from [DESIGN.md](DESIGN.md) §11.
-Status: **reviewed (plan-eng-review)** · Branch: `design-review-fixes` · Created: 2026-06-14
+Status: **✅ IMPLEMENTED & REVIEWED** — all features built, plan-eng-review findings fixed, 46 unit tests + tsc + lint green · Branch: `design-review-fixes` · Created: 2026-06-14
 
 > Grounded against real code. The points/level/streak engine and the `achievements.tsx`
 > shell already exist — this increment builds **on top** of that engine, deriving from the
@@ -259,27 +259,27 @@ Integration (RNTL, lower priority): seed `storage`, render the 3 screens, assert
 
 Synthesized from this review. P1 blocks ship; P2 same-branch; P3 follow-up.
 
-- [ ] **T1 (P1, human ~3h / CC ~20min)** — components — Refactor-first: extract `ProgressBar`, `StatChip`, `Card`, **`StreakHero`, `LevelCard`** (D10) to `src/components/`; switch `index.tsx` + `achievements.tsx` to them. No behavior change.
+- [x] **T1 (P1, human ~3h / CC ~20min)** — components — Refactor-first: extract `ProgressBar`, `StatChip`, `Card`, **`StreakHero`, `LevelCard`** (D10) to `src/components/`; switch `index.tsx` + `achievements.tsx` to them. No behavior change.
   - Surfaced by: Code Quality D10 — "never structural + behavioral changes simultaneously"; de-dup streak-hero/level-card
   - Files: `src/components/{progress-bar,stat-chip,card,streak-hero,level-card}.tsx`, `src/app/(tabs)/{index,achievements}.tsx`
   - Verify: Home + Achievements visually identical (manual) + RNTL smoke — larger regression surface now
-- [ ] **T2 (P1, human ~1h / CC ~10min)** — tooling — Set up `jest-expo` + `npm test`.
+- [x] **T2 (P1, human ~1h / CC ~10min)** — tooling — Set up `jest-expo` + `npm test`.
   - Surfaced by: Test Review — repo has no test runner
   - Files: `package.json`, `jest.config.js`, `jest.setup.ts`
   - Verify: `npm test` runs an example pass
-- [ ] **T3 (P1, human ~1.5h / CC ~12min)** — data-model — Add `wardDone?` to `DayProgress` (D5); `ChallengeState` type + `StorageKeys.challenges` + `DEFAULT_CHALLENGES`; 7 calendar/locked tokens in `tokens.ts`; `completeWard` sets `wardDone`. **Drop `Score.level` (D9):** remove the field, derive via `levelInfo()`, stop writing it in `completeCategory`/`completeWard`.
+- [x] **T3 (P1, human ~1.5h / CC ~12min)** — data-model — Add `wardDone?` to `DayProgress` (D5); `ChallengeState` type + `StorageKeys.challenges` + `DEFAULT_CHALLENGES`; 7 calendar/locked tokens in `tokens.ts`; `completeWard` sets `wardDone`. **Drop `Score.level` (D9):** remove the field, derive via `levelInfo()`, stop writing it in `completeCategory`/`completeWard`.
   - Surfaced by: Architecture D5 (sentinel corrupts `totalAdhkar`) + Code Quality D9 (level double-source)
   - Files: `src/types.ts`, `src/utils/storage.ts`, `src/store/store.ts`, `src/theme/tokens.ts`, `src/app/(tabs)/{index,achievements}.tsx` (level reads)
   - Verify: unit test `completeWard` sets `wardDone` + leaves `completedIds` untouched; `level` consistent after points change
-- [ ] **T4 (P2, human ~3h / CC ~20min)** — badges — `data/badges.ts` catalog, pure `store/badges.ts` `evaluateBadges`/`aggregateStats`, `useBadges()` derive-on-read (D6), `badge-tile.tsx`, achievements grid + chip swap.
+- [x] **T4 (P2, human ~3h / CC ~20min)** — badges — `data/badges.ts` catalog, pure `store/badges.ts` `evaluateBadges`/`aggregateStats`, `useBadges()` derive-on-read (D6), `badge-tile.tsx`, achievements grid + chip swap.
   - Surfaced by: Feature 1 + D6
   - Files: `src/data/badges.ts`, `src/store/badges.ts`, `src/components/badge-tile.tsx`, `src/app/(tabs)/achievements.tsx`
   - Verify: unit tests for all thresholds; grid renders locked/unlocked
-- [ ] **T5 (P2, human ~4.5h / CC ~28min)** — challenges — `data/challenges.ts`, `store/challenges.ts` (derive + Sat-aligned weekly + auto-claim helpers), `app/challenges.tsx`, achievements nav link, **Home "تحدي اليوم" card (D11)** in `index.tsx`. Auto-claim in `useEffect`, idempotent.
+- [x] **T5 (P2, human ~4.5h / CC ~28min)** — challenges — `data/challenges.ts`, `store/challenges.ts` (derive + Sat-aligned weekly + auto-claim helpers), `app/challenges.tsx`, achievements nav link, **Home "تحدي اليوم" card (D11)** in `index.tsx`. Auto-claim in `useEffect`, idempotent.
   - Surfaced by: Feature 2 + D4 + D8 + D11
   - Files: `src/data/challenges.ts`, `src/store/challenges.ts`, `src/app/challenges.tsx`, `src/app/(tabs)/achievements.tsx`, `src/app/(tabs)/index.tsx`
   - Verify: unit `dailyDone`/`weeklyProgress`/claim-idempotency; integration claim-twice→+once; Home card hidden when all daily done
-- [ ] **T6 (P2, human ~4h / CC ~25min)** — stats — `dates.ts` helpers (`monthDayKeys`, `firstWeekdayOfMonth`, `startOfWeekKey`, `thisWeekKeys`), `store/calendar.ts` (`dayState`/`weeklyBars`/`weekDelta`), Hijri label util (lib + try/catch fallback), `app/stats.tsx`, achievements nav link.
+- [x] **T6 (P2, human ~4h / CC ~25min)** — stats — `dates.ts` helpers (`monthDayKeys`, `firstWeekdayOfMonth`, `startOfWeekKey`, `thisWeekKeys`), `store/calendar.ts` (`dayState`/`weeklyBars`/`weekDelta`), Hijri label util (lib + try/catch fallback), `app/stats.tsx`, achievements nav link.
   - Surfaced by: Feature 3 + D3/D7/D8
   - Files: `src/store/dates.ts`, `src/store/calendar.ts`, `src/app/stats.tsx`, `src/theme/tokens.ts`, `package.json` (Hijri dep)
   - Verify: unit tests for cell states, week helpers, Hijri fallback; device check of the Hijri label
