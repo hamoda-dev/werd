@@ -16,6 +16,7 @@ interface Props {
 export function ListRow({ children, onPress, onLongPress, accessory, style }: Props) {
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
       onLongPress={onLongPress}
       style={({ pressed }) => [

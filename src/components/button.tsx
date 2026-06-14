@@ -5,19 +5,19 @@ import { gradients, radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 
-type Variant = "primary" | "ghost" | "link";
+export type ButtonVariant = "primary" | "ghost" | "link";
 
 interface Props {
   children: ReactNode;
   onPress: () => void;
-  variant?: Variant;
+  variant?: ButtonVariant;
   icon?: string;
   haptic?: boolean;
   disabled?: boolean;
   style?: ViewStyle;
 }
 
-const FILL: Record<Variant, ViewStyle> = {
+const FILL: Record<ButtonVariant, ViewStyle> = {
   primary: {
     experimental_backgroundImage: gradients.gold,
     backgroundColor: semantic.accent,
@@ -36,7 +36,7 @@ const FILL: Record<Variant, ViewStyle> = {
   link: {},
 };
 
-const TEXT_COLOR: Record<Variant, string> = {
+const TEXT_COLOR: Record<ButtonVariant, string> = {
   primary: semantic.textOnCream,
   ghost: semantic.textGhost,
   link: semantic.accentLight,
@@ -46,7 +46,7 @@ const TEXT_COLOR: Record<Variant, string> = {
 export function Button({ children, onPress, variant = "primary", icon, haptic = true, disabled = false, style }: Props) {
   function handlePress() {
     if (disabled) return;
-    if (haptic) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (haptic && process.env.EXPO_OS === "ios") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress();
   }
 
@@ -54,6 +54,7 @@ export function Button({ children, onPress, variant = "primary", icon, haptic = 
 
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={handlePress}
       disabled={disabled}
       style={({ pressed }) => [

@@ -36,7 +36,9 @@ export function Screen({ children, gradient = "darkScreen", scroll = true, conte
           {children}
         </ScrollView>
       ) : (
-        <View style={[{ flex: 1 }, content, contentStyle]}>{children}</View>
+        <View style={[{ flex: 1 }, content, { paddingBottom: insets.bottom + spacing.xxl }, contentStyle]}>
+          {children}
+        </View>
       )}
     </View>
   );
