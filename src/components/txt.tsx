@@ -1,7 +1,8 @@
 import { Text, type TextProps, type TextStyle } from "react-native";
-import { colors, fonts } from "@/theme/tokens";
+import { colors, fonts, text as textScale } from "@/theme/tokens";
 
 type Weight = "regular" | "medium" | "semibold" | "bold";
+type Variant = keyof typeof textScale;
 
 const SANS: Record<Weight, string> = {
   regular: fonts.sans,
@@ -11,6 +12,8 @@ const SANS: Record<Weight, string> = {
 };
 
 interface Props extends TextProps {
+  /** Type-scale preset (size + weight + lineHeight). Explicit size/weight still override. */
+  variant?: Variant;
   weight?: Weight;
   /** Use the Amiri font (for adhkar/Quran). */
   naskh?: boolean;
@@ -21,19 +24,24 @@ interface Props extends TextProps {
 
 /** Unified text: proper Arabic font + alignment that follows layout direction + light default color (dark theme). */
 export function Txt({
-  weight = "regular",
+  variant,
+  weight,
   naskh = false,
-  size = 15,
+  size,
   color = colors.creamText,
   align = "auto",
   style,
   ...rest
 }: Props) {
+  const preset = variant ? textScale[variant] : undefined;
+  const resolvedWeight: Weight = weight ?? preset?.weight ?? "regular";
+  const resolvedSize = size ?? preset?.size ?? 15;
+
   const fontFamily = naskh
-    ? weight === "bold"
+    ? resolvedWeight === "bold"
       ? fonts.naskhBold
       : fonts.naskh
-    : SANS[weight];
+    : SANS[resolvedWeight];
 
   return (
     <Text
@@ -41,9 +49,10 @@ export function Txt({
       style={[
         {
           fontFamily,
-          fontSize: size,
+          fontSize: resolvedSize,
           color,
           textAlign: align,
+          ...(preset ? { lineHeight: preset.lineHeight } : null),
         },
         style,
       ]}

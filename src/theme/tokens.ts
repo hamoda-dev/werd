@@ -88,3 +88,14 @@ export const badgeGradientCss: Record<"gold" | "sage" | "terracotta", string> = 
   sage: "linear-gradient(150deg, #3f8268, #2c5e4a)",
   terracotta: "linear-gradient(150deg, #c8784e, #a85733)",
 };
+
+/** Type scale — size + weight + lineHeight only. Color stays a separate, contextual prop. */
+export const text = {
+  title:      { size: 26, weight: "bold",    lineHeight: 34 },
+  heading:    { size: 18, weight: "bold",    lineHeight: 26 },
+  subheading: { size: 16, weight: "bold",    lineHeight: 24 },
+  body:       { size: 15, weight: "regular", lineHeight: 24 },
+  label:      { size: 14, weight: "medium",  lineHeight: 20 },
+  caption:    { size: 12, weight: "regular", lineHeight: 18 },
+  micro:      { size: 11, weight: "regular", lineHeight: 14 },
+} as const;
