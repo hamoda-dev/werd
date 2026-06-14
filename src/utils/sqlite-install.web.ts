@@ -1,3 +1,3 @@
-// الويب: المتصفّح يوفّر localStorage أصلاً، فلا حاجة لـ polyfill expo-sqlite
-// (وبالتالي نتجنّب wa-sqlite.wasm وترويسات COEP/COOP). هذا الملف فارغ عمداً.
+// Web: the browser already provides localStorage, so no expo-sqlite polyfill is needed
+// (which also lets us avoid wa-sqlite.wasm and the COEP/COOP headers). This file is intentionally empty.
 export {};

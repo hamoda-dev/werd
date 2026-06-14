@@ -1,45 +1,49 @@
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, radii, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
+import { Icon } from "@/components/icon";
+import { StatChip } from "@/components/stat-chip";
+import { StreakHero } from "@/components/streak-hero";
+import { LevelCard } from "@/components/level-card";
+import { BadgeTile } from "@/components/badge-tile";
 import { toArabicNumerals } from "@/utils/numerals";
-import {
-  levelInfo,
-  levelTitle,
-  useProgressMap,
-  useScore,
-  useStreak,
-} from "@/store/store";
+import { aggregateStats } from "@/store/badges";
+import { BADGES } from "@/data/badges";
+import { useBadges, useProgressMap, useScore, useStreak } from "@/store/store";
 
-function StatChip({ value, label }: { value: string; label: string }) {
+function NavRow({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
   return (
-    <View
+    <Pressable
+      onPress={onPress}
       style={{
-        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         backgroundColor: colors.whiteAlpha06,
         borderRadius: radii.tile,
         borderCurve: "continuous",
-        paddingVertical: spacing.lg,
-        alignItems: "center",
-        gap: 4,
+        padding: spacing.lg,
       }}
     >
-      <Txt size={24} weight="bold" color={colors.gold300}>{value}</Txt>
-      <Txt size={11} color={colors.muted3} align="center">{label}</Txt>
-    </View>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+        <Icon name={icon} size={20} color={colors.gold300} />
+        <Txt size={15} weight="semibold" color={colors.creamText}>{label}</Txt>
+      </View>
+      <Icon name="chevron.forward" size={18} color={colors.muted2} />
+    </Pressable>
   );
 }
 
 export default function Achievements() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const streak = useStreak();
   const score = useScore();
   const progress = useProgressMap();
-  const lvl = levelInfo(score);
-
-  const days = Object.values(progress);
-  const activeDays = days.filter((d) => d.morningDone || d.eveningDone).length;
-  const totalAdhkar = days.reduce((s, d) => s + d.completedIds.length, 0);
+  const badges = useBadges();
+  const { activeDays, totalAdhkar } = aggregateStats(progress);
 
   return (
     <View
@@ -60,55 +64,31 @@ export default function Achievements() {
       >
         <Txt size={22} weight="bold">إنجازاتي</Txt>
 
-        {/* بطل السلسلة */}
-        <View
-          style={{
-            backgroundColor: colors.terracotta500,
-            experimental_backgroundImage: "linear-gradient(150deg, #c8784e, #a85733)",
-            borderRadius: radii.cardLg,
-            borderCurve: "continuous",
-            padding: spacing.xl,
-            alignItems: "center",
-            gap: 4,
-            boxShadow: "0 16px 32px -16px rgba(168,87,51,0.6)",
-          }}
-        >
-          <Txt size={72} weight="bold" color="#fff" style={{ fontVariant: ["tabular-nums"] }}>
-            {toArabicNumerals(streak.current)}
-          </Txt>
-          <Txt size={16} weight="semibold" color="#fff">يوماً متتالياً 🔥</Txt>
-          <Txt size={12} color="rgba(255,255,255,0.85)">
-            أطول سلسلة: {toArabicNumerals(streak.longest)} يوماً
-          </Txt>
-        </View>
+        <StreakHero
+          current={streak.current}
+          size={72}
+          subtitle="يوماً متتالياً 🔥"
+          longestText={`أطول سلسلة: ${toArabicNumerals(streak.longest)} يوماً`}
+        />
 
-        {/* إحصائيات */}
         <View style={{ flexDirection: "row", gap: spacing.md }}>
-          <StatChip value={toArabicNumerals(totalAdhkar)} label="مجموع الأذكار" />
-          <StatChip value={toArabicNumerals(activeDays)} label="أيام نشطة" />
-          <StatChip value={toArabicNumerals(score.points)} label="النقاط" />
+          <StatChip value={toArabicNumerals(totalAdhkar)} label="إجمالي الأذكار" />
+          <StatChip value={toArabicNumerals(activeDays)} label="يوم نشِط" />
+          <StatChip value={toArabicNumerals(badges.size)} label="شارة" />
         </View>
 
-        {/* المستوى */}
-        <View
-          style={{
-            backgroundColor: colors.whiteAlpha06,
-            borderRadius: radii.card,
-            borderCurve: "continuous",
-            padding: spacing.lg,
-            gap: spacing.sm,
-          }}
-        >
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-            <Txt size={16} weight="bold">المستوى {toArabicNumerals(lvl.level)}</Txt>
-            <Txt size={13} weight="semibold" color={colors.gold300}>{levelTitle(lvl.level)}</Txt>
-          </View>
-          <View style={{ height: 10, borderRadius: 5, backgroundColor: colors.whiteAlpha14, overflow: "hidden" }}>
-            <View style={{ height: 10, width: `${lvl.ratio * 100}%`, backgroundColor: colors.gold500, borderRadius: 5 }} />
-          </View>
-          <Txt size={12} color={colors.muted3}>
-            باقٍ {toArabicNumerals(lvl.toNext)} نقطة للمستوى التالي
-          </Txt>
+        <LevelCard score={score} showToNext />
+
+        <View style={{ gap: spacing.sm }}>
+          <NavRow icon="flame.fill" label="التحديات" onPress={() => router.push("/challenges")} />
+          <NavRow icon="checkmark.seal.fill" label="الإحصائيات والتقويم" onPress={() => router.push("/stats")} />
+        </View>
+
+        <Txt size={18} weight="bold" style={{ marginTop: spacing.xs }}>الشارات</Txt>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+          {BADGES.map((def) => (
+            <BadgeTile key={def.id} def={def} unlocked={badges.has(def.id)} />
+          ))}
         </View>
       </ScrollView>
     </View>

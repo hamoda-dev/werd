@@ -12,20 +12,20 @@ const SANS: Record<Weight, string> = {
 
 interface Props extends TextProps {
   weight?: Weight;
-  /** استخدم خط Amiri (للأذكار/القرآن). */
+  /** Use the Amiri font (for adhkar/Quran). */
   naskh?: boolean;
   size?: number;
   color?: string;
   align?: TextStyle["textAlign"];
 }
 
-/** نص موحّد: خط عربي صحيح + اتجاه RTL + لون فاتح افتراضي (الثيم الداكن). */
+/** Unified text: proper Arabic font + alignment that follows layout direction + light default color (dark theme). */
 export function Txt({
   weight = "regular",
   naskh = false,
   size = 15,
   color = colors.creamText,
-  align = "right",
+  align = "auto",
   style,
   ...rest
 }: Props) {
@@ -44,7 +44,6 @@ export function Txt({
           fontSize: size,
           color,
           textAlign: align,
-          writingDirection: "rtl",
         },
         style,
       ]}

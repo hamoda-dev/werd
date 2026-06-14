@@ -1,9 +1,9 @@
 /**
- * تنبيهات محلية مجدولة (بلا سيرفر/push). تذكير يومي للصباح والمساء.
+ * Scheduled local notifications (no server/push). A daily reminder for morning and evening.
  */
 import * as Notifications from "expo-notifications";
 
-// إظهار التنبيه حتى لو كان التطبيق مفتوحاً.
+// Show the notification even if the app is open.
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
@@ -29,7 +29,7 @@ async function ensureAndroidChannel(): Promise<void> {
   }
 }
 
-/** يطلب الإذن إن لزم، ثم يجدول التذكيرين. يعيد true إن مُنح الإذن. */
+/** Requests permission if needed, then schedules both reminders. Returns true if permission is granted. */
 export async function ensureReminders(
   morningTime: string,
   eveningTime: string,
@@ -45,7 +45,7 @@ export async function ensureReminders(
   return true;
 }
 
-/** يلغي القديم ويجدول تذكيري الصباح والمساء يومياً. */
+/** Cancels the old schedule and schedules the daily morning and evening reminders. */
 export async function scheduleReminders(
   morningTime: string,
   eveningTime: string,

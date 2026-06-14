@@ -30,8 +30,8 @@ const fieldStyle = {
   fontFamily: fonts.sansMedium,
   fontSize: 16,
   color: colors.creamText,
-  textAlign: "right" as const,
-  writingDirection: "rtl" as const,
+  textAlign: "auto" as const,
+  writingDirection: "auto" as const,
 };
 
 export function WardForm({ heading, initial, submitLabel, onSubmit, onCancel, onDelete }: Props) {

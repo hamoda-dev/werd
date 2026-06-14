@@ -51,7 +51,7 @@ export default function Profile() {
       >
         <Txt size={22} weight="bold">ملفي</Txt>
 
-        {/* الاسم */}
+        {/* Name */}
         <View style={{ gap: spacing.sm }}>
           <Txt size={14} weight="medium" color={colors.muted3}>الاسم</Txt>
           <TextInput
@@ -71,13 +71,13 @@ export default function Profile() {
               fontFamily: fonts.sansMedium,
               fontSize: 18,
               color: colors.creamText,
-              textAlign: "right",
-              writingDirection: "rtl",
+              textAlign: "auto",
+              writingDirection: "auto",
             }}
           />
         </View>
 
-        {/* التنبيهات */}
+        {/* Reminders */}
         <View
           style={{
             backgroundColor: colors.whiteAlpha06,
@@ -119,7 +119,7 @@ export default function Profile() {
           </Pressable>
         </View>
 
-        {/* عن التطبيق */}
+        {/* About the app */}
         <View
           style={{
             backgroundColor: colors.whiteAlpha06,

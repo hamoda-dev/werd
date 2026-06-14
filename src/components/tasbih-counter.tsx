@@ -22,10 +22,10 @@ const C = 2 * Math.PI * R;
 const ADVANCE_DELAY = 950;
 
 interface Props {
-  /** يتغيّر عند تبديل الذكر؛ يُعيد تهيئة العدّاد من initialCount. */
+  /** Changes when switching dhikr; re-initializes the counter from initialCount. */
   itemKey: string;
   target: number;
-  /** العدّ المحفوظ للذكر الحالي (لاستئناف التسبيح من حيث توقّف). */
+  /** Saved count for the current dhikr (to resume the tasbih where it stopped). */
   initialCount?: number;
   resetSignal?: number;
   accent?: string;
@@ -58,12 +58,12 @@ export function TasbihCounter({
   const celebrate = useSharedValue(0);
   const done = count >= target;
 
-  // نحتفظ بأحدث initialCount في ref حتى لا تُعيد التهيئة عند مجرد تغيّر القيمة
-  // (نريد التهيئة فقط عند تبديل الذكر itemKey).
+  // Keep the latest initialCount in a ref so we don't re-initialize on a mere value change
+  // (we want to initialize only when switching dhikr via itemKey).
   const initialRef = useRef(initialCount);
   initialRef.current = initialCount;
 
-  // عند تبديل الذكر: ابدأ من العدّ المحفوظ لذلك الذكر.
+  // When switching dhikr: start from the saved count for that dhikr.
   useEffect(() => {
     const init = initialRef.current;
     setCount(init);
@@ -71,7 +71,7 @@ export function TasbihCounter({
     celebrate.value = 0;
   }, [itemKey, target, progress, celebrate]);
 
-  // زر التصفير: نتجاهل القيمة الابتدائية (0) عند أول تركيب.
+  // Reset button: ignore the initial value (0) on first mount.
   useEffect(() => {
     if (resetSignal === 0) return;
     setCount(0);
@@ -106,7 +106,7 @@ export function TasbihCounter({
   return (
     <Pressable onPress={handleTap} disabled={done}>
       <View style={{ width: SIZE, height: SIZE, alignItems: "center", justifyContent: "center" }}>
-        {/* حلقة الاحتفال */}
+        {/* Celebration ring */}
         <Animated.View
           pointerEvents="none"
           style={[
@@ -145,7 +145,7 @@ export function TasbihCounter({
           />
         </Svg>
 
-        {/* العدّاد في المنتصف */}
+        {/* Counter in the center */}
         <View style={{ position: "absolute", alignItems: "center" }}>
           <Txt
             style={{ fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] }}

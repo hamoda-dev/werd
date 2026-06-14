@@ -5,7 +5,7 @@ import { useSettings } from "@/store/store";
 export default function TabsLayout() {
   const { settings } = useSettings();
 
-  // بوابة الترحيب: إن لم يُدخل الاسم بعد، نحوّله لشاشة الترحيب.
+  // Onboarding gate: if the name hasn't been entered yet, redirect to the welcome screen.
   if (!settings.name) return <Redirect href="/onboarding" />;
 
   return (

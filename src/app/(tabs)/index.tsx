@@ -1,16 +1,19 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { colors, radii, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
+import { ProgressBar } from "@/components/progress-bar";
+import { StreakHero } from "@/components/streak-hero";
+import { LevelCard } from "@/components/level-card";
 import { toArabicNumerals } from "@/utils/numerals";
 import { getCategory } from "@/data/adhkar";
+import { DAILY_CHALLENGES } from "@/data/challenges";
+import { dailyDone } from "@/store/challenges";
+import { isActiveDay } from "@/store/calendar";
 import { last7DayKeys, todayKey, weekdayLetter } from "@/store/dates";
 import {
-  levelInfo,
-  levelTitle,
   useCustomAwrad,
   useProgressMap,
   useScore,
@@ -25,14 +28,6 @@ function greeting(): string {
   return h < 12 ? "صباح الخير" : "مساء الخير";
 }
 
-function ProgressBar({ ratio, color = colors.gold500 }: { ratio: number; color?: string }) {
-  return (
-    <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.whiteAlpha14, overflow: "hidden" }}>
-      <View style={{ height: 8, width: `${Math.min(100, ratio * 100)}%`, backgroundColor: color, borderRadius: 4 }} />
-    </View>
-  );
-}
-
 export default function Home() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -43,9 +38,9 @@ export default function Home() {
   const progress = useProgressMap();
   const { list: awrad } = useCustomAwrad();
 
-  const lvl = levelInfo(score);
   const week = last7DayKeys();
   const tKey = todayKey();
+  const openDaily = DAILY_CHALLENGES.find((d) => !dailyDone(d.id, today));
 
   function catProgress(id: CategoryId) {
     const cat = getCategory(id)!;
@@ -74,44 +69,26 @@ export default function Home() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* تحية */}
+        {/* Greeting */}
         <View>
           <Txt size={14} color={colors.muted3}>{greeting()}</Txt>
           <Txt size={26} weight="bold" color={colors.creamText}>{settings.name} 👋</Txt>
         </View>
 
-        {/* بطل السلسلة */}
-        <Animated.View
-          entering={FadeInDown.duration(400)}
-          style={{
-            backgroundColor: colors.terracotta500,
-            experimental_backgroundImage: "linear-gradient(150deg, #c8784e, #a85733)",
-            borderRadius: radii.cardLg,
-            borderCurve: "continuous",
-            padding: spacing.xl,
-            alignItems: "center",
-            gap: 6,
-            boxShadow: "0 16px 32px -16px rgba(168,87,51,0.6)",
-          }}
-        >
-          <Txt size={52} weight="bold" color="#fff" align="center" style={{ fontVariant: ["tabular-nums"] }}>
-            {toArabicNumerals(streak.current)}
-          </Txt>
-          <Txt size={16} weight="semibold" color="#fff" align="center">
-            {streak.current > 0 ? "أيام متتالية! 🎉" : "ابدأ سلسلتك اليوم 🔥"}
-          </Txt>
-          {streak.longest > 0 ? (
-            <Txt size={12} color="rgba(255,255,255,0.85)" align="center">
-              أطول سلسلة: {toArabicNumerals(streak.longest)} يوماً
-            </Txt>
-          ) : null}
-        </Animated.View>
+        {/* Streak hero */}
+        <StreakHero
+          current={streak.current}
+          size={52}
+          animated
+          subtitle={streak.current > 0 ? "أيام متتالية! 🎉" : "ابدأ سلسلتك اليوم 🔥"}
+          longestText={streak.longest > 0 ? `أطول سلسلة: ${toArabicNumerals(streak.longest)} يوماً` : null}
+        />
 
-        {/* نقاط الأسبوع */}
+        {/* Week dots */}
         <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: spacing.xs }}>
           {week.map((key) => {
             const day = progress[key];
-            const done = !!day && (day.morningDone || day.eveningDone);
+            const done = isActiveDay(day);
             const isToday = key === tKey;
             return (
               <View key={key} style={{ alignItems: "center", gap: 6 }}>
@@ -138,7 +115,7 @@ export default function Home() {
           })}
         </View>
 
-        {/* بطاقتا الصباح والمساء */}
+        {/* Morning and evening cards */}
         <View style={{ flexDirection: "row", gap: spacing.md }}>
           <Pressable
             onPress={() => router.push("/session/morning")}
@@ -155,7 +132,11 @@ export default function Home() {
           >
             <Icon name="sun.max.fill" size={30} color={colors.gold700} />
             <Txt size={16} weight="bold" color={colors.green800}>أذكار الصباح</Txt>
-            <ProgressBar ratio={morning.total ? morning.done / morning.total : 0} color={colors.sage} />
+            <ProgressBar
+              ratio={morning.total ? morning.done / morning.total : 0}
+              color={colors.sage}
+              track={colors.borderWarm}
+            />
             <Txt size={12} color={colors.muted1}>
               {morning.isDone ? "اكتمل ✓" : `${toArabicNumerals(morning.done)} من ${toArabicNumerals(morning.total)}`}
             </Txt>
@@ -181,28 +162,33 @@ export default function Home() {
           </Pressable>
         </View>
 
-        {/* بطاقة المستوى */}
-        <View
-          style={{
-            backgroundColor: colors.whiteAlpha06,
-            borderRadius: radii.card,
-            borderCurve: "continuous",
-            padding: spacing.lg,
-            gap: spacing.sm,
-          }}
-        >
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-            <Txt size={15} weight="bold" color={colors.creamText}>
-              المستوى {toArabicNumerals(lvl.level)} · {levelTitle(lvl.level)}
-            </Txt>
-            <Txt size={12} weight="semibold" color={colors.gold300}>
-              {toArabicNumerals(lvl.inLevel)}/{toArabicNumerals(500)}
-            </Txt>
-          </View>
-          <ProgressBar ratio={lvl.ratio} color={colors.gold500} />
-        </View>
+        {/* Daily challenge — only shown while there is an open daily challenge */}
+        {openDaily ? (
+          <Pressable
+            onPress={() => router.push("/challenges")}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: spacing.sm,
+              backgroundColor: colors.whiteAlpha06,
+              borderRadius: radii.card,
+              borderCurve: "continuous",
+              padding: spacing.lg,
+            }}
+          >
+            <Icon name={openDaily.icon} size={24} color={colors.gold300} />
+            <View style={{ flex: 1 }}>
+              <Txt size={12} color={colors.muted3}>تحدي اليوم</Txt>
+              <Txt size={15} weight="bold" color={colors.creamText} numberOfLines={1}>{openDaily.title}</Txt>
+            </View>
+            <Txt size={14} weight="bold" color={colors.gold300}>+{toArabicNumerals(openDaily.reward)}</Txt>
+          </Pressable>
+        ) : null}
 
-        {/* أورادي */}
+        {/* Level card */}
+        <LevelCard score={score} />
+
+        {/* My awrad */}
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: spacing.xs }}>
           <Txt size={18} weight="bold" color={colors.creamText}>أورادي</Txt>
           <Pressable

@@ -36,7 +36,7 @@ export default function TasbihTab() {
       >
         <Txt size={22} weight="bold" align="center">التسبيح</Txt>
 
-        {/* اختيار الذكر */}
+        {/* Phrase selection */}
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, justifyContent: "center" }}>
           {PHRASES.map((p, i) => (
             <Pressable
@@ -63,7 +63,7 @@ export default function TasbihTab() {
           />
         </View>
 
-        {/* اختيار العدد */}
+        {/* Count selection */}
         <View style={{ flexDirection: "row", gap: spacing.sm, justifyContent: "center" }}>
           {PRESETS.map((t) => (
             <Pressable
