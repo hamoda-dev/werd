@@ -74,20 +74,16 @@ export const shadows = {
   terracotta: "0 16px 32px -16px rgba(168,87,51,0.6)",
 } as const;
 
-/** Background gradients (for use with expo-linear-gradient or layered Views). */
+/** Background gradients as ready-to-use CSS strings (Expo 55 `experimental_backgroundImage`). */
 export const gradients = {
-  darkScreen: ["#16352a", "#0e2d22"] as const,
-  brandCard: ["#1c4a3a", "#0e2d22"] as const,
-  streak: ["#c8784e", "#a85733"] as const,
-  gold: ["#d8b46a", "#bf9648"] as const,
-};
-
-/** Badge tile gradients, keyed by the gradient field in BadgeDef. */
-export const badgeGradientCss: Record<"gold" | "sage" | "terracotta", string> = {
-  gold: "linear-gradient(150deg, #d8b46a, #bf9648)",
-  sage: "linear-gradient(150deg, #3f8268, #2c5e4a)",
+  darkScreen: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+  brandCard:  "linear-gradient(150deg, #1c4a3a, #0e2d22)",
+  gold:       "linear-gradient(150deg, #d8b46a, #bf9648)",
+  sage:       "linear-gradient(150deg, #3f8268, #2c5e4a)",
   terracotta: "linear-gradient(150deg, #c8784e, #a85733)",
-};
+  onboardingGlow:
+    "radial-gradient(circle at 50% 18%, rgba(216,180,106,0.28) 0%, transparent 55%), linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+} as const;
 
 /** Type scale — size + weight + lineHeight only. Color stays a separate, contextual prop. */
 export const text = {

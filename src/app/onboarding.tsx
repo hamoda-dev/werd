@@ -9,8 +9,6 @@ import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { useSettings } from "@/store/store";
 
-const goldGradient = `linear-gradient(150deg, ${gradients.gold[0]}, ${gradients.gold[1]})`;
-
 export default function Onboarding() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -41,8 +39,7 @@ export default function Onboarding() {
       style={{
         flex: 1,
         backgroundColor: colors.green800,
-        experimental_backgroundImage:
-          "radial-gradient(circle at 50% 18%, rgba(216,180,106,0.28) 0%, transparent 55%), linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+        experimental_backgroundImage: gradients.onboardingGlow,
       }}
     >
       {/* Top area: logo + tagline — hidden when the keyboard opens so the logo isn't clipped */}
@@ -150,7 +147,7 @@ export default function Onboarding() {
             alignItems: "center",
             marginTop: spacing.xs,
             backgroundColor: trimmed ? colors.gold500 : colors.borderWarm,
-            experimental_backgroundImage: trimmed ? goldGradient : undefined,
+            experimental_backgroundImage: trimmed ? gradients.gold : undefined,
           }}
         >
           <Txt weight="bold" size={16} color={trimmed ? colors.green800 : colors.muted2}>
