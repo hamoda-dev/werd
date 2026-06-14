@@ -11,7 +11,7 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
       <Tabs.Screen name="index" options={{ title: "الرئيسية" }} />
-      <Tabs.Screen name="tasbih" options={{ title: "التسبيح" }} />
+      <Tabs.Screen name="tasbih" options={{ title: "أذكاري" }} />
       <Tabs.Screen name="achievements" options={{ title: "إنجازاتي" }} />
       <Tabs.Screen name="profile" options={{ title: "ملفي" }} />
     </Tabs>

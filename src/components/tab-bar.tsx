@@ -3,13 +3,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
-import { Icon } from "@/components/icon";
+import { TabIcon } from "@/components/tab-icon";
 
-const TABS: Record<string, { label: string; icon: string }> = {
-  index: { label: "الرئيسية", icon: "house.fill" },
-  tasbih: { label: "التسبيح", icon: "circle.fill" },
-  achievements: { label: "إنجازاتي", icon: "star.fill" },
-  profile: { label: "ملفي", icon: "person.fill" },
+const TABS: Record<string, { label: string }> = {
+  index: { label: "الرئيسية" },
+  tasbih: { label: "أذكاري" },
+  achievements: { label: "إنجازاتي" },
+  profile: { label: "ملفي" },
 };
 
 export function TabBar({ state, navigation }: BottomTabBarProps) {
@@ -47,19 +47,12 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
           <Pressable
             key={route.key}
             onPress={onPress}
-            style={{ flex: 1, alignItems: "center", gap: 4, paddingVertical: 4 }}
+            style={{ flex: 1, alignItems: "center", gap: 5, paddingVertical: 6 }}
           >
-            <View
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: focused ? semantic.accent : "transparent",
-              }}
-            />
-            <Icon
-              name={meta.icon}
-              size={22}
+            <TabIcon
+              name={route.name}
+              active={focused}
+              size={24}
               color={focused ? semantic.accentLight : semantic.textTertiary}
             />
             <Txt

@@ -20,10 +20,7 @@ const FALLBACK: Record<string, string> = {
   ellipsis: "⋯",
   xmark: "✕",
   "arrow.counterclockwise": "↺",
-  "house.fill": "⌂",
-  "circle.fill": "●",
-  "star.fill": "★",
-  "person.fill": "☻",
+  "star.fill": "★", // still used by challenges/badges; tab glyphs moved to tab-icon.tsx
   "checkmark.seal.fill": "✓",
 };
 

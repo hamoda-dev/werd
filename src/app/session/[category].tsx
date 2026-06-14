@@ -32,7 +32,7 @@ export default function SessionScreen() {
   const items: Dhikr[] = useMemo(() => {
     if (builtin) return builtin.adhkar;
     if (ward)
-      return [{ id: ward.id, text: ward.text, count: ward.count, title: ward.title }];
+      return [{ id: ward.id, text: ward.text, count: ward.count ?? 0, title: ward.title }];
     return [];
   }, [builtin, ward]);
 

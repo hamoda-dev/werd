@@ -258,14 +258,21 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 
 ## 7. Iconography
 
-[`<Icon name size color />`](src/components/icon.tsx) is the single icon primitive. It renders **SF Symbols via `expo-symbols`** on iOS and a curated **Unicode fallback** on Android/web, so layouts stay readable cross‑platform. The handoff's small inline geometric icons were intentionally replaced by this system.
+There are **two** icon primitives, by surface:
+
+1. **Tab bar** → [`<TabIcon name active color size />`](src/components/tab-icon.tsx). Four **hand‑drawn SVG** glyphs (`react-native-svg`) on a 24×24 grid — **pixel‑identical on iOS and Android**. Style is "Rounded": `2px` rounded strokes when inactive, **solid fill** when active (the only outline↔fill state the app uses). Color comes from the tab bar (`accentLight`/`gold300` active, `textTertiary`/`muted2` inactive). These replace the former SF‑Symbol tab glyphs — `circle.fill` was a meaningless dot for tasbih, and the Android Unicode fallbacks (● ☻) looked amateurish.
+
+| Tab | TabIcon glyph |
+|-----|---------------|
+| Home (`index`) | House |
+| Tasbih (`tasbih`) | **Misbaha** — beaded loop + imame + tassel |
+| Achievements (`achievements`) | **Trophy** |
+| Profile (`profile`) | Person |
+
+2. **Everywhere else** → [`<Icon name size color />`](src/components/icon.tsx). Renders **SF Symbols via `expo-symbols`** on iOS and a curated **Unicode fallback** on Android/web, so layouts stay readable cross‑platform.
 
 | Purpose | SF Symbol | Fallback |
 |---------|-----------|----------|
-| Home tab | `house.fill` | ⌂ |
-| Tasbih tab | `circle.fill` | ● |
-| Achievements tab | `star.fill` | ★ |
-| Profile tab | `person.fill` | ☻ |
 | Morning | `sun.max.fill` | ☀ |
 | Evening | `moon.fill` | ☾ |
 | Streak | `flame.fill` | 🔥 |
@@ -279,7 +286,7 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 | Reset | `arrow.counterclockwise` | ↺ |
 | Locked | `lock.fill` | 🔒 |
 
-Keep icons **minimal and geometric**. To add one: pick the SF Symbol name and add a matching Unicode fallback entry in [icon.tsx](src/components/icon.tsx) — never import a third‑party icon set.
+Keep icons **minimal and geometric**, and **never import a third‑party icon set**. To add a general icon: pick the SF Symbol name and add a matching Unicode fallback entry in [icon.tsx](src/components/icon.tsx). To change a tab glyph: edit the hand‑drawn SVG in [tab-icon.tsx](src/components/tab-icon.tsx) (still in‑repo, still minimal/geometric — drawing our own is not the same as importing a set).
 
 ---
 
@@ -313,10 +320,12 @@ Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, t
 |-----------|------|-------|
 | `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, variant scale, RTL, theme color. |
 | `Icon` | [icon.tsx](src/components/icon.tsx) | SF Symbols + Unicode fallback. |
-| `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. Reused for built‑in adhkar **and** custom awrad. |
+| `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. `target: number \| null` — `null` is a **free** tasbih (faint full ring, «تسبيح حر», no goal/celebration). Reused for built‑in adhkar, the session, and the single‑dhikr counter. |
+| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row: count/«حر» chip + 🔒 (locked) or chevron; user items wrap `ReanimatedSwipeable` for تعديل/حذف. |
 | `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
+| `TabIcon` | [tab-icon.tsx](src/components/tab-icon.tsx) | Hand‑drawn SVG tab glyphs (house / misbaha / trophy / person); outline→fill on active. |
 | `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |
-| `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a custom wird. |
+| `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a ذِكر: title + text + category picker (inline‑create) + هدف محدد/تسبيح حر toggle + stepper. |
 | `Screen` | [screen.tsx](src/components/screen.tsx) | Gradient scaffold + safe-area; see §10. |
 | `Button` | [button.tsx](src/components/button.tsx) | Unified CTA: primary/ghost/link; see §10. |
 | `SectionHeader` | [section-header.tsx](src/components/section-header.tsx) | Title + optional trailing action; see §10. |
@@ -407,7 +416,7 @@ Props: `onPress`, `onLongPress` (optional), `accessory` (ReactNode — replaces 
 Routes use `expo-router`; the shell is custom (no default headers — `headerShown: false` globally, default `contentStyle` background `green800`).
 
 ### Navigation shell — [TabBar](src/components/tab-bar.tsx)
-Four tabs, RTL order: **الرئيسية · التسبيح · إنجازاتي · ملفي**. Translucent fill `rgba(14,45,34,0.96)`, `1px whiteAlpha08` top hairline, safe‑area aware bottom padding. Each tab = a **6px gold dot** (active only) + icon (`gold300` active / `muted2` inactive) + 11px label (`creamText`+semibold active / `muted2` regular inactive). The active state is the gold dot — quiet, not a pill.
+Four tabs, RTL order: **الرئيسية · أذكاري · إنجازاتي · ملفي** (the `tasbih` route keeps its name and misbaha glyph; only the label changed). Translucent fill `rgba(14,45,34,0.96)`, `1px whiteAlpha08` top hairline, safe‑area aware bottom padding. Each tab = a [`TabIcon`](src/components/tab-icon.tsx) glyph (filled `gold300` active / outline `muted2` inactive) + 11px label (`creamText`+semibold active / `muted2` regular inactive). The active state reads through the outline→fill flip plus the gold/cream colour shift — quiet, not a pill.
 
 ### Onboarding — [onboarding.tsx](src/app/onboarding.tsx)
 First run only. Asks the name, nothing else; stored locally. The tabs layout redirects here while `settings.name` is empty ([(tabs)/_layout.tsx](src/app/(tabs)/_layout.tsx)).
@@ -419,10 +428,19 @@ First run only. Asks the name, nothing else; stored locally. The tabs layout red
 3. **Week dots** — last 7 days as completion dots, today ringed.
 4. **Morning / Evening cards** — side‑by‑side; light gold‑bordered vs dark green; each shows a progress bar and "x من y" / "اكتمل ✓", taps into its session.
 5. **Level card** — raised translucent: "المستوى N · {title}" + points `inLevel/500` + gold progress bar.
-6. **أورادي (My Awrad)** — section header + "إضافة وِرد" link; either a dashed empty state or rows (tap → session, long‑press → edit).
 
-### Tasbih tab — [(tabs)/tasbih.tsx](src/app/(tabs)/tasbih.tsx)
-A **free** counter — the same ring, unbound to any list, for ad‑hoc dhikr.
+(The former **أورادي** home section was removed — its concept moved to the **أذكاري** tab.)
+
+### أذكاري tab — [(tabs)/tasbih.tsx](src/app/(tabs)/tasbih.tsx)
+The user's tasbih **library**: a categorized list of remembrances they count. Title + gold **+** add button → the create modal. A row of **filter chips** (`radii.pill`, gold‑fill active / `surfaceStrong` inactive): **الكل** + every category that has items. Under «الكل» the list is **grouped by category** (gold section labels); selecting a chip flattens to that category.
+
+Each row is an [`AdhkarRow`](src/components/adhkar-row.tsx): a count chip (`٣٣` or «حر» for a free tasbih) + a trailing **🔒** (locked built‑in) or chevron (user item). **Tap → `/dhikr/[id]`** to count. The user's own items are **swipeable** (`ReanimatedSwipeable`) to reveal **تعديل / حذف**; locked classics don't swipe. The list seeds the four post‑prayer classics (سبحان الله / الحمد لله / الله أكبر / لا إله إلا الله) and a few more as **read‑only built‑ins** ([data/adhkari.ts](src/data/adhkari.ts)).
+
+### Single‑dhikr counter — [dhikr/[id].tsx](src/app/dhikr/[id].tsx)
+Resolves one item (built‑in or custom) by id → dhikr card (Amiri) + [TasbihCounter](src/components/tasbih-counter.tsx) + «تصفير». A **target** item fills the ring, celebrates at the goal, then calls `completeWard()` (points + the daily‑ward challenge) and returns. A **free** item (`count === null`) shows a faint full ring + «تسبيح حر», counts up with no ceiling and awards nothing.
+
+### Manage categories — [settings/categories.tsx](src/app/settings/categories.tsx)
+Reached from **Profile**. Lists categories: the five locked defaults (**🔒 أساسي**) and the user's own (inline‑rename ✎ / delete 🗑 — deleting reassigns its أذكار to «عامة»), plus «+ تصنيف جديد».
 
 ### Session (the core) — [session/[category].tsx](src/app/session/[category].tsx)
 `darkScreen` gradient. **Header** (back ‹ / centered title + "الذكر i من n" / spacer) → **segmented progress bars** → centered **dhikr card** (gold‑hairline, Amiri 26/lh46, optional title in `gold300` + note in `muted3`) → **TasbihCounter** → hint "اضغط الدائرة للعدّ" → **controls** ("تصفير" neutral `flex:1` + "الذكر التالي ←" / "إنهاء ✓" primary `flex:2`). Resumes from the first incomplete dhikr; partial counts persist per‑dhikr so a tap‑count survives leaving the screen. Drives the same component for built‑in categories and single‑item custom awrad.
@@ -436,8 +454,8 @@ Streak banner + simple stat chips (v1). The full badge grid & calendar are defer
 ### Profile — [(tabs)/profile.tsx](src/app/(tabs)/profile.tsx)
 Name, reminder access, awrad management, about.
 
-### Custom wird — [awrad/new.tsx](src/app/awrad/new.tsx) · [awrad/[id].tsx](src/app/awrad/[id].tsx)
-Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal wird (title + text + repeat count) via [WardForm](src/components/ward-form.tsx); it then runs through the shared session/counter.
+### Create / edit a ذِكر — [awrad/new.tsx](src/app/awrad/new.tsx) · [awrad/[id].tsx](src/app/awrad/[id].tsx)
+Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal ذِكر via [WardForm](src/components/ward-form.tsx): title + text + a **category picker** (chips + dashed «+ جديدة» inline‑create) + a **هدف محدد ⇆ تسبيح حر** toggle (free hides the stepper). It then runs through the shared `/dhikr/[id]` counter. (Route folder is still `awrad/` for continuity.)
 
 ### Reminders — [settings/reminders.tsx](src/app/settings/reminders.tsx)
 Morning (default **07:00**) / evening (default **18:30**) local‑notification times with iOS‑style toggles (on = `gold500` track). Scheduled via `expo-notifications`; re‑scheduled on launch ([app/_layout.tsx](src/app/_layout.tsx)). No push/server — fully local.
@@ -483,12 +501,20 @@ These were fully designed in the prototype and are preserved here so they can be
 The app is local‑only; persistence keys (AsyncStorage / local DB) and their shapes:
 
 ```ts
-settings    = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30" }
-progress    = { [date: "YYYY-MM-DD"]: { morningDone: bool, eveningDone: bool, completedIds: string[] } }
-streak      = { current: number, longest: number, lastCompletedDate: string }
-score       = { points: number, level: number }   // level bar fills every 500 pts
-customAwrad = [ { id, title, text, count, createdAt } ]
+settings        = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30" }
+progress        = { [date: "YYYY-MM-DD"]: { morningDone: bool, eveningDone: bool, completedIds: string[], wardDone?: bool } }
+streak          = { current: number, longest: number, lastCompletedDate: string }
+score           = { points: number, level: number }   // level bar fills every 500 pts
+customAwrad     = [ { id, title, text, count: number | null, category: string, createdAt } ]  // count null = free tasbih
+customCategories= [ { id, label, builtin: false } ]   // user-created only; locked defaults live in data/adhkari.ts
 ```
+
+### أذكاري library — [data/adhkari.ts](src/data/adhkari.ts)
+The أذكاري tab merges two read sources into one `AdhkariItem = { id, title?, text, count: number|null, category, locked }` list:
+- **`BUILTIN_ADHKAR`** — read‑only (`locked:true`) classics shipped in code (stable `bi-*` ids that double as per‑day count keys).
+- The user's **`customAwrad`** (`locked:false`), legacy items missing `category` normalize to `general`.
+
+Categories merge the same way: **`DEFAULT_CATEGORIES`** (5 locked: التسبيحات · الاستغفار · الصلاة على النبي · أدعية · عامة) + the user's `customCategories`. Pure helpers (`mergeAdhkariItems`, `groupByCategory`, `getAdhkariItemById`, `isFree`) are unit‑tested in [data/__tests__/adhkari.test.ts](src/data/__tests__/adhkari.test.ts).
 
 ### Dhikr shape — the unit every view renders
 Built‑in adhkar and custom awrad normalize to the **same** shape so [TasbihCounter](src/components/tasbih-counter.tsx) and the session screen treat them identically:

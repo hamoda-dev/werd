@@ -1,10 +1,12 @@
 import { useRouter } from "expo-router";
 import { WardForm, type WardValues } from "@/components/ward-form";
-import { useCustomAwrad } from "@/store/store";
+import { useAdhkariCategories, useCustomAwrad, useCustomCategories } from "@/store/store";
 
 export default function NewWard() {
   const router = useRouter();
   const { add } = useCustomAwrad();
+  const categories = useAdhkariCategories();
+  const { add: addCategory } = useCustomCategories();
 
   function handleSubmit(values: WardValues) {
     add(values);
@@ -13,8 +15,10 @@ export default function NewWard() {
 
   return (
     <WardForm
-      heading="وِرد جديد"
-      submitLabel="حفظ الوِرد"
+      heading="ذِكر جديد"
+      submitLabel="حفظ"
+      categories={categories}
+      onCreateCategory={addCategory}
       onSubmit={handleSubmit}
       onCancel={() => router.back()}
     />

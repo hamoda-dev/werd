@@ -119,6 +119,26 @@ export default function Profile() {
           </Pressable>
         </View>
 
+        {/* Adhkari management */}
+        <Pressable
+          onPress={() => router.push("/settings/categories")}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: semantic.surface,
+            borderRadius: radii.card,
+            borderCurve: "continuous",
+            padding: spacing.lg,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
+            <Icon name="gearshape.fill" size={20} color={semantic.accentLight} />
+            <Txt size={15} weight="medium">إدارة تصنيفات الأذكار</Txt>
+          </View>
+          <Icon name="chevron.forward" size={16} color={semantic.textTertiary} />
+        </Pressable>
+
         {/* About the app */}
         <View
           style={{

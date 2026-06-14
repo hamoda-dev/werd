@@ -7,9 +7,6 @@ import { ProgressBar } from "@/components/progress-bar";
 import { StreakHero } from "@/components/streak-hero";
 import { LevelCard } from "@/components/level-card";
 import { Screen } from "@/components/screen";
-import { SectionHeader } from "@/components/section-header";
-import { ListRow } from "@/components/list-row";
-import { Button } from "@/components/button";
 import { toArabicNumerals } from "@/utils/numerals";
 import { getCategory } from "@/data/adhkar";
 import { DAILY_CHALLENGES } from "@/data/challenges";
@@ -17,7 +14,6 @@ import { dailyDone } from "@/store/challenges";
 import { isActiveDay } from "@/store/calendar";
 import { last7DayKeys, todayKey, weekdayLetter } from "@/store/dates";
 import {
-  useCustomAwrad,
   useProgressMap,
   useScore,
   useSettings,
@@ -38,7 +34,6 @@ export default function Home() {
   const score = useScore();
   const today = useTodayProgress();
   const progress = useProgressMap();
-  const { list: awrad } = useCustomAwrad();
 
   const week = last7DayKeys();
   const tKey = todayKey();
@@ -174,49 +169,6 @@ export default function Home() {
 
       {/* Level card */}
       <LevelCard score={score} />
-
-      {/* My awrad */}
-      <SectionHeader
-        title="أورادي"
-        action={
-          <Button variant="link" icon="plus" onPress={() => router.push("/awrad/new")}>
-            إضافة وِرد
-          </Button>
-        }
-      />
-
-      {awrad.length === 0 ? (
-        <Pressable
-          onPress={() => router.push("/awrad/new")}
-          style={{
-            borderWidth: 1,
-            borderColor: semantic.border,
-            borderStyle: "dashed",
-            borderRadius: radii.card,
-            borderCurve: "continuous",
-            padding: spacing.xl,
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <Txt size={14} color={semantic.textSecondary} align="center">أضِف وِردك الخاص لتبدأ تسبيحه يومياً</Txt>
-        </Pressable>
-      ) : (
-        <View style={{ gap: spacing.sm }}>
-          {awrad.map((w) => (
-            <ListRow
-              key={w.id}
-              onPress={() => router.push({ pathname: "/session/[category]", params: { category: w.id } })}
-              onLongPress={() => router.push({ pathname: "/awrad/[id]", params: { id: w.id } })}
-            >
-              <View style={{ flex: 1, gap: 2 }}>
-                <Txt size={15} weight="semibold" color={semantic.textPrimary} numberOfLines={1}>{w.title}</Txt>
-                <Txt size={12} color={semantic.textSecondary}>التكرار: {toArabicNumerals(w.count)}</Txt>
-              </View>
-            </ListRow>
-          ))}
-        </View>
-      )}
     </Screen>
   );
 }
