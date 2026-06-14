@@ -3,7 +3,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
-import { colors, radii, spacing } from "@/theme/tokens";
+import { gradients, radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { TasbihCounter } from "@/components/tasbih-counter";
@@ -54,7 +54,7 @@ export default function SessionScreen() {
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: spacing.xl }}>
         <Txt size={18} weight="semibold">لم يُعثر على هذا الوِرد</Txt>
         <Pressable onPress={() => router.back()} style={{ marginTop: spacing.lg }}>
-          <Txt color={colors.gold500} weight="semibold">رجوع</Txt>
+          <Txt color={semantic.accent} weight="semibold">رجوع</Txt>
         </Pressable>
       </View>
     );
@@ -83,8 +83,8 @@ export default function SessionScreen() {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.green800,
-        experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+        backgroundColor: semantic.screen,
+        experimental_backgroundImage: gradients.darkScreen,
         paddingTop: insets.top + spacing.sm,
         paddingBottom: insets.bottom + spacing.lg,
       }}
@@ -103,11 +103,11 @@ export default function SessionScreen() {
           hitSlop={12}
           style={{ width: 38, height: 38, alignItems: "center", justifyContent: "center" }}
         >
-          <Icon name="chevron.backward" size={24} color={colors.creamText} />
+          <Icon name="chevron.backward" size={24} color={semantic.textPrimary} />
         </Pressable>
         <View style={{ alignItems: "center" }}>
           <Txt size={17} weight="bold" align="center">{title}</Txt>
-          <Txt size={12} color={colors.muted3} align="center">
+          <Txt size={12} color={semantic.textSecondary} align="center">
             الذكر {toArabicNumerals(index + 1)} من {toArabicNumerals(items.length)}
           </Txt>
         </View>
@@ -126,7 +126,7 @@ export default function SessionScreen() {
               height: 5,
               borderRadius: 3,
               backgroundColor:
-                i < index ? colors.sage : i === index ? colors.gold500 : colors.whiteAlpha14,
+                i < index ? semantic.success : i === index ? semantic.accent : semantic.surfaceFaint,
             }}
           />
         ))}
@@ -149,9 +149,9 @@ export default function SessionScreen() {
           entering={FadeInUp.duration(350)}
           style={{
             width: "100%",
-            backgroundColor: colors.whiteAlpha06,
+            backgroundColor: semantic.surface,
             borderWidth: 1,
-            borderColor: colors.goldAlpha25,
+            borderColor: semantic.goldHairline,
             borderRadius: radii.card,
             borderCurve: "continuous",
             paddingVertical: spacing.xxl,
@@ -163,15 +163,15 @@ export default function SessionScreen() {
           }}
         >
           {current.title ? (
-            <Txt size={13} weight="semibold" color={colors.gold300} align="center">
+            <Txt size={13} weight="semibold" color={semantic.accentLight} align="center">
               {current.title}
             </Txt>
           ) : null}
-          <Txt naskh size={26} color={colors.creamText} align="center" style={{ lineHeight: 46 }} selectable>
+          <Txt naskh size={26} color={semantic.textPrimary} align="center" style={{ lineHeight: 46 }} selectable>
             {current.text}
           </Txt>
           {current.note ? (
-            <Txt size={12} color={colors.muted3} align="center">{current.note}</Txt>
+            <Txt size={12} color={semantic.textSecondary} align="center">{current.note}</Txt>
           ) : null}
         </Animated.View>
 
@@ -187,7 +187,7 @@ export default function SessionScreen() {
           />
         </Animated.View>
 
-        <Txt size={13} color={colors.muted3} align="center">
+        <Txt size={13} color={semantic.textSecondary} align="center">
           اضغط الدائرة للعدّ
         </Txt>
       </ScrollView>
@@ -203,27 +203,27 @@ export default function SessionScreen() {
           }}
           style={{
             flex: 1,
-            backgroundColor: colors.whiteAlpha08,
+            backgroundColor: semantic.surfaceStrong,
             borderRadius: radii.tile,
             borderCurve: "continuous",
             paddingVertical: 15,
             alignItems: "center",
           }}
         >
-          <Txt weight="semibold" color="#cfe0d6">تصفير</Txt>
+          <Txt weight="semibold" color={semantic.textGhost}>تصفير</Txt>
         </Pressable>
         <Pressable
           onPress={advance}
           style={{
             flex: 2,
-            backgroundColor: colors.gold500,
+            backgroundColor: semantic.accent,
             borderRadius: radii.tile,
             borderCurve: "continuous",
             paddingVertical: 15,
             alignItems: "center",
           }}
         >
-          <Txt weight="bold" color={colors.green800}>
+          <Txt weight="bold" color={semantic.textOnCream}>
             {isLast ? "إنهاء ✓" : "الذكر التالي ←"}
           </Txt>
         </Pressable>
