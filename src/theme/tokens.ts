@@ -95,3 +95,39 @@ export const text = {
   caption:    { size: 12, weight: "regular", lineHeight: 18 },
   micro:      { size: 11, weight: "regular", lineHeight: 14 },
 } as const;
+
+/** Semantic (role-based) color aliases. Additive — references the palette above. */
+export const semantic = {
+  // Surfaces — dark
+  screen:        colors.green800,
+  screenDeep:    colors.green900,
+  surface:       colors.whiteAlpha06,
+  surfaceStrong: colors.whiteAlpha08,
+  surfaceFaint:  colors.whiteAlpha14, // subtle fill/track — same value as `border` by design
+  brandSurface:  colors.green700,
+  // Surfaces — cream / light
+  surfaceCream:    colors.cream50,
+  surfaceCreamAlt: colors.cream200,
+  screenCream:     colors.cream100,
+  // Text
+  textPrimary:      colors.creamText,
+  textSecondary:    colors.muted3,
+  textOnColor:      "#fff",
+  textOnColorMuted: "rgba(255,255,255,0.85)",
+  textOnCream:      colors.green800,
+  textMutedCream:   colors.muted1,
+  textTertiary:     colors.muted2,
+  textGhost:        "#cfe0d6",
+  // Accent / status
+  accent:      colors.gold500,
+  accentLight: colors.gold300,
+  accentDeep:  colors.gold700,
+  success:     colors.sage,
+  warm:        colors.terracotta500,
+  warmDeep:    colors.terracotta700,
+  // Lines / chrome
+  border:       colors.whiteAlpha14, // hairline stroke — same value as `surfaceFaint` by design
+  borderCream:  colors.borderWarm,
+  goldHairline: colors.goldAlpha25,
+  tabBar:       "rgba(14,45,34,0.96)", // green900 + 0.96 alpha for the blur-under tab bar
+} as const;
