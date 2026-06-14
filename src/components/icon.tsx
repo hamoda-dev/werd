@@ -20,6 +20,7 @@ const FALLBACK: Record<string, string> = {
   ellipsis: "⋯",
   xmark: "✕",
   "arrow.counterclockwise": "↺",
+  infinity: "∞", // "free" (no-target) tasbih indicator
   "star.fill": "★", // still used by challenges/badges; tab glyphs moved to tab-icon.tsx
   "checkmark.seal.fill": "✓",
 };

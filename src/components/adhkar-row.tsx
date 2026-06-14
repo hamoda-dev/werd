@@ -1,6 +1,6 @@
 import { I18nManager, Pressable, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import { radii, semantic, spacing } from "@/theme/tokens";
+import { gradients, radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -23,14 +23,19 @@ function CountChip({ count }: { count: number | null }) {
         borderRadius: radii.pill,
         borderCurve: "continuous",
         paddingHorizontal: 11,
-        paddingVertical: 3,
+        paddingVertical: free ? 5 : 3,
         minWidth: 34,
         alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <Txt size={13} weight="semibold" color={free ? semantic.textSecondary : semantic.accentLight}>
-        {free ? "حر" : toArabicNumerals(count as number)}
-      </Txt>
+      {free ? (
+        <Icon name="infinity" size={15} color={semantic.textSecondary} />
+      ) : (
+        <Txt size={13} weight="semibold" color={semantic.accentLight}>
+          {toArabicNumerals(count as number)}
+        </Txt>
+      )}
     </View>
   );
 }
@@ -78,13 +83,15 @@ function RowBody({ item }: { item: AdhkariItem }) {
 }
 
 function ActionButton({
-  bg,
-  icon,
+  gradient,
+  fallback,
+  labelColor,
   label,
   onPress,
 }: {
-  bg: string;
-  icon: string;
+  gradient: string;
+  fallback: string;
+  labelColor: string;
   label: string;
   onPress: () => void;
 }) {
@@ -92,18 +99,17 @@ function ActionButton({
     <Pressable
       onPress={onPress}
       style={{
-        width: 64,
+        width: 72,
         marginLeft: spacing.sm,
         borderRadius: radii.tile,
         borderCurve: "continuous",
-        backgroundColor: bg,
+        backgroundColor: fallback,
+        experimental_backgroundImage: gradient,
         alignItems: "center",
         justifyContent: "center",
-        gap: 3,
       }}
     >
-      <Icon name={icon} size={18} color={semantic.textOnColor} />
-      <Txt size={11} weight="semibold" color={semantic.textOnColor}>{label}</Txt>
+      <Txt size={14} weight="bold" color={labelColor}>{label}</Txt>
     </Pressable>
   );
 }
@@ -124,8 +130,9 @@ export function AdhkarRow({ item, onPress, onEdit, onDelete }: Props) {
   const actions = (methods: { close: () => void }) => (
     <View style={{ flexDirection: "row", alignItems: "stretch" }}>
       <ActionButton
-        bg={semantic.accentDeep}
-        icon="pencil"
+        gradient={gradients.gold}
+        fallback={semantic.accent}
+        labelColor={semantic.textOnCream}
         label="تعديل"
         onPress={() => {
           methods.close();
@@ -133,8 +140,9 @@ export function AdhkarRow({ item, onPress, onEdit, onDelete }: Props) {
         }}
       />
       <ActionButton
-        bg={semantic.warmDeep}
-        icon="trash"
+        gradient={gradients.terracotta}
+        fallback={semantic.warm}
+        labelColor={semantic.textOnColor}
         label="حذف"
         onPress={() => {
           methods.close();

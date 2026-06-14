@@ -285,6 +285,7 @@ There are **two** icon primitives, by surface:
 | Edit / Delete | `pencil` / `trash` | ✎ / 🗑 |
 | Reset | `arrow.counterclockwise` | ↺ |
 | Locked | `lock.fill` | 🔒 |
+| Free (unlimited) tasbih | `infinity` | ∞ |
 
 Keep icons **minimal and geometric**, and **never import a third‑party icon set**. To add a general icon: pick the SF Symbol name and add a matching Unicode fallback entry in [icon.tsx](src/components/icon.tsx). To change a tab glyph: edit the hand‑drawn SVG in [tab-icon.tsx](src/components/tab-icon.tsx) (still in‑repo, still minimal/geometric — drawing our own is not the same as importing a set).
 
@@ -321,7 +322,7 @@ Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, t
 | `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, variant scale, RTL, theme color. |
 | `Icon` | [icon.tsx](src/components/icon.tsx) | SF Symbols + Unicode fallback. |
 | `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. `target: number \| null` — `null` is a **free** tasbih (faint full ring, «تسبيح حر», no goal/celebration). Reused for built‑in adhkar, the session, and the single‑dhikr counter. |
-| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row: count/«حر» chip + 🔒 (locked) or chevron; user items wrap `ReanimatedSwipeable` for تعديل/حذف. |
+| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row: count chip (number, or `∞` for a free tasbih) + 🔒 (locked) or chevron; user items wrap `ReanimatedSwipeable` for تعديل (gold gradient) / حذف (terracotta gradient) — text-only, no icons. |
 | `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
 | `TabIcon` | [tab-icon.tsx](src/components/tab-icon.tsx) | Hand‑drawn SVG tab glyphs (house / misbaha / trophy / person); outline→fill on active. |
 | `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |
@@ -434,7 +435,7 @@ First run only. Asks the name, nothing else; stored locally. The tabs layout red
 ### أذكاري tab — [(tabs)/tasbih.tsx](src/app/(tabs)/tasbih.tsx)
 The user's tasbih **library**: a categorized list of remembrances they count. Title + gold **+** add button → the create modal. A row of **filter chips** (`radii.pill`, gold‑fill active / `surfaceStrong` inactive): **الكل** + every category that has items. Under «الكل» the list is **grouped by category** (gold section labels); selecting a chip flattens to that category.
 
-Each row is an [`AdhkarRow`](src/components/adhkar-row.tsx): a count chip (`٣٣` or «حر» for a free tasbih) + a trailing **🔒** (locked built‑in) or chevron (user item). **Tap → `/dhikr/[id]`** to count. The user's own items are **swipeable** (`ReanimatedSwipeable`) to reveal **تعديل / حذف**; locked classics don't swipe. The list seeds the four post‑prayer classics (سبحان الله / الحمد لله / الله أكبر / لا إله إلا الله) and a few more as **read‑only built‑ins** ([data/adhkari.ts](src/data/adhkari.ts)).
+Each row is an [`AdhkarRow`](src/components/adhkar-row.tsx): a count chip (`٣٣`, or an **∞** glyph for a free tasbih) + a trailing **🔒** (locked built‑in) or chevron (user item). **Tap → `/dhikr/[id]`** to count. The user's own items are **swipeable** (`ReanimatedSwipeable`) to reveal **تعديل** (gold gradient) / **حذف** (terracotta gradient); locked classics don't swipe. The list seeds the four post‑prayer classics (سبحان الله / الحمد لله / الله أكبر / لا إله إلا الله) and a few more as **read‑only built‑ins** ([data/adhkari.ts](src/data/adhkari.ts)).
 
 ### Single‑dhikr counter — [dhikr/[id].tsx](src/app/dhikr/[id].tsx)
 Resolves one item (built‑in or custom) by id → dhikr card (Amiri) + [TasbihCounter](src/components/tasbih-counter.tsx) + «تصفير». A **target** item fills the ring, celebrates at the goal, then calls `completeWard()` (points + the daily‑ward challenge) and returns. A **free** item (`count === null`) shows a faint full ring + «تسبيح حر», counts up with no ceiling and awards nothing.
