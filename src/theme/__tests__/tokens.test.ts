@@ -12,7 +12,7 @@ describe("text scale", () => {
 });
 
 describe("gradients", () => {
-  const keys = ["darkScreen", "brandCard", "gold", "sage", "terracotta", "onboardingGlow"] as const;
+  const keys = ["darkScreen", "brandCard", "gold", "sage", "terracotta", "onboardingGlow", "logoGlow"] as const;
   it("are ready-to-use css gradient strings", () => {
     for (const k of keys) {
       expect(typeof gradients[k]).toBe("string");
@@ -23,7 +23,7 @@ describe("gradients", () => {
 
 describe("shadows", () => {
   it("are css box-shadow strings", () => {
-    for (const k of ["cardOnCream", "darkElevated", "terracotta", "floatingButton", "goldCard"] as const) {
+    for (const k of ["cardOnCream", "darkElevated", "terracotta", "floatingButton", "goldCard", "sheet"] as const) {
       expect(typeof shadows[k]).toBe("string");
       expect(shadows[k]).toMatch(/px/);
     }
@@ -49,5 +49,6 @@ describe("semantic colors alias the palette", () => {
     expect(semantic.tabBar).toBe("rgba(14,45,34,0.96)");
     expect(semantic.inkChip).toBe("rgba(14,45,34,0.15)");
     expect(semantic.inkTrack).toBe("rgba(14,45,34,0.18)");
+    expect(semantic.surfaceWhite).toBe("#fff");
   });
 });

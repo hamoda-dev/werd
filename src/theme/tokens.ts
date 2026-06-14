@@ -74,6 +74,7 @@ export const shadows = {
   terracotta: "0 16px 32px -16px rgba(168,87,51,0.6)",
   floatingButton: "0 12px 28px -12px rgba(0,0,0,0.5)",
   goldCard: "0 16px 32px -16px rgba(191,150,72,0.5)",
+  sheet: "0 -12px 30px -16px rgba(14,45,34,0.5)",
 } as const;
 
 /** Background gradients as ready-to-use CSS strings (Expo 55 `experimental_backgroundImage`). */
@@ -85,6 +86,7 @@ export const gradients = {
   terracotta: "linear-gradient(150deg, #c8784e, #a85733)",
   onboardingGlow:
     "radial-gradient(circle at 50% 18%, rgba(216,180,106,0.28) 0%, transparent 55%), linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+  logoGlow: "radial-gradient(circle, rgba(216,180,106,0.30) 0%, transparent 62%)",
 } as const;
 
 /** Type scale — size + weight + lineHeight only. Color stays a separate, contextual prop. */
@@ -111,6 +113,7 @@ export const semantic = {
   surfaceCream:    colors.cream50,
   surfaceCreamAlt: colors.cream200,
   screenCream:     colors.cream100,
+  surfaceWhite:    "#fff", // pure-white input surface (distinct from cream)
   // Text
   textPrimary:      colors.creamText,
   textSecondary:    colors.muted3,
