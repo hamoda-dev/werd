@@ -77,17 +77,58 @@ These build depth on the green night without new opaque colors:
 | `whiteAlpha14` | `rgba(255,255,255,0.14)` | Progress track on dark; dashed empty‑state border; upcoming segments |
 | `goldAlpha25` | `rgba(216,180,106,0.25)` | Gold hairline border on the dhikr card |
 
-**Intentional literals** (not tokens): pure `#fff` and `rgba(255,255,255,0.85)` for text on the terracotta hero ([index.tsx](src/app/(tabs)/index.tsx)), `#cfe0d6` for the reset‑button label, and the tab bar's `rgba(14,45,34,0.96)` translucent fill ([tab-bar.tsx](src/components/tab-bar.tsx)).
+**Intentional literals note (updated):** the former inline `#fff`, `rgba(255,255,255,0.85)`, `#cfe0d6`, and tab‑bar `rgba(14,45,34,0.96)` are now tokenized as `semantic.textOnColor`, `semantic.textOnColorMuted`, `semantic.textGhost`, and `semantic.tabBar` respectively. A Jest test at [`src/theme/__tests__/no-raw-hex.test.ts`](src/theme/__tests__/no-raw-hex.test.ts) **enforces** "no raw hex/rgba in `src/app` or `src/components`". The only deliberate remaining palette refs (not literals) are `colors.lockedTile` (badge-tile cell) and `colors.green900`/`colors.green700` used as text on the onboarding cream sheet (no semantic alias exists for these).
+
+### Semantic colors
+`tokens.semantic` is an **additive, role-based** alias layer over the palette. Components reference `semantic.*` — never raw palette tokens — so a future theme swap only touches `tokens.semantic`, not every component.
+
+| Role | Alias | Palette / literal |
+|------|-------|-------------------|
+| `screen` | Dark screen bg | `green800` |
+| `screenDeep` | Deepest bg / gradient end | `green900` |
+| `surface` | Default raised card (translucent) | `whiteAlpha06` |
+| `surfaceStrong` | Slightly brighter raised surface | `whiteAlpha08` |
+| `surfaceFaint` | Subtle fill / progress track | `whiteAlpha14` |
+| `brandSurface` | Brand-green surface | `green700` |
+| `surfaceCream` | Light card on dark | `cream50` |
+| `surfaceCreamAlt` | Subtle cream fill | `cream200` |
+| `screenCream` | Light-mode screen bg | `cream100` |
+| `surfaceWhite` | Pure-white input surface | `#fff` |
+| `textPrimary` | Default text/icon on dark | `creamText` |
+| `textSecondary` | Captions on dark | `muted3` |
+| `textTertiary` | Inactive/meta | `muted2` |
+| `textMutedCream` | Secondary text on cream | `muted1` |
+| `textOnCream` | Body text on cream surfaces | `green800` |
+| `textOnColor` | Text over saturated fills | `#fff` |
+| `textOnColorMuted` | Softer text over saturated fills | `rgba(255,255,255,0.85)` |
+| `textGhost` | Reset-button label | `#cfe0d6` |
+| `accent` | Primary accent (rings, primary btn) | `gold500` |
+| `accentLight` | Secondary accent / link text | `gold300` |
+| `accentDeep` | Gold depth | `gold700` |
+| `success` | Completed states | `sage` |
+| `warm` | Streak / warm alerts | `terracotta500` |
+| `warmDeep` | Streak gradient end | `terracotta700` |
+| `border` | Hairline on dark | `whiteAlpha14` |
+| `borderCream` | Hairline on cream | `borderWarm` |
+| `goldHairline` | Dhikr card border | `goldAlpha25` |
+| `tabBar` | Tab bar translucent fill | `rgba(14,45,34,0.96)` |
+| `inkChip` | Translucent dark chip over gold | `rgba(14,45,34,0.15)` |
+| `inkTrack` | Translucent dark track over gold | `rgba(14,45,34,0.18)` |
+
+`textOnColor` / `textOnColorMuted` / `textGhost` / `tabBar` / `surfaceWhite` / `inkChip` / `inkTrack` hold literal string values — they tokenize what were previously scattered inline literals.
 
 ### Gradients
-Defined in `tokens.gradients`, but **applied via CSS gradient strings** in `experimental_backgroundImage` (the Expo 55 idiom — see §6), not the `LinearGradient` component. `darkScreen` and `streak` are in active use; `brandCard` and `gold` are available for brand cards / featured surfaces.
+Defined in `tokens.gradients` as **ready-to-use CSS gradient strings**, applied directly via `experimental_backgroundImage` (the Expo 55 idiom — see §6). They are **not** stop arrays — use them as-is.
 
-| Name | Stops | Where |
-|------|-------|-------|
-| `darkScreen` | `#16352a → #0e2d22` (180°) | Home & session screen backgrounds |
-| `brandCard` | `#1c4a3a → #0e2d22` | Brand cards (available) |
-| `streak` | `#c8784e → #a85733` (150°) | Streak hero card |
-| `gold` | `#d8b46a → #bf9648` | Gold buttons / featured challenge (available) |
+| Name | CSS string (abbreviated) | Where |
+|------|--------------------------|-------|
+| `darkScreen` | `linear-gradient(180deg, #16352a, #0e2d22)` | Home, achievements, tasbih screens |
+| `brandCard` | `linear-gradient(150deg, #1c4a3a, #0e2d22)` | Brand / featured cards |
+| `gold` | `linear-gradient(150deg, #d8b46a, #bf9648)` | Primary button, featured challenge |
+| `sage` | `linear-gradient(150deg, #3f8268, #2c5e4a)` | Success/completion accents |
+| `terracotta` | `linear-gradient(150deg, #c8784e, #a85733)` | Streak hero card |
+| `onboardingGlow` | radial gold glow + `darkScreen` | Onboarding background |
+| `logoGlow` | radial gold glow | Logo / splash accent |
 
 ---
 
@@ -112,22 +153,33 @@ fonts = {
 
 ### The `Txt` component — the only text primitive
 ```tsx
-<Txt weight="bold" size={26} color={colors.creamText}>{name} 👋</Txt>
+<Txt variant="title" color={colors.creamText}>{name} 👋</Txt>
 <Txt naskh size={26} align="center" style={{ lineHeight: 46 }} selectable>{dhikr}</Txt>
+<Txt variant="caption" color={colors.muted3}>٧ من ١٢</Txt>
 ```
-Defaults: `weight="regular"`, `size={15}`, `color={colors.creamText}`, `align="right"`, `writingDirection: "rtl"`. Weights map `regular→400, medium→500, semibold→600, bold→700`. With `naskh`, only `regular`/`bold` exist (other weights fall back to regular).
+Defaults: `weight="regular"`, `size={15}`, `color={colors.creamText}`, `align="auto"` (React Native flips alignment under RTL automatically — this matches the project RTL convention; no `writingDirection` is set). Weights map `regular→400, medium→500, semibold→600, bold→700`. With `naskh`, only `regular`/`bold` exist (other weights fall back to regular).
 
-### Type scale (as shipped)
+The optional `variant` prop accepts a key from `tokens.text` and sets `size`, `weight`, and `lineHeight` together. Explicit `size`/`weight` props still override the preset. Naskh/dhikr text that needs a custom `lineHeight` (e.g. 46) keeps its own explicit `style={{ lineHeight: 46 }}`.
+
+### Type scale — `tokens.text`
+| Variant | Size | Weight | LineHeight | Typical use |
+|---------|------|--------|------------|-------------|
+| `title` | 26 | bold | 34 | Screen title, greeting name |
+| `heading` | 18 | bold | 26 | Section headings (أورادي, etc.) |
+| `subheading` | 16 | bold | 24 | Card titles |
+| `body` | 15 | regular | 24 | Default body / button text |
+| `label` | 14 | medium | 20 | Button labels, row labels |
+| `caption` | 12 | regular | 18 | Captions, progress sub-labels |
+| `micro` | 11 | regular | 14 | Smallest labels, tab labels |
+
+### Special/hero sizes (beyond the token scale)
+Some one-off large sizes have no token variant and are set explicitly:
+
 | Role | Size / Weight | Family | Example |
 |------|---------------|--------|---------|
 | Tasbih counter | **78 / bold**, tabular‑nums | Sans | `٣` |
 | Streak hero number | 52 / bold, tabular‑nums | Sans | `٧` |
-| Greeting name / screen title | 26 / bold | Sans | `محمد 👋` |
 | Dhikr text | **26 / regular, line‑height 46** | **Naskh** | أذكار |
-| Section heading | 18 / bold | Sans | `أورادي` |
-| Card title | 16–17 / bold | Sans | `أذكار الصباح` |
-| Body / button | 15 / semibold–bold | Sans | `الذكر التالي ←` |
-| Caption | 11–13 / regular–semibold | Sans | `٧ من ١٢` |
 | Counter sub‑label | 15 / regular, `muted3` | Sans | `من ١٢` |
 
 > Prototype reference sizing (380‑wide frame): dhikr text rendered at 24–27/700 Amiri with line‑height ~1.9; the shipped app settles on 26 / line‑height 46.
@@ -165,12 +217,15 @@ Hairlines carry hierarchy on the dark theme:
 - Tab bar top: `1px` `whiteAlpha08`.
 
 ### Shadows / elevation — `tokens.shadows`
-Expressed as **`boxShadow` strings** (Expo 55 idiom — no legacy `shadow*`/`elevation`). Three elevations only:
+Expressed as **`boxShadow` strings** (Expo 55 idiom — no legacy `shadow*`/`elevation`).
 | Token | Value | Use |
 |-------|-------|-----|
-| `cardOnCream` | `0 8px 20px -12px rgba(20,57,46,.3)` | Cards on a light surface |
-| `darkElevated` | `0 18px 36px -16px rgba(14,45,34,.6)` | Raised dark cards |
-| `terracotta` | `0 16px 32px -16px rgba(168,87,51,.6)` | Streak hero (warm‑tinted shadow) |
+| `cardOnCream` | `0 8px 20px -12px rgba(20,57,46,0.3)` | Cards on a light surface |
+| `darkElevated` | `0 18px 36px -16px rgba(14,45,34,0.6)` | Raised dark cards |
+| `terracotta` | `0 16px 32px -16px rgba(168,87,51,0.6)` | Streak hero (warm‑tinted shadow) |
+| `floatingButton` | `0 12px 28px -12px rgba(0,0,0,0.5)` | Category-list floating CTA button |
+| `goldCard` | `0 16px 32px -16px rgba(191,150,72,0.5)` | Challenges featured gold card |
+| `sheet` | `0 -12px 30px -16px rgba(14,45,34,0.5)` | Onboarding cream sheet (upward shadow) |
 
 Depth on the dark theme comes **primarily from translucent white layers**, not shadow. Reserve shadows for hero moments.
 
@@ -256,12 +311,16 @@ Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, t
 
 | Component | File | Notes |
 |-----------|------|-------|
-| `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, RTL, theme color. |
+| `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, variant scale, RTL, theme color. |
 | `Icon` | [icon.tsx](src/components/icon.tsx) | SF Symbols + Unicode fallback. |
 | `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. Reused for built‑in adhkar **and** custom awrad. |
 | `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
 | `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |
 | `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a custom wird. |
+| `Screen` | [screen.tsx](src/components/screen.tsx) | Gradient scaffold + safe-area; see §10. |
+| `Button` | [button.tsx](src/components/button.tsx) | Unified CTA: primary/ghost/link; see §10. |
+| `SectionHeader` | [section-header.tsx](src/components/section-header.tsx) | Title + optional trailing action; see §10. |
+| `ListRow` | [list-row.tsx](src/components/list-row.tsx) | Translucent rounded pressable row; see §10. |
 
 ### Card vocabulary
 A small, consistent set of surface treatments — reuse these, don't invent new ones:
@@ -293,7 +352,57 @@ On = `gold500` track + white knob; off = muted track. Used on the reminder rows.
 
 ---
 
-## 10. Screens (v1 — shipped)
+## 10. Primitives
+
+Four shared scaffold/interaction components that landed with the design-system refactor. They live in `src/components/` alongside the existing catalog and are backed entirely by `tokens.*` — no inline hex/literal values.
+
+### `Screen` — [src/components/screen.tsx](src/components/screen.tsx)
+Gradient background + safe-area insets + scroll or fixed content scaffold. Eliminates per-screen boilerplate for the standard dark-gradient layout.
+
+```tsx
+<Screen gradient="darkScreen" scroll contentStyle={{ gap: spacing.xl }}>
+  {/* page content */}
+</Screen>
+```
+
+Props: `gradient` (`keyof typeof gradients`, default `"darkScreen"`), `scroll` (boolean, default `true`), `contentStyle` (`ViewStyle`, optional override/extension of the inner container padding).
+
+Used by **home, achievements, tasbih**. Screens with a fixed header/footer or keyboard handling (session, list, stats, challenges, profile, reminders, ward-form, onboarding) intentionally keep their own root and just use `tokens.*` directly.
+
+### `Button` — [src/components/button.tsx](src/components/button.tsx)
+Unified CTA with three variants mapping to the app's existing button language. Exports `ButtonVariant`.
+
+```tsx
+<Button variant="primary" icon="plus" onPress={handleAdd}>إضافة وِرد</Button>
+<Button variant="ghost" onPress={handleReset}>تصفير</Button>
+<Button variant="link" onPress={handleNav}>المزيد ‹</Button>
+```
+
+Props: `variant` (`"primary" | "ghost" | "link"`, default `"primary"`), `icon` (SF Symbol name, optional), `haptic` (boolean, default `true` — fires iOS light impact), `disabled` (boolean), `style`. Sets `accessibilityRole="button"`. `primary` renders the gold gradient; `ghost` is translucent; `link` is icon + text with no background.
+
+### `SectionHeader` — [src/components/section-header.tsx](src/components/section-header.tsx)
+Title on the leading edge with an optional trailing action (typically a `link` Button).
+
+```tsx
+<SectionHeader title="أورادي" action={<Button variant="link" onPress={handleAdd}>+ إضافة وِرد</Button>} />
+```
+
+Props: `title` (string), `action` (ReactNode, optional), `style` (ViewStyle escape hatch).
+
+### `ListRow` — [src/components/list-row.tsx](src/components/list-row.tsx)
+Translucent rounded pressable row — the standard surface for awrad items and category lists.
+
+```tsx
+<ListRow onPress={() => router.push(`/session/${id}`)} onLongPress={handleEdit}>
+  <Txt variant="subheading">{title}</Txt>
+</ListRow>
+```
+
+Props: `onPress`, `onLongPress` (optional), `accessory` (ReactNode — replaces the default trailing chevron), `style`. Uses `semantic.surface` background, `radii.tile` corners with `borderCurve: "continuous"`.
+
+---
+
+## 11. Screens (v1 — shipped)
 
 Routes use `expo-router`; the shell is custom (no default headers — `headerShown: false` globally, default `contentStyle` background `green800`).
 
@@ -322,7 +431,7 @@ A **free** counter — the same ring, unbound to any list, for ad‑hoc dhikr.
 Overview of a category: each row a status circle (sage ✓ done / gold number current / outlined upcoming) + Amiri title + repetition caption; current row emphasized (dark green gradient + ▶ glyph), completed rows dimmed (opacity ~0.7).
 
 ### Achievements — [(tabs)/achievements.tsx](src/app/(tabs)/achievements.tsx)
-Streak banner + simple stat chips (v1). The full badge grid & calendar are deferred — see §11.
+Streak banner + simple stat chips (v1). The full badge grid & calendar are deferred — see §12.
 
 ### Profile — [(tabs)/profile.tsx](src/app/(tabs)/profile.tsx)
 Name, reminder access, awrad management, about.
@@ -335,7 +444,7 @@ Morning (default **07:00**) / evening (default **18:30**) local‑notification t
 
 ---
 
-## 11. Deferred Surfaces (v2 — specced, not yet built)
+## 12. Deferred Surfaces (v2 — specced, not yet built)
 
 These were fully designed in the prototype and are preserved here so they can be built without the handoff. v1 deliberately ships the core (streak + morning/evening + tasbih + awrad + reminders); the following are next.
 
@@ -369,7 +478,7 @@ These were fully designed in the prototype and are preserved here so they can be
 
 ---
 
-## 12. Content Model & Data Shape
+## 13. Content Model & Data Shape
 
 The app is local‑only; persistence keys (AsyncStorage / local DB) and their shapes:
 
@@ -410,7 +519,7 @@ Dhikr = { id, text, count, note?, title? }
 
 ---
 
-## 13. Logo & Brand System
+## 14. Logo & Brand System
 
 The mark is a **rising sun (الفجر) over a hill**, with the wordmark **«وِرْد»** in Amiri 700. It says *dawn, beginning, the morning wird* — the app's whole reason for being.
 
@@ -435,7 +544,7 @@ The mark is a **rising sun (الفجر) over a hill**, with the wordmark **«و�
 
 ---
 
-## 14. App Identity
+## 15. App Identity
 
 From [`app.json`](app.json) and `assets/`:
 - **Icon** — `wird-logo.png` (the dawn/hill mark above).
@@ -447,7 +556,7 @@ From [`app.json`](app.json) and `assets/`:
 
 ---
 
-## 15. Accessibility & Quality Notes
+## 16. Accessibility & Quality Notes
 
 - **Contrast** — `creamText` on the green night and `green800` on gold buttons both clear AA for body text. Keep captions at `muted3` or lighter only for non‑essential text.
 - **Tap targets** — interactive rows/buttons run full‑width or use `hitSlop` (10–12) for small controls; the counter is a 248px target.
@@ -457,7 +566,7 @@ From [`app.json`](app.json) and `assets/`:
 
 ---
 
-## 16. Working With This System
+## 17. Working With This System
 
 **Source of truth:** [`src/theme/tokens.ts`](src/theme/tokens.ts). Change a value there, not in a component.
 
@@ -466,7 +575,7 @@ From [`app.json`](app.json) and `assets/`:
 2. Colors / spacing / radii / shadows → `tokens.*`. No new hex without a token.
 3. Rounded surface → set `borderCurve: "continuous"`.
 4. Background gradient → `experimental_backgroundImage` + solid fallback. Shadow → `boxShadow` string.
-5. Reuse a card from §9 and a button from §9 before inventing a new one.
+5. Reuse a card from §9 and a button from §9/§10 before inventing a new one.
 6. Design and test **RTL on both platforms**; verify glyph direction for any new directional icon, and confirm the Unicode fallback for any new SF Symbol.
 7. Read the **Expo 55** docs before adopting any new native/styling API ([AGENTS.md](AGENTS.md)).
 
