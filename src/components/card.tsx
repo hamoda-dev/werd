@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { View, type ViewStyle } from "react-native";
-import { colors, radii, spacing } from "@/theme/tokens";
+import { radii, semantic, spacing } from "@/theme/tokens";
 
 /** Unified translucent dark-surface card (whiteAlpha06). */
 export function Card({ children, style }: { children: ReactNode; style?: ViewStyle }) {
@@ -8,7 +8,7 @@ export function Card({ children, style }: { children: ReactNode; style?: ViewSty
     <View
       style={[
         {
-          backgroundColor: colors.whiteAlpha06,
+          backgroundColor: semantic.surface,
           borderRadius: radii.card,
           borderCurve: "continuous",
           padding: spacing.lg,

@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { colors, radii, spacing } from "@/theme/tokens";
+import { radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 
 /** Small stat chip (value + label). */
@@ -8,7 +8,7 @@ export function StatChip({ value, label }: { value: string; label: string }) {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.whiteAlpha06,
+        backgroundColor: semantic.surface,
         borderRadius: radii.tile,
         borderCurve: "continuous",
         paddingVertical: spacing.lg,
@@ -16,8 +16,8 @@ export function StatChip({ value, label }: { value: string; label: string }) {
         gap: 4,
       }}
     >
-      <Txt size={24} weight="bold" color={colors.gold300}>{value}</Txt>
-      <Txt size={11} color={colors.muted3} align="center">{label}</Txt>
+      <Txt size={24} weight="bold" color={semantic.accentLight}>{value}</Txt>
+      <Txt size={11} color={semantic.textSecondary} align="center">{label}</Txt>
     </View>
   );
 }

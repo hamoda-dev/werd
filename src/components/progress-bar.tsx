@@ -1,11 +1,11 @@
 import { View } from "react-native";
-import { colors } from "@/theme/tokens";
+import { semantic } from "@/theme/tokens";
 
 /** Unified horizontal progress bar. */
 export function ProgressBar({
   ratio,
-  color = colors.gold500,
-  track = colors.whiteAlpha14,
+  color = semantic.accent,
+  track = semantic.surfaceFaint,
   height = 8,
 }: {
   ratio: number;
