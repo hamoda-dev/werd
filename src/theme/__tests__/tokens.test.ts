@@ -1,4 +1,4 @@
-import { colors, gradients, semantic, text } from "@/theme/tokens";
+import { colors, gradients, semantic, shadows, text } from "@/theme/tokens";
 
 describe("text scale", () => {
   const variants = ["title", "heading", "subheading", "body", "label", "caption", "micro"] as const;
@@ -17,6 +17,15 @@ describe("gradients", () => {
     for (const k of keys) {
       expect(typeof gradients[k]).toBe("string");
       expect(gradients[k]).toMatch(/gradient\(/);
+    }
+  });
+});
+
+describe("shadows", () => {
+  it("are css box-shadow strings", () => {
+    for (const k of ["cardOnCream", "darkElevated", "terracotta", "floatingButton"] as const) {
+      expect(typeof shadows[k]).toBe("string");
+      expect(shadows[k]).toMatch(/px/);
     }
   });
 });

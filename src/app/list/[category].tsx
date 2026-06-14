@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, radii, spacing } from "@/theme/tokens";
+import { gradients, radii, semantic, shadows, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -30,8 +30,8 @@ export default function ListScreen() {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.green800,
-        experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+        backgroundColor: semantic.screen,
+        experimental_backgroundImage: gradients.darkScreen,
       }}
     >
       <ScrollView
@@ -53,11 +53,11 @@ export default function ListScreen() {
           }}
         >
           <Pressable onPress={() => router.back()} hitSlop={12} style={{ width: 38, height: 38, alignItems: "center", justifyContent: "center" }}>
-            <Icon name="chevron.backward" size={24} color={colors.creamText} />
+            <Icon name="chevron.backward" size={24} color={semantic.textPrimary} />
           </Pressable>
           <View style={{ alignItems: "center" }}>
             <Txt size={18} weight="bold" align="center">{cat.title}</Txt>
-            <Txt size={12} color={colors.muted3} align="center">
+            <Txt size={12} color={semantic.textSecondary} align="center">
               أكملت {toArabicNumerals(doneCount)} من {toArabicNumerals(cat.adhkar.length)} ذِكراً
             </Txt>
           </View>
@@ -73,7 +73,7 @@ export default function ListScreen() {
                 flexDirection: "row",
                 gap: spacing.md,
                 alignItems: "flex-start",
-                backgroundColor: colors.whiteAlpha06,
+                backgroundColor: semantic.surface,
                 borderRadius: radii.tile,
                 borderCurve: "continuous",
                 padding: spacing.lg,
@@ -87,24 +87,24 @@ export default function ListScreen() {
                   borderRadius: 17,
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: done ? colors.sage : "transparent",
+                  backgroundColor: done ? semantic.success : "transparent",
                   borderWidth: done ? 0 : 1.5,
-                  borderColor: colors.muted3,
+                  borderColor: semantic.textSecondary,
                 }}
               >
                 {done ? (
-                  <Icon name="checkmark" size={18} color="#fff" />
+                  <Icon name="checkmark" size={18} color={semantic.textOnColor} />
                 ) : (
-                  <Txt size={13} weight="semibold" color={colors.muted3} align="center">
+                  <Txt size={13} weight="semibold" color={semantic.textSecondary} align="center">
                     {toArabicNumerals(i + 1)}
                   </Txt>
                 )}
               </View>
               <View style={{ flex: 1, gap: 4 }}>
-                <Txt naskh size={18} color={colors.creamText} style={{ lineHeight: 32 }} selectable>
+                <Txt naskh size={18} color={semantic.textPrimary} style={{ lineHeight: 32 }} selectable>
                   {d.text}
                 </Txt>
-                <Txt size={11} color={colors.muted3}>
+                <Txt size={11} color={semantic.textSecondary}>
                   التكرار: {toArabicNumerals(d.count)}
                 </Txt>
               </View>
@@ -118,15 +118,15 @@ export default function ListScreen() {
         <Pressable
           onPress={() => router.push(`/session/${cat.id}`)}
           style={{
-            backgroundColor: colors.gold500,
+            backgroundColor: semantic.accent,
             borderRadius: radii.pill,
             borderCurve: "continuous",
             paddingVertical: 16,
             alignItems: "center",
-            boxShadow: "0 12px 28px -12px rgba(0,0,0,0.5)",
+            boxShadow: shadows.floatingButton,
           }}
         >
-          <Txt weight="bold" size={16} color={colors.green800}>ابدأ المسبحة</Txt>
+          <Txt weight="bold" size={16} color={semantic.textOnCream}>ابدأ المسبحة</Txt>
         </Pressable>
       </View>
     </View>

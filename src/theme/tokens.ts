@@ -72,6 +72,7 @@ export const shadows = {
   cardOnCream: "0 8px 20px -12px rgba(20,57,46,0.3)",
   darkElevated: "0 18px 36px -16px rgba(14,45,34,0.6)",
   terracotta: "0 16px 32px -16px rgba(168,87,51,0.6)",
+  floatingButton: "0 12px 28px -12px rgba(0,0,0,0.5)",
 } as const;
 
 /** Background gradients as ready-to-use CSS strings (Expo 55 `experimental_backgroundImage`). */
