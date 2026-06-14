@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { colors, radii, spacing } from "@/theme/tokens";
+import { gradients, radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -67,7 +67,7 @@ export default function Reminders() {
           }}
         >
           <Txt size={15} weight="medium">{label}</Txt>
-          <Txt size={16} weight="semibold" color={colors.gold300} style={{ fontVariant: ["tabular-nums"] }}>
+          <Txt size={16} weight="semibold" color={semantic.accentLight} style={{ fontVariant: ["tabular-nums"] }}>
             {toArabicNumerals(value)}
           </Txt>
         </Pressable>
@@ -87,8 +87,8 @@ export default function Reminders() {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.green800,
-        experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+        backgroundColor: semantic.screen,
+        experimental_backgroundImage: gradients.darkScreen,
       }}
     >
       <ScrollView
@@ -102,32 +102,32 @@ export default function Reminders() {
       >
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Pressable onPress={() => router.back()} hitSlop={12} style={{ width: 38, height: 38, alignItems: "center", justifyContent: "center" }}>
-            <Icon name="chevron.backward" size={24} color={colors.creamText} />
+            <Icon name="chevron.backward" size={24} color={semantic.textPrimary} />
           </Pressable>
           <Txt size={18} weight="bold">أوقات التذكير</Txt>
           <View style={{ width: 38 }} />
         </View>
 
-        <View style={{ backgroundColor: colors.whiteAlpha06, borderRadius: radii.card, borderCurve: "continuous", padding: spacing.lg, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <View style={{ backgroundColor: semantic.surface, borderRadius: radii.card, borderCurve: "continuous", padding: spacing.lg, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
-            <Icon name="bell.fill" size={20} color={colors.gold300} />
+            <Icon name="bell.fill" size={20} color={semantic.accentLight} />
             <Txt size={15} weight="medium">تفعيل التذكير</Txt>
           </View>
           <Switch
             value={settings.remindersEnabled}
             onValueChange={toggle}
-            trackColor={{ true: colors.gold500, false: colors.whiteAlpha14 }}
-            thumbColor="#fff"
+            trackColor={{ true: semantic.accent, false: semantic.surfaceFaint }}
+            thumbColor={semantic.textOnColor}
           />
         </View>
 
-        <View style={{ backgroundColor: colors.whiteAlpha06, borderRadius: radii.card, borderCurve: "continuous", overflow: "hidden" }}>
+        <View style={{ backgroundColor: semantic.surface, borderRadius: radii.card, borderCurve: "continuous", overflow: "hidden" }}>
           <TimeRow which="morning" label="تذكير الصباح" />
-          <View style={{ height: 1, backgroundColor: colors.whiteAlpha08 }} />
+          <View style={{ height: 1, backgroundColor: semantic.surfaceStrong }} />
           <TimeRow which="evening" label="تذكير المساء" />
         </View>
 
-        <Txt size={13} color={colors.muted3} style={{ lineHeight: 22 }}>
+        <Txt size={13} color={semantic.textSecondary} style={{ lineHeight: 22 }}>
           تصلك التنبيهات محلياً على جهازك في الوقت المحدّد — حتى دون اتصال بالإنترنت.
         </Txt>
       </ScrollView>

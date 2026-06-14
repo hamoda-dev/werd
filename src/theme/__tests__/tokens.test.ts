@@ -23,7 +23,7 @@ describe("gradients", () => {
 
 describe("shadows", () => {
   it("are css box-shadow strings", () => {
-    for (const k of ["cardOnCream", "darkElevated", "terracotta", "floatingButton"] as const) {
+    for (const k of ["cardOnCream", "darkElevated", "terracotta", "floatingButton", "goldCard"] as const) {
       expect(typeof shadows[k]).toBe("string");
       expect(shadows[k]).toMatch(/px/);
     }
@@ -47,5 +47,7 @@ describe("semantic colors alias the palette", () => {
     expect(semantic.textOnColorMuted).toBe("rgba(255,255,255,0.85)");
     expect(semantic.textGhost).toBe("#cfe0d6");
     expect(semantic.tabBar).toBe("rgba(14,45,34,0.96)");
+    expect(semantic.inkChip).toBe("rgba(14,45,34,0.15)");
+    expect(semantic.inkTrack).toBe("rgba(14,45,34,0.18)");
   });
 });

@@ -73,6 +73,7 @@ export const shadows = {
   darkElevated: "0 18px 36px -16px rgba(14,45,34,0.6)",
   terracotta: "0 16px 32px -16px rgba(168,87,51,0.6)",
   floatingButton: "0 12px 28px -12px rgba(0,0,0,0.5)",
+  goldCard: "0 16px 32px -16px rgba(191,150,72,0.5)",
 } as const;
 
 /** Background gradients as ready-to-use CSS strings (Expo 55 `experimental_backgroundImage`). */
@@ -131,4 +132,7 @@ export const semantic = {
   borderCream:  colors.borderWarm,
   goldHairline: colors.goldAlpha25,
   tabBar:       "rgba(14,45,34,0.96)", // green900 + 0.96 alpha for the blur-under tab bar
+  // On the gold featured card (challenges)
+  inkChip:  "rgba(14,45,34,0.15)", // translucent dark chip over gold
+  inkTrack: "rgba(14,45,34,0.18)", // translucent dark progress track over gold
 } as const;

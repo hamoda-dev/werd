@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, spacing } from "@/theme/tokens";
+import { colors, gradients, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { Card } from "@/components/card";
@@ -23,9 +23,9 @@ import { useProgressMap } from "@/store/store";
 const WEEKDAY_HEADERS = ["س", "ح", "ن", "ث", "ر", "خ", "ج"]; // Saturday first
 
 const CELL: Record<DayCellState, { bg: string; fg: string }> = {
-  today: { bg: colors.gold500, fg: colors.green800 },
+  today: { bg: semantic.accent, fg: semantic.textOnCream },
   future: { bg: colors.futureCell, fg: colors.futureCellText },
-  complete: { bg: colors.green700, fg: "#fff" },
+  complete: { bg: semantic.brandSurface, fg: semantic.textOnColor },
   partial: { bg: colors.partialCell, fg: colors.partialCellText },
   missed: { bg: colors.missedCell, fg: colors.missedCellText },
 };
@@ -34,7 +34,7 @@ function Legend({ state, label }: { state: DayCellState; label: string }) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
       <View style={{ width: 12, height: 12, borderRadius: 4, backgroundColor: CELL[state].bg }} />
-      <Txt size={12} color={colors.muted3}>{label}</Txt>
+      <Txt size={12} color={semantic.textSecondary}>{label}</Txt>
     </View>
   );
 }
@@ -78,8 +78,8 @@ export default function Stats() {
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.green800,
-        experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+        backgroundColor: semantic.screen,
+        experimental_backgroundImage: gradients.darkScreen,
         paddingTop: insets.top + spacing.sm,
       }}
     >
@@ -97,7 +97,7 @@ export default function Stats() {
           hitSlop={12}
           style={{ width: 38, height: 38, alignItems: "center", justifyContent: "center" }}
         >
-          <Icon name="chevron.backward" size={24} color={colors.creamText} />
+          <Icon name="chevron.backward" size={24} color={semantic.textPrimary} />
         </Pressable>
         <Txt size={17} weight="bold" align="center">الإحصائيات والتقويم</Txt>
         <View style={{ width: 38, height: 38 }} />
@@ -116,11 +116,11 @@ export default function Stats() {
         <Card>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
             <Pressable onPress={() => shiftMonth(-1)} hitSlop={12} style={{ padding: 4 }}>
-              <Icon name="chevron.backward" size={22} color={colors.gold300} />
+              <Icon name="chevron.backward" size={22} color={semantic.accentLight} />
             </Pressable>
             <Txt size={16} weight="bold">{monthLabel(ym.year, ym.month1)}</Txt>
             <Pressable onPress={() => shiftMonth(1)} hitSlop={12} style={{ padding: 4 }}>
-              <Icon name="chevron.forward" size={22} color={colors.gold300} />
+              <Icon name="chevron.forward" size={22} color={semantic.accentLight} />
             </Pressable>
           </View>
 
@@ -128,7 +128,7 @@ export default function Stats() {
           <View style={{ flexDirection: "row", marginTop: spacing.sm }}>
             {WEEKDAY_HEADERS.map((h, i) => (
               <View key={i} style={{ width: `${100 / 7}%`, alignItems: "center" }}>
-                <Txt size={11} color={colors.muted3}>{h}</Txt>
+                <Txt size={11} color={semantic.textSecondary}>{h}</Txt>
               </View>
             ))}
           </View>
@@ -171,7 +171,7 @@ export default function Stats() {
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <Txt size={16} weight="bold">هذا الأسبوع</Txt>
             {delta !== null ? (
-              <Txt size={12} weight="semibold" color={delta >= 0 ? colors.sage : colors.terracotta500}>
+              <Txt size={12} weight="semibold" color={delta >= 0 ? semantic.success : semantic.warm}>
                 {delta >= 0 ? "+" : "−"}{toArabicNumerals(Math.abs(delta))}٪ عن السابق
               </Txt>
             ) : null}
@@ -187,10 +187,10 @@ export default function Stats() {
                       width: "55%",
                       height: h,
                       borderRadius: 6,
-                      backgroundColor: i === bars.maxIndex ? colors.gold500 : colors.whiteAlpha14,
+                      backgroundColor: i === bars.maxIndex ? semantic.accent : semantic.surfaceFaint,
                     }}
                   />
-                  <Txt size={11} color={key === today ? colors.gold300 : colors.muted3}>
+                  <Txt size={11} color={key === today ? semantic.accentLight : semantic.textSecondary}>
                     {weekdayLetter(key)}
                   </Txt>
                 </View>
