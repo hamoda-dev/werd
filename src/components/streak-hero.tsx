@@ -1,5 +1,5 @@
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { colors, radii, spacing } from "@/theme/tokens";
+import { gradients, radii, semantic, shadows, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { toArabicNumerals } from "@/utils/numerals";
 
@@ -21,22 +21,22 @@ export function StreakHero({
     <Animated.View
       entering={animated ? FadeInDown.duration(400) : undefined}
       style={{
-        backgroundColor: colors.terracotta500,
-        experimental_backgroundImage: "linear-gradient(150deg, #c8784e, #a85733)",
+        backgroundColor: semantic.warm,
+        experimental_backgroundImage: gradients.terracotta,
         borderRadius: radii.cardLg,
         borderCurve: "continuous",
         padding: spacing.xl,
         alignItems: "center",
         gap: 6,
-        boxShadow: "0 16px 32px -16px rgba(168,87,51,0.6)",
+        boxShadow: shadows.terracotta,
       }}
     >
-      <Txt size={size} weight="bold" color="#fff" align="center" style={{ fontVariant: ["tabular-nums"] }}>
+      <Txt size={size} weight="bold" color={semantic.textOnColor} align="center" style={{ fontVariant: ["tabular-nums"] }}>
         {toArabicNumerals(current)}
       </Txt>
-      <Txt size={16} weight="semibold" color="#fff" align="center">{subtitle}</Txt>
+      <Txt size={16} weight="semibold" color={semantic.textOnColor} align="center">{subtitle}</Txt>
       {longestText ? (
-        <Txt size={12} color="rgba(255,255,255,0.85)" align="center">{longestText}</Txt>
+        <Txt size={12} color={semantic.textOnColorMuted} align="center">{longestText}</Txt>
       ) : null}
     </Animated.View>
   );

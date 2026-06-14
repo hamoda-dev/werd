@@ -1,7 +1,6 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, radii, spacing } from "@/theme/tokens";
+import { radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { StatChip } from "@/components/stat-chip";
@@ -12,6 +11,7 @@ import { toArabicNumerals } from "@/utils/numerals";
 import { aggregateStats } from "@/store/badges";
 import { BADGES } from "@/data/badges";
 import { useBadges, useProgressMap, useScore, useStreak } from "@/store/store";
+import { Screen } from "@/components/screen";
 
 function NavRow({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
   return (
@@ -21,23 +21,22 @@ function NavRow({ icon, label, onPress }: { icon: string; label: string; onPress
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: colors.whiteAlpha06,
+        backgroundColor: semantic.surface,
         borderRadius: radii.tile,
         borderCurve: "continuous",
         padding: spacing.lg,
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
-        <Icon name={icon} size={20} color={colors.gold300} />
-        <Txt size={15} weight="semibold" color={colors.creamText}>{label}</Txt>
+        <Icon name={icon} size={20} color={semantic.accentLight} />
+        <Txt size={15} weight="semibold" color={semantic.textPrimary}>{label}</Txt>
       </View>
-      <Icon name="chevron.forward" size={18} color={colors.muted2} />
+      <Icon name="chevron.forward" size={18} color={semantic.textTertiary} />
     </Pressable>
   );
 }
 
 export default function Achievements() {
-  const insets = useSafeAreaInsets();
   const router = useRouter();
   const streak = useStreak();
   const score = useScore();
@@ -46,51 +45,35 @@ export default function Achievements() {
   const { activeDays, totalAdhkar } = aggregateStats(progress);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.green800,
-        experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
-      }}
-    >
-      <ScrollView
-        contentContainerStyle={{
-          paddingTop: insets.top + spacing.lg,
-          paddingBottom: spacing.xxl,
-          paddingHorizontal: spacing.xl,
-          gap: spacing.lg,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Txt size={22} weight="bold">إنجازاتي</Txt>
+    <Screen>
+      <Txt size={22} weight="bold">إنجازاتي</Txt>
 
-        <StreakHero
-          current={streak.current}
-          size={72}
-          subtitle="يوماً متتالياً 🔥"
-          longestText={`أطول سلسلة: ${toArabicNumerals(streak.longest)} يوماً`}
-        />
+      <StreakHero
+        current={streak.current}
+        size={72}
+        subtitle="يوماً متتالياً 🔥"
+        longestText={`أطول سلسلة: ${toArabicNumerals(streak.longest)} يوماً`}
+      />
 
-        <View style={{ flexDirection: "row", gap: spacing.md }}>
-          <StatChip value={toArabicNumerals(totalAdhkar)} label="إجمالي الأذكار" />
-          <StatChip value={toArabicNumerals(activeDays)} label="يوم نشِط" />
-          <StatChip value={toArabicNumerals(badges.size)} label="شارة" />
-        </View>
+      <View style={{ flexDirection: "row", gap: spacing.md }}>
+        <StatChip value={toArabicNumerals(totalAdhkar)} label="إجمالي الأذكار" />
+        <StatChip value={toArabicNumerals(activeDays)} label="يوم نشِط" />
+        <StatChip value={toArabicNumerals(badges.size)} label="شارة" />
+      </View>
 
-        <LevelCard score={score} showToNext />
+      <LevelCard score={score} showToNext />
 
-        <View style={{ gap: spacing.sm }}>
-          <NavRow icon="flame.fill" label="التحديات" onPress={() => router.push("/challenges")} />
-          <NavRow icon="checkmark.seal.fill" label="الإحصائيات والتقويم" onPress={() => router.push("/stats")} />
-        </View>
+      <View style={{ gap: spacing.sm }}>
+        <NavRow icon="flame.fill" label="التحديات" onPress={() => router.push("/challenges")} />
+        <NavRow icon="checkmark.seal.fill" label="الإحصائيات والتقويم" onPress={() => router.push("/stats")} />
+      </View>
 
-        <Txt size={18} weight="bold" style={{ marginTop: spacing.xs }}>الشارات</Txt>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-          {BADGES.map((def) => (
-            <BadgeTile key={def.id} def={def} unlocked={badges.has(def.id)} />
-          ))}
-        </View>
-      </ScrollView>
-    </View>
+      <Txt size={18} weight="bold" style={{ marginTop: spacing.xs }}>الشارات</Txt>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+        {BADGES.map((def) => (
+          <BadgeTile key={def.id} def={def} unlocked={badges.has(def.id)} />
+        ))}
+      </View>
+    </Screen>
   );
 }

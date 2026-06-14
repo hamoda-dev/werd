@@ -1,7 +1,7 @@
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { colors, spacing } from "@/theme/tokens";
+import { semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 
@@ -19,9 +19,9 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
     <View
       style={{
         flexDirection: "row",
-        backgroundColor: "rgba(14,45,34,0.96)",
+        backgroundColor: semantic.tabBar,
         borderTopWidth: 1,
-        borderTopColor: colors.whiteAlpha08,
+        borderTopColor: semantic.surfaceStrong,
         paddingTop: spacing.sm,
         paddingBottom: Math.max(insets.bottom, spacing.sm),
         paddingHorizontal: spacing.sm,
@@ -54,18 +54,18 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
                 width: 6,
                 height: 6,
                 borderRadius: 3,
-                backgroundColor: focused ? colors.gold500 : "transparent",
+                backgroundColor: focused ? semantic.accent : "transparent",
               }}
             />
             <Icon
               name={meta.icon}
               size={22}
-              color={focused ? colors.gold300 : colors.muted2}
+              color={focused ? semantic.accentLight : semantic.textTertiary}
             />
             <Txt
               size={11}
               weight={focused ? "semibold" : "regular"}
-              color={focused ? colors.creamText : colors.muted2}
+              color={focused ? semantic.textPrimary : semantic.textTertiary}
               align="center"
             >
               {meta.label}

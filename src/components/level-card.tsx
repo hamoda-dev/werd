@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { colors } from "@/theme/tokens";
+import { semantic } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Card } from "@/components/card";
 import { ProgressBar } from "@/components/progress-bar";
@@ -13,16 +13,16 @@ export function LevelCard({ score, showToNext = false }: { score: Score; showToN
   return (
     <Card>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Txt size={15} weight="bold" color={colors.creamText}>
+        <Txt size={15} weight="bold" color={semantic.textPrimary}>
           المستوى {toArabicNumerals(lvl.level)} · {levelTitle(lvl.level)}
         </Txt>
-        <Txt size={12} weight="semibold" color={colors.gold300}>
+        <Txt size={12} weight="semibold" color={semantic.accentLight}>
           {toArabicNumerals(lvl.inLevel)}/{toArabicNumerals(POINTS_PER_LEVEL)}
         </Txt>
       </View>
-      <ProgressBar ratio={lvl.ratio} color={colors.gold500} />
+      <ProgressBar ratio={lvl.ratio} />
       {showToNext ? (
-        <Txt size={12} color={colors.muted3}>
+        <Txt size={12} color={semantic.textSecondary}>
           باقٍ {toArabicNumerals(lvl.toNext)} نقطة للمستوى التالي
         </Txt>
       ) : null}

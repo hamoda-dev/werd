@@ -72,19 +72,70 @@ export const shadows = {
   cardOnCream: "0 8px 20px -12px rgba(20,57,46,0.3)",
   darkElevated: "0 18px 36px -16px rgba(14,45,34,0.6)",
   terracotta: "0 16px 32px -16px rgba(168,87,51,0.6)",
+  floatingButton: "0 12px 28px -12px rgba(0,0,0,0.5)",
+  goldCard: "0 16px 32px -16px rgba(191,150,72,0.5)",
+  sheet: "0 -12px 30px -16px rgba(14,45,34,0.5)",
 } as const;
 
-/** Background gradients (for use with expo-linear-gradient or layered Views). */
+/** Background gradients as ready-to-use CSS strings (Expo 55 `experimental_backgroundImage`). */
 export const gradients = {
-  darkScreen: ["#16352a", "#0e2d22"] as const,
-  brandCard: ["#1c4a3a", "#0e2d22"] as const,
-  streak: ["#c8784e", "#a85733"] as const,
-  gold: ["#d8b46a", "#bf9648"] as const,
-};
-
-/** Badge tile gradients, keyed by the gradient field in BadgeDef. */
-export const badgeGradientCss: Record<"gold" | "sage" | "terracotta", string> = {
-  gold: "linear-gradient(150deg, #d8b46a, #bf9648)",
-  sage: "linear-gradient(150deg, #3f8268, #2c5e4a)",
+  darkScreen: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+  brandCard:  "linear-gradient(150deg, #1c4a3a, #0e2d22)",
+  gold:       "linear-gradient(150deg, #d8b46a, #bf9648)",
+  sage:       "linear-gradient(150deg, #3f8268, #2c5e4a)",
   terracotta: "linear-gradient(150deg, #c8784e, #a85733)",
-};
+  onboardingGlow:
+    "radial-gradient(circle at 50% 18%, rgba(216,180,106,0.28) 0%, transparent 55%), linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+  logoGlow: "radial-gradient(circle, rgba(216,180,106,0.30) 0%, transparent 62%)",
+} as const;
+
+/** Type scale — size + weight + lineHeight only. Color stays a separate, contextual prop. */
+export const text = {
+  title:      { size: 26, weight: "bold",    lineHeight: 34 },
+  heading:    { size: 18, weight: "bold",    lineHeight: 26 },
+  subheading: { size: 16, weight: "bold",    lineHeight: 24 },
+  body:       { size: 15, weight: "regular", lineHeight: 24 },
+  label:      { size: 14, weight: "medium",  lineHeight: 20 },
+  caption:    { size: 12, weight: "regular", lineHeight: 18 },
+  micro:      { size: 11, weight: "regular", lineHeight: 14 },
+} as const;
+
+/** Semantic (role-based) color aliases. Additive — references the palette above. */
+export const semantic = {
+  // Surfaces — dark
+  screen:        colors.green800,
+  screenDeep:    colors.green900,
+  surface:       colors.whiteAlpha06,
+  surfaceStrong: colors.whiteAlpha08,
+  surfaceFaint:  colors.whiteAlpha14, // subtle fill/track — same value as `border` by design
+  brandSurface:  colors.green700,
+  // Surfaces — cream / light
+  surfaceCream:    colors.cream50,
+  surfaceCreamAlt: colors.cream200,
+  screenCream:     colors.cream100,
+  surfaceWhite:    "#fff", // pure-white input surface (distinct from cream)
+  // Text
+  textPrimary:      colors.creamText,
+  textSecondary:    colors.muted3,
+  textOnColor:      "#fff",
+  textOnColorMuted: "rgba(255,255,255,0.85)",
+  textOnCream:      colors.green800,
+  textMutedCream:   colors.muted1,
+  textTertiary:     colors.muted2,
+  textGhost:        "#cfe0d6",
+  // Accent / status
+  accent:      colors.gold500,
+  accentLight: colors.gold300,
+  accentDeep:  colors.gold700,
+  success:     colors.sage,
+  warm:        colors.terracotta500,
+  warmDeep:    colors.terracotta700,
+  // Lines / chrome
+  border:       colors.whiteAlpha14, // hairline stroke — same value as `surfaceFaint` by design
+  borderCream:  colors.borderWarm,
+  goldHairline: colors.goldAlpha25,
+  tabBar:       "rgba(14,45,34,0.96)", // green900 + 0.96 alpha for the blur-under tab bar
+  // On the gold featured card (challenges)
+  inkChip:  "rgba(14,45,34,0.15)", // translucent dark chip over gold
+  inkTrack: "rgba(14,45,34,0.18)", // translucent dark progress track over gold
+} as const;

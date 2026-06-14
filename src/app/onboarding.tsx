@@ -4,12 +4,10 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp, FadeOut } from "react-native-reanimated";
 import { Image } from "expo-image";
-import { colors, fonts, gradients, radii, shadows, spacing } from "@/theme/tokens";
+import { colors, fonts, gradients, radii, shadows, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { useSettings } from "@/store/store";
-
-const goldGradient = `linear-gradient(150deg, ${gradients.gold[0]}, ${gradients.gold[1]})`;
 
 export default function Onboarding() {
   const router = useRouter();
@@ -40,9 +38,8 @@ export default function Onboarding() {
       keyboardVerticalOffset={0}
       style={{
         flex: 1,
-        backgroundColor: colors.green800,
-        experimental_backgroundImage:
-          "radial-gradient(circle at 50% 18%, rgba(216,180,106,0.28) 0%, transparent 55%), linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+        backgroundColor: semantic.screen,
+        experimental_backgroundImage: gradients.onboardingGlow,
       }}
     >
       {/* Top area: logo + tagline — hidden when the keyboard opens so the logo isn't clipped */}
@@ -63,8 +60,7 @@ export default function Onboarding() {
                 width: 230,
                 height: 230,
                 borderRadius: 115,
-                experimental_backgroundImage:
-                  "radial-gradient(circle, rgba(216,180,106,0.30) 0%, transparent 62%)",
+                experimental_backgroundImage: gradients.logoGlow,
               }}
             />
             <Animated.View
@@ -79,7 +75,7 @@ export default function Onboarding() {
                   contentFit="contain"
                 />
               </View>
-              <Txt naskh size={14} color={colors.gold300} align="center" style={{ letterSpacing: 0.5, opacity: 0.92 }}>
+              <Txt naskh size={14} color={semantic.accentLight} align="center" style={{ letterSpacing: 0.5, opacity: 0.92 }}>
                 أذكار الصباح والمساء
               </Txt>
             </Animated.View>
@@ -91,24 +87,24 @@ export default function Onboarding() {
       <Animated.View
         entering={FadeInUp.duration(450)}
         style={{
-          backgroundColor: colors.cream50,
+          backgroundColor: semantic.surfaceCream,
           borderTopLeftRadius: radii.cardLg,
           borderTopRightRadius: radii.cardLg,
           borderCurve: "continuous",
           borderWidth: 1.5,
           borderBottomWidth: 0,
-          borderColor: colors.gold500,
+          borderColor: semantic.accent,
           paddingHorizontal: spacing.xl,
           paddingTop: spacing.xxl,
           paddingBottom: insets.bottom + spacing.xl,
           gap: spacing.md,
-          boxShadow: "0 -12px 30px -16px rgba(14,45,34,0.5)",
+          boxShadow: shadows.sheet,
         }}
       >
         <Txt naskh weight="bold" size={26} color={colors.green900}>
           أهلاً بك
         </Txt>
-        <Txt size={14} color={colors.muted1} style={{ lineHeight: 24 }}>
+        <Txt size={14} color={semantic.textMutedCream} style={{ lineHeight: 24 }}>
           لِنبدأ بالتعرّف عليك ونخصّص لك يومك.
         </Txt>
 
@@ -120,13 +116,13 @@ export default function Onboarding() {
             value={name}
             onChangeText={setName}
             placeholder="اكتب اسمك"
-            placeholderTextColor={colors.muted2}
+            placeholderTextColor={semantic.textTertiary}
             returnKeyType="done"
             onSubmitEditing={handleStart}
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: semantic.surfaceWhite,
               borderWidth: 1,
-              borderColor: colors.borderWarm,
+              borderColor: semantic.borderCream,
               borderRadius: radii.tile,
               borderCurve: "continuous",
               paddingHorizontal: spacing.lg,
@@ -149,11 +145,11 @@ export default function Onboarding() {
             paddingVertical: 16,
             alignItems: "center",
             marginTop: spacing.xs,
-            backgroundColor: trimmed ? colors.gold500 : colors.borderWarm,
-            experimental_backgroundImage: trimmed ? goldGradient : undefined,
+            backgroundColor: trimmed ? semantic.accent : semantic.borderCream,
+            experimental_backgroundImage: trimmed ? gradients.gold : undefined,
           }}
         >
-          <Txt weight="bold" size={16} color={trimmed ? colors.green800 : colors.muted2}>
+          <Txt weight="bold" size={16} color={trimmed ? semantic.textOnCream : semantic.textTertiary}>
             ابدأ
           </Txt>
         </Pressable>
@@ -167,8 +163,8 @@ export default function Onboarding() {
             marginTop: spacing.xs,
           }}
         >
-          <Icon name="lock.fill" size={12} color={colors.muted1} />
-          <Txt size={11} color={colors.muted1}>
+          <Icon name="lock.fill" size={12} color={semantic.textMutedCream} />
+          <Txt size={11} color={semantic.textMutedCream}>
             بياناتك تبقى على جهازك
           </Txt>
         </View>

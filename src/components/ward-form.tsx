@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, fonts, radii, spacing } from "@/theme/tokens";
+import { fonts, gradients, radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -22,14 +22,14 @@ interface Props {
 }
 
 const fieldStyle = {
-  backgroundColor: colors.whiteAlpha08,
+  backgroundColor: semantic.surfaceStrong,
   borderRadius: radii.tile,
   borderCurve: "continuous" as const,
   paddingHorizontal: spacing.lg,
   paddingVertical: 14,
   fontFamily: fonts.sansMedium,
   fontSize: 16,
-  color: colors.creamText,
+  color: semantic.textPrimary,
   textAlign: "auto" as const,
   writingDirection: "auto" as const,
 };
@@ -59,8 +59,8 @@ export function WardForm({ heading, initial, submitLabel, onSubmit, onCancel, on
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.green800,
-        experimental_backgroundImage: "linear-gradient(180deg, #16352a 0%, #0e2d22 100%)",
+        backgroundColor: semantic.screen,
+        experimental_backgroundImage: gradients.darkScreen,
       }}
     >
       <ScrollView
@@ -76,7 +76,7 @@ export function WardForm({ heading, initial, submitLabel, onSubmit, onCancel, on
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Txt size={20} weight="bold">{heading}</Txt>
           <Pressable onPress={onCancel} hitSlop={12} style={{ width: 36, height: 36, alignItems: "center", justifyContent: "center" }}>
-            <Icon name="xmark" size={20} color={colors.muted2} />
+            <Icon name="xmark" size={20} color={semantic.textTertiary} />
           </Pressable>
         </View>
 
@@ -86,7 +86,7 @@ export function WardForm({ heading, initial, submitLabel, onSubmit, onCancel, on
             value={title}
             onChangeText={setTitle}
             placeholder="مثال: تسبيح بعد الصلاة"
-            placeholderTextColor={colors.muted2}
+            placeholderTextColor={semantic.textTertiary}
             style={fieldStyle}
           />
         </View>
@@ -97,7 +97,7 @@ export function WardForm({ heading, initial, submitLabel, onSubmit, onCancel, on
             value={text}
             onChangeText={setText}
             placeholder="اكتب نص الذكر"
-            placeholderTextColor={colors.muted2}
+            placeholderTextColor={semantic.textTertiary}
             multiline
             style={[fieldStyle, { minHeight: 110, textAlignVertical: "top", fontFamily: fonts.naskh, fontSize: 20, lineHeight: 34 }]}
           />
@@ -108,18 +108,18 @@ export function WardForm({ heading, initial, submitLabel, onSubmit, onCancel, on
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.xl }}>
             <Pressable
               onPress={() => setCount((c) => Math.max(1, c - 1))}
-              style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colors.whiteAlpha08, alignItems: "center", justifyContent: "center" }}
+              style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: semantic.surfaceStrong, alignItems: "center", justifyContent: "center" }}
             >
-              <Txt size={26} weight="bold" color={colors.creamText}>−</Txt>
+              <Txt size={26} weight="bold" color={semantic.textPrimary}>−</Txt>
             </Pressable>
-            <Txt size={32} weight="bold" color={colors.gold300} style={{ minWidth: 70, fontVariant: ["tabular-nums"] }} align="center">
+            <Txt size={32} weight="bold" color={semantic.accentLight} style={{ minWidth: 70, fontVariant: ["tabular-nums"] }} align="center">
               {toArabicNumerals(count)}
             </Txt>
             <Pressable
               onPress={() => setCount((c) => c + 1)}
-              style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colors.whiteAlpha08, alignItems: "center", justifyContent: "center" }}
+              style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: semantic.surfaceStrong, alignItems: "center", justifyContent: "center" }}
             >
-              <Txt size={26} weight="bold" color={colors.creamText}>+</Txt>
+              <Txt size={26} weight="bold" color={semantic.textPrimary}>+</Txt>
             </Pressable>
           </View>
         </View>
@@ -129,19 +129,19 @@ export function WardForm({ heading, initial, submitLabel, onSubmit, onCancel, on
           disabled={!valid}
           style={{
             marginTop: spacing.sm,
-            backgroundColor: valid ? colors.gold500 : colors.whiteAlpha14,
+            backgroundColor: valid ? semantic.accent : semantic.surfaceFaint,
             borderRadius: radii.pill,
             borderCurve: "continuous",
             paddingVertical: 16,
             alignItems: "center",
           }}
         >
-          <Txt weight="bold" size={16} color={valid ? colors.green800 : colors.muted2}>{submitLabel}</Txt>
+          <Txt weight="bold" size={16} color={valid ? semantic.textOnCream : semantic.textTertiary}>{submitLabel}</Txt>
         </Pressable>
 
         {onDelete ? (
           <Pressable onPress={confirmDelete} style={{ paddingVertical: 14, alignItems: "center" }}>
-            <Txt weight="semibold" color={colors.terracotta500}>حذف الوِرد</Txt>
+            <Txt weight="semibold" color={semantic.warm}>حذف الوِرد</Txt>
           </Pressable>
         ) : null}
       </ScrollView>
