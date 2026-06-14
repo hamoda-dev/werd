@@ -32,7 +32,9 @@ export default function DhikrCounterScreen() {
   const free = isFree(item.count);
 
   function handleComplete() {
-    completeWard();
+    // Ward points + the "complete your own ward" challenge apply to user items only,
+    // not the read-only built-in classics.
+    if (!item!.locked) completeWard();
     router.back();
   }
 

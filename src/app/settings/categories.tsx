@@ -93,7 +93,7 @@ export default function CategoriesScreen() {
               <>
                 <TextInput value={draft} onChangeText={setDraft} autoFocus onSubmitEditing={saveEdit} returnKeyType="done" style={[inputStyle, { flex: 1 }]} />
                 <Pressable onPress={saveEdit} hitSlop={10}>
-                  <Icon name="checkmark" size={20} color={semantic.accentLight} />
+                  <Icon name="checkmark" size={20} color={draft.trim() ? semantic.accentLight : semantic.textTertiary} />
                 </Pressable>
               </>
             ) : (

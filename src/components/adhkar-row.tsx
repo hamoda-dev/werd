@@ -1,4 +1,4 @@
-import { Pressable, View } from "react-native";
+import { I18nManager, Pressable, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
@@ -121,36 +121,44 @@ export function AdhkarRow({ item, onPress, onEdit, onDelete }: Props) {
     );
   }
 
-  return (
-    <ReanimatedSwipeable
-      friction={2}
-      rightThreshold={36}
-      renderRightActions={(_progress, _translation, methods) => (
-        <View style={{ flexDirection: "row", alignItems: "stretch" }}>
-          <ActionButton
-            bg={semantic.accentDeep}
-            icon="pencil"
-            label="تعديل"
-            onPress={() => {
-              methods.close();
-              onEdit?.();
-            }}
-          />
-          <ActionButton
-            bg={semantic.warmDeep}
-            icon="trash"
-            label="حذف"
-            onPress={() => {
-              methods.close();
-              onDelete?.();
-            }}
-          />
-        </View>
-      )}
-    >
-      <Pressable accessibilityRole="button" onPress={onPress}>
-        <RowBody item={item} />
-      </Pressable>
+  const actions = (methods: { close: () => void }) => (
+    <View style={{ flexDirection: "row", alignItems: "stretch" }}>
+      <ActionButton
+        bg={semantic.accentDeep}
+        icon="pencil"
+        label="تعديل"
+        onPress={() => {
+          methods.close();
+          onEdit?.();
+        }}
+      />
+      <ActionButton
+        bg={semantic.warmDeep}
+        icon="trash"
+        label="حذف"
+        onPress={() => {
+          methods.close();
+          onDelete?.();
+        }}
+      />
+    </View>
+  );
+
+  const child = (
+    <Pressable accessibilityRole="button" onPress={onPress}>
+      <RowBody item={item} />
+    </Pressable>
+  );
+
+  // gesture-handler mirrors the action panel for RTL but does NOT flip the swipe
+  // trigger, so reveal on the leading edge explicitly: left actions under RTL.
+  return I18nManager.isRTL ? (
+    <ReanimatedSwipeable friction={2} leftThreshold={36} renderLeftActions={(_p, _t, m) => actions(m)}>
+      {child}
+    </ReanimatedSwipeable>
+  ) : (
+    <ReanimatedSwipeable friction={2} rightThreshold={36} renderRightActions={(_p, _t, m) => actions(m)}>
+      {child}
     </ReanimatedSwipeable>
   );
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,33 +11,22 @@ import { toArabicNumerals } from "@/utils/numerals";
 import { getCategory } from "@/data/adhkar";
 import {
   completeCategory,
-  completeWard,
   getPartialCount,
   getTodayCompletedIds,
   markDhikrCompleted,
   setPartialCount,
-  useCustomAwrad,
 } from "@/store/store";
-import type { Dhikr } from "@/types";
 
 export default function SessionScreen() {
   const { category } = useLocalSearchParams<{ category: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { list } = useCustomAwrad();
 
+  // The session serves the built-in morning/evening categories. Custom أذكار are
+  // counted one-at-a-time via /dhikr/[id], so there is no custom-ward path here.
   const builtin = category ? getCategory(category) : undefined;
-  const ward = !builtin && category ? list.find((w) => w.id === category) : undefined;
-
-  const items: Dhikr[] = useMemo(() => {
-    if (builtin) return builtin.adhkar;
-    if (ward)
-      return [{ id: ward.id, text: ward.text, count: ward.count ?? 0, title: ward.title }];
-    return [];
-  }, [builtin, ward]);
-
-  const title = builtin ? builtin.title : (ward?.title ?? "وِرد");
-  const isBuiltin = !!builtin;
+  const items = builtin?.adhkar ?? [];
+  const title = builtin?.title ?? "";
 
   // Resume from the first dhikr not yet completed today (for built-in adhkar). Computed once on open.
   const [index, setIndex] = useState(() => {
@@ -61,18 +50,16 @@ export default function SessionScreen() {
   }
 
   function finish() {
-    if (isBuiltin && builtin) {
+    if (builtin) {
       completeCategory(builtin.id);
       // Clear the partial counts so a later repeat starts from zero.
       builtin.adhkar.forEach((d) => setPartialCount(d.id, 0));
-    } else {
-      completeWard();
     }
     router.back();
   }
 
   function advance() {
-    if (isBuiltin) markDhikrCompleted(current.id);
+    markDhikrCompleted(current.id);
     if (index < items.length - 1) setIndex(index + 1);
     else finish();
   }

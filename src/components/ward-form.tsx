@@ -59,7 +59,8 @@ export function WardForm({
   const [free, setFree] = useState(initial ? initial.count == null : false);
   const [count, setCount] = useState(initial?.count ?? DEFAULT_TARGET);
   const [category, setCategory] = useState(
-    initial?.category ?? categories[0]?.id ?? "general",
+    // `||` (not `??`) so a legacy item with an empty-string category falls back too.
+    (initial?.category && initial.category.trim()) || categories[0]?.id || "general",
   );
   const [adding, setAdding] = useState(false);
   const [newCat, setNewCat] = useState("");
