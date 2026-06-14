@@ -14,28 +14,23 @@ interface Props {
   onDelete?: () => void;
 }
 
-function CountChip({ count }: { count: number | null }) {
-  const free = isFree(count);
+/** Gold repetition chip — rendered only for items that have a target. */
+function CountChip({ count }: { count: number }) {
   return (
     <View
       style={{
-        backgroundColor: free ? semantic.surfaceStrong : semantic.goldHairline,
+        backgroundColor: semantic.goldHairline,
         borderRadius: radii.pill,
         borderCurve: "continuous",
         paddingHorizontal: 11,
-        paddingVertical: free ? 5 : 3,
+        paddingVertical: 3,
         minWidth: 34,
         alignItems: "center",
-        justifyContent: "center",
       }}
     >
-      {free ? (
-        <Icon name="infinity" size={15} color={semantic.textSecondary} />
-      ) : (
-        <Txt size={13} weight="semibold" color={semantic.accentLight}>
-          {toArabicNumerals(count as number)}
-        </Txt>
-      )}
+      <Txt size={13} weight="semibold" color={semantic.accentLight}>
+        {toArabicNumerals(count)}
+      </Txt>
     </View>
   );
 }
@@ -71,12 +66,8 @@ function RowBody({ item }: { item: AdhkariItem }) {
         )}
       </View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
-        <CountChip count={item.count} />
-        {item.locked ? (
-          <Icon name="lock.fill" size={14} color={semantic.textTertiary} />
-        ) : (
-          <Icon name="chevron.forward" size={18} color={semantic.textTertiary} />
-        )}
+        {isFree(item.count) ? null : <CountChip count={item.count as number} />}
+        <Icon name="chevron.forward" size={18} color={semantic.textTertiary} />
       </View>
     </View>
   );
