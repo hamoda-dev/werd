@@ -70,12 +70,14 @@ function ActionButton({
   gradient,
   fallback,
   labelColor,
+  icon,
   label,
   onPress,
 }: {
   gradient: string;
   fallback: string;
   labelColor: string;
+  icon: string;
   label: string;
   onPress: () => void;
 }) {
@@ -91,9 +93,11 @@ function ActionButton({
         experimental_backgroundImage: gradient,
         alignItems: "center",
         justifyContent: "center",
+        gap: 4,
       }}
     >
-      <Txt size={14} weight="bold" color={labelColor}>{label}</Txt>
+      <Icon name={icon} size={20} color={labelColor} />
+      <Txt size={12} weight="bold" color={labelColor}>{label}</Txt>
     </GHPressable>
   );
 }
@@ -117,6 +121,7 @@ export function AdhkarRow({ item, onPress, onEdit, onDelete }: Props) {
         gradient={gradients.gold}
         fallback={semantic.accent}
         labelColor={semantic.textOnCream}
+        icon="pencil"
         label="تعديل"
         onPress={() => {
           methods.close();
@@ -127,6 +132,7 @@ export function AdhkarRow({ item, onPress, onEdit, onDelete }: Props) {
         gradient={gradients.terracotta}
         fallback={semantic.warm}
         labelColor={semantic.textOnColor}
+        icon="trash"
         label="حذف"
         onPress={() => {
           methods.close();

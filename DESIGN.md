@@ -234,7 +234,7 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 ## 5. RTL & Internationalization
 
 - **Hard RTL.** [`app/_layout.tsx`](src/app/_layout.tsx) calls `I18nManager.allowRTL(true)` + `forceRTL(true)` at module load. The whole layout mirrors; design and review everything right‑to‑left. (RN applies a forced‑RTL flip after the first relaunch — expected behavior.)
-- **Directional glyphs flip meaning.** "Back" points **right** (toward the start edge in RTL). Because the bidi engine mirrors angle-bracket glyphs (and `SymbolView` doesn't mirror `chevron.backward`), the [Icon](src/components/icon.tsx) component handles `chevron.backward` explicitly under RTL — `chevron.right` on iOS, a mirror-aware glyph on Android — so every header back button points right. Forward/disclosure chevrons (`chevron.forward`) are left as-is.
+- **Directional glyphs flip meaning.** "Back" points **right** (toward the start edge in RTL), "forward/next" points **left**. The [Icon](src/components/icon.tsx) component draws chevrons as SVG and maps `chevron.backward`/`chevron.forward` to the right/left glyph per `I18nManager.isRTL` — deterministic, with none of the SF‑Symbol/bidi mirroring quirks the old font‑glyph approach had.
 - **All copy is Arabic.** No i18n framework — strings are inline Arabic literals. There is no English UI surface to maintain.
 - **Numerals** are Eastern‑Arabic everywhere (§3).
 
@@ -258,35 +258,23 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 
 ## 7. Iconography
 
-There are **two** icon primitives, by surface:
+**Every icon is hand‑drawn SVG** (`react-native-svg`) on a 24×24 grid in one **"Rounded" style** — `2px` rounded strokes, round joins — so the whole app shares a single geometric language and renders **pixel‑identical on iOS and Android**. No SF Symbols, no Unicode/emoji fallbacks, **no third‑party icon set**. Two primitives, same style:
 
-1. **Tab bar** → [`<TabIcon name active color size />`](src/components/tab-icon.tsx). Four **hand‑drawn SVG** glyphs (`react-native-svg`) on a 24×24 grid — **pixel‑identical on iOS and Android**. Style is "Rounded": `2px` rounded strokes when inactive, **solid fill** when active (the only outline↔fill state the app uses). Color comes from the tab bar (`accentLight`/`gold300` active, `textTertiary`/`muted2` inactive). These replace the former SF‑Symbol tab glyphs — `circle.fill` was a meaningless dot for tasbih, and the Android Unicode fallbacks (● ☻) looked amateurish.
+1. **General icons** → [`<Icon name size color />`](src/components/icon.tsx). The shared **stroke** set. `color` defaults to `textPrimary`; directional chevrons resolve per layout direction (`chevron.backward` → right under RTL — no SF‑Symbol/bidi mirroring quirks). Names keep their old SF‑Symbol‑style keys so call sites didn't change.
 
-| Tab | TabIcon glyph |
-|-----|---------------|
-| Home (`index`) | House |
-| Tasbih (`tasbih`) | **Misbaha** — beaded loop + imame + tassel |
-| Achievements (`achievements`) | **Trophy** |
-| Profile (`profile`) | Person |
+| Purpose | `name` | Purpose | `name` |
+|---------|--------|---------|--------|
+| Morning (sun) | `sun.max.fill` | Add | `plus` |
+| Evening (moon) | `moon.fill` | Done | `checkmark` |
+| Streak (flame) | `flame.fill` | Close | `xmark` |
+| Reminders (bell) | `bell.fill` | Back / Forward | `chevron.backward` / `chevron.forward` |
+| Settings (gear) | `gearshape.fill` | Edit / Delete | `pencil` / `trash` |
+| Locked | `lock.fill` | Reset | `arrow.counterclockwise` |
+| Star / Seal‑check | `star.fill` / `checkmark.seal.fill` | More | `ellipsis` |
 
-2. **Everywhere else** → [`<Icon name size color />`](src/components/icon.tsx). Renders **SF Symbols via `expo-symbols`** on iOS and a curated **Unicode fallback** on Android/web, so layouts stay readable cross‑platform.
+2. **Tab bar** → [`<TabIcon name active color size />`](src/components/tab-icon.tsx). The four tab glyphs (House, **Misbaha**, **Trophy**, Person) in the same style but **two‑state**: `2px` outline when inactive, **solid fill** when active (gold). The only outline↔fill state the app uses.
 
-| Purpose | SF Symbol | Fallback |
-|---------|-----------|----------|
-| Morning | `sun.max.fill` | ☀ |
-| Evening | `moon.fill` | ☾ |
-| Streak | `flame.fill` | 🔥 |
-| Done | `checkmark` | ✓ |
-| Add | `plus` | + |
-| Back (RTL) | `chevron.backward` | › |
-| Forward | `chevron.forward` | ‹ |
-| Reminders | `bell.fill` | 🔔 |
-| Settings | `gearshape.fill` | ⚙ |
-| Edit / Delete | `pencil` / `trash` | ✎ / 🗑 |
-| Reset | `arrow.counterclockwise` | ↺ |
-| Locked (category) | `lock.fill` | 🔒 |
-
-Keep icons **minimal and geometric**, and **never import a third‑party icon set**. To add a general icon: pick the SF Symbol name and add a matching Unicode fallback entry in [icon.tsx](src/components/icon.tsx). To change a tab glyph: edit the hand‑drawn SVG in [tab-icon.tsx](src/components/tab-icon.tsx) (still in‑repo, still minimal/geometric — drawing our own is not the same as importing a set).
+Keep icons **minimal and geometric**. To add a general icon: add an SVG glyph to the `GLYPHS` map in [icon.tsx](src/components/icon.tsx) (stroke‑only, 24×24). To change a tab glyph: edit [tab-icon.tsx](src/components/tab-icon.tsx). Drawing our own in‑repo is **not** the same as importing a set. (`expo-symbols` is no longer used by the icon system.)
 
 ---
 
@@ -319,9 +307,9 @@ Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, t
 | Component | File | Notes |
 |-----------|------|-------|
 | `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, variant scale, RTL, theme color. |
-| `Icon` | [icon.tsx](src/components/icon.tsx) | SF Symbols + Unicode fallback. |
+| `Icon` | [icon.tsx](src/components/icon.tsx) | The shared hand‑drawn SVG glyph set (rounded 2px stroke, 24×24); RTL‑aware chevrons. |
 | `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. `target: number \| null` — `null` is a **free** tasbih (faint full ring, «تسبيح حر», no goal/celebration). Reused for built‑in adhkar, the session, and the single‑dhikr counter. |
-| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row. **Built-ins and user items render identically** — the dhikr text in Amiri/naskh (18/semibold). Gold count chip **only when the item has a target** (free items show no chip); a chevron only on the user's own items (built-ins have none). User items wrap `ReanimatedSwipeable` for تعديل (gold gradient) / حذف (terracotta gradient) — text-only, no icons. |
+| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row. **Built-ins and user items render identically** — the dhikr text in Amiri/naskh (18/semibold). Gold count chip **only when the item has a target** (free items show no chip); a chevron only on the user's own items (built-ins have none). User items wrap `ReanimatedSwipeable` for تعديل (gold gradient, pencil icon) / حذف (terracotta gradient, trash icon). |
 | `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
 | `TabIcon` | [tab-icon.tsx](src/components/tab-icon.tsx) | Hand‑drawn SVG tab glyphs (house / misbaha / trophy / person); outline→fill on active. |
 | `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |
