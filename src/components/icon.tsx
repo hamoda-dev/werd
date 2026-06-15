@@ -52,6 +52,14 @@ const GLYPHS: Record<string, ReactNode> = {
     </>
   ),
 
+  "speaker.wave.fill": (
+    <>
+      <Path d="M11 5 L6 9 H3 a1 1 0 0 0 -1 1 V14 a1 1 0 0 0 1 1 H6 L11 19 Z" />
+      <Path d="M15.5 9 a4.5 4.5 0 0 1 0 6" />
+      <Path d="M18.5 6 a9 9 0 0 1 0 12" />
+    </>
+  ),
+
   pencil: <Path d="M16.5 4.5 a2.12 2.12 0 0 1 3 3 L7 20 L3 21 L4 17 Z" />,
 
   trash: (

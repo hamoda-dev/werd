@@ -61,6 +61,8 @@ export interface Settings {
   remindersEnabled: boolean;
   morningTime: string; // "HH:mm"
   eveningTime: string; // "HH:mm"
+  /** Play the click sound on each tasbih tap. Undefined (legacy) is treated as enabled. */
+  soundEnabled?: boolean;
 }
 
 export interface DayProgress {

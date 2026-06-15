@@ -269,6 +269,7 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 | Streak (flame) | `flame.fill` | Close | `xmark` |
 | Reminders (bell) | `bell.fill` | Back / Forward | `chevron.backward` / `chevron.forward` |
 | Settings (gear) | `gearshape.fill` | Edit / Delete | `pencil` / `trash` |
+| Sound (speaker) | `speaker.wave.fill` | | |
 | Locked | `lock.fill` | Reset | `arrow.counterclockwise` |
 | Star / Seal‑check | `star.fill` / `checkmark.seal.fill` | More | `ellipsis` |
 
@@ -290,7 +291,7 @@ Animation is **purposeful and gentle** — entrance reveals and reward moments, 
 On each tap of the [TasbihCounter](src/components/tasbih-counter.tsx):
 1. **Ring fills** — `strokeDashoffset = C × (1 − count/target)`, `withTiming(…, { duration: 320 })`.
 2. **Haptic** — light impact (`Haptics.impactAsync(Light)`), iOS only.
-3. **Click sound** — a short bundled tap sound ([assets/sounds/click.wav](assets/sounds/click.wav)) via **`expo-audio`** (`useAudioPlayer` → `seekTo(0)` + `play()` per tap; `playsInSilentMode: true`). Local asset, no network. Cross-platform (iOS + Android).
+3. **Click sound** — a short bundled tap sound ([assets/sounds/click.wav](assets/sounds/click.wav)) via **`expo-audio`** (`useAudioPlayer` → `seekTo(0)` + `play()` per tap; `playsInSilentMode: true`). Local asset, no network. Cross-platform. **Toggleable from Profile** (`settings.soundEnabled`; legacy/undefined = on).
 
 On reaching the target:
 3. **Success haptic** — `notificationAsync(Success)`.
@@ -441,7 +442,7 @@ Overview of a category: each row a status circle (sage ✓ done / gold number cu
 Streak banner + simple stat chips (v1). The full badge grid & calendar are deferred — see §12.
 
 ### Profile — [(tabs)/profile.tsx](src/app/(tabs)/profile.tsx)
-Name, reminder access, awrad management, about.
+Name, reminder access, manage-categories link, a **tap-sound toggle** (gold `Switch` → `settings.soundEnabled`), and about.
 
 ### Create / edit a ذِكر — [awrad/new.tsx](src/app/awrad/new.tsx) · [awrad/[id].tsx](src/app/awrad/[id].tsx)
 Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal ذِكر via [WardForm](src/components/ward-form.tsx): title + text + a **category picker** (chips + dashed «+ جديدة» inline‑create) + a **هدف محدد ⇆ تسبيح حر** toggle (free hides the stepper). It then runs through the shared `/dhikr/[id]` counter. (Route folder is still `awrad/` for continuity.)
@@ -490,7 +491,7 @@ These were fully designed in the prototype and are preserved here so they can be
 The app is local‑only; persistence keys (AsyncStorage / local DB) and their shapes:
 
 ```ts
-settings        = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30" }
+settings        = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30", soundEnabled?: bool }  // soundEnabled undefined (legacy) = on
 progress        = { [date: "YYYY-MM-DD"]: { morningDone: bool, eveningDone: bool, completedIds: string[], wardDone?: bool } }
 streak          = { current: number, longest: number, lastCompletedDate: string }
 score           = { points: number, level: number }   // level bar fills every 500 pts

@@ -139,6 +139,30 @@ export default function Profile() {
           <Icon name="chevron.forward" size={16} color={semantic.textTertiary} />
         </Pressable>
 
+        {/* Tap sound */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: semantic.surface,
+            borderRadius: radii.card,
+            borderCurve: "continuous",
+            padding: spacing.lg,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
+            <Icon name="speaker.wave.fill" size={20} color={semantic.accentLight} />
+            <Txt size={15} weight="medium">صوت النقر عند التسبيح</Txt>
+          </View>
+          <Switch
+            value={settings.soundEnabled !== false}
+            onValueChange={(v) => update({ soundEnabled: v })}
+            trackColor={{ true: semantic.accent, false: semantic.surfaceFaint }}
+            thumbColor={semantic.textOnColor}
+          />
+        </View>
+
         {/* About the app */}
         <View
           style={{
