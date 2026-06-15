@@ -274,7 +274,7 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 
 2. **Tab bar** → [`<TabIcon name active color size />`](src/components/tab-icon.tsx). The four tab glyphs (House, **Misbaha**, **Trophy**, Person) in the same style but **two‑state**: `2px` outline when inactive, **solid fill** when active (gold). The only outline↔fill state the app uses.
 
-Keep icons **minimal and geometric**. To add a general icon: add an SVG glyph to the `GLYPHS` map in [icon.tsx](src/components/icon.tsx) (stroke‑only, 24×24). To change a tab glyph: edit [tab-icon.tsx](src/components/tab-icon.tsx). Drawing our own in‑repo is **not** the same as importing a set. (`expo-symbols` is no longer used by the icon system.)
+**Rule — need an icon that doesn't exist? Generate it the same way.** Hand‑draw a new SVG glyph in this exact style (stroke‑only, `2px` rounded strokes, round joins, on a 24×24 grid) and add it to the `GLYPHS` map in [icon.tsx](src/components/icon.tsx) — or to [tab-icon.tsx](src/components/tab-icon.tsx) for a tab glyph. **Never** reach for SF Symbols, emoji/Unicode glyphs, an icon font, or a third‑party icon package. Keep every glyph minimal and geometric so the set stays coherent. Drawing our own in‑repo is **not** the same as importing a set. (`expo-symbols` is no longer used by the icon system and can be removed in a future deps cleanup.)
 
 ---
 
