@@ -206,7 +206,7 @@ A 6‑step scale. Use tokens, not raw numbers, for padding/gap/margins.
 Conventions: **screen horizontal padding = `xl` (22)**; **vertical gap between stacked sections = `lg` (18)**; small inline gaps use raw `4`/`6` where below the scale. (Prototype source ranges: card padding 16–26, card gaps 12–18, screen padding 22–30 — the tokens above are the codified subset.)
 
 ### Radius — `tokens.radii`
-`tile: 18` (list rows, buttons) · `card: 24` (standard cards) · `cardLg: 28` (hero cards) · `pill: 30` (pills). Full circles use `borderRadius: size/2`.
+`tile: 10` (list rows, buttons) · `card: 12` (standard cards) · `cardLg: 14` (hero cards) · `pill: 14` (pills). Full circles use `borderRadius: size/2` (independent of these tokens). _(Roundness was sharpened from the original 18/24/28/30 — adjust the single `radii` block in `tokens.ts` to retune.)_
 **Always pair a radius with `borderCurve: "continuous"`** for iOS‑smooth (squircle) corners — applied on every rounded surface in the app.
 
 ### Borders
@@ -234,7 +234,7 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 ## 5. RTL & Internationalization
 
 - **Hard RTL.** [`app/_layout.tsx`](src/app/_layout.tsx) calls `I18nManager.allowRTL(true)` + `forceRTL(true)` at module load. The whole layout mirrors; design and review everything right‑to‑left. (RN applies a forced‑RTL flip after the first relaunch — expected behavior.)
-- **Directional glyphs flip meaning.** "Back" points **right** (`chevron.backward` → `›`), "next" points **left** (`←` in `الذكر التالي ←`). The [Icon](src/components/icon.tsx) fallbacks already encode this.
+- **Directional glyphs flip meaning.** "Back" points **right** (toward the start edge in RTL), "forward/next" points **left**. The [Icon](src/components/icon.tsx) component draws chevrons as SVG and maps `chevron.backward`/`chevron.forward` to the right/left glyph per `I18nManager.isRTL` — deterministic, with none of the SF‑Symbol/bidi mirroring quirks the old font‑glyph approach had.
 - **All copy is Arabic.** No i18n framework — strings are inline Arabic literals. There is no English UI surface to maintain.
 - **Numerals** are Eastern‑Arabic everywhere (§3).
 
@@ -258,28 +258,24 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 
 ## 7. Iconography
 
-[`<Icon name size color />`](src/components/icon.tsx) is the single icon primitive. It renders **SF Symbols via `expo-symbols`** on iOS and a curated **Unicode fallback** on Android/web, so layouts stay readable cross‑platform. The handoff's small inline geometric icons were intentionally replaced by this system.
+**Every icon is hand‑drawn SVG** (`react-native-svg`) on a 24×24 grid in one **"Rounded" style** — `2px` rounded strokes, round joins — so the whole app shares a single geometric language and renders **pixel‑identical on iOS and Android**. No SF Symbols, no Unicode/emoji fallbacks, **no third‑party icon set**. Two primitives, same style:
 
-| Purpose | SF Symbol | Fallback |
-|---------|-----------|----------|
-| Home tab | `house.fill` | ⌂ |
-| Tasbih tab | `circle.fill` | ● |
-| Achievements tab | `star.fill` | ★ |
-| Profile tab | `person.fill` | ☻ |
-| Morning | `sun.max.fill` | ☀ |
-| Evening | `moon.fill` | ☾ |
-| Streak | `flame.fill` | 🔥 |
-| Done | `checkmark` | ✓ |
-| Add | `plus` | + |
-| Back (RTL) | `chevron.backward` | › |
-| Forward | `chevron.forward` | ‹ |
-| Reminders | `bell.fill` | 🔔 |
-| Settings | `gearshape.fill` | ⚙ |
-| Edit / Delete | `pencil` / `trash` | ✎ / 🗑 |
-| Reset | `arrow.counterclockwise` | ↺ |
-| Locked | `lock.fill` | 🔒 |
+1. **General icons** → [`<Icon name size color />`](src/components/icon.tsx). The shared **stroke** set. `color` defaults to `textPrimary`; directional chevrons resolve per layout direction (`chevron.backward` → right under RTL — no SF‑Symbol/bidi mirroring quirks). Names keep their old SF‑Symbol‑style keys so call sites didn't change.
 
-Keep icons **minimal and geometric**. To add one: pick the SF Symbol name and add a matching Unicode fallback entry in [icon.tsx](src/components/icon.tsx) — never import a third‑party icon set.
+| Purpose | `name` | Purpose | `name` |
+|---------|--------|---------|--------|
+| Morning (sun) | `sun.max.fill` | Add | `plus` |
+| Evening (moon) | `moon.fill` | Done | `checkmark` |
+| Streak (flame) | `flame.fill` | Close | `xmark` |
+| Reminders (bell) | `bell.fill` | Back / Forward | `chevron.backward` / `chevron.forward` |
+| Settings (gear) | `gearshape.fill` | Edit / Delete | `pencil` / `trash` |
+| Sound (speaker) | `speaker.wave.fill` | | |
+| Locked | `lock.fill` | Reset | `arrow.counterclockwise` |
+| Star / Seal‑check | `star.fill` / `checkmark.seal.fill` | More | `ellipsis` |
+
+2. **Tab bar** → [`<TabIcon name active color size />`](src/components/tab-icon.tsx). The four tab glyphs (House, **Misbaha**, **Trophy**, Person) in the same style but **two‑state**: `2px` outline when inactive, **solid fill** when active (gold). The only outline↔fill state the app uses.
+
+**Rule — need an icon that doesn't exist? Generate it the same way.** Hand‑draw a new SVG glyph in this exact style (stroke‑only, `2px` rounded strokes, round joins, on a 24×24 grid) and add it to the `GLYPHS` map in [icon.tsx](src/components/icon.tsx) — or to [tab-icon.tsx](src/components/tab-icon.tsx) for a tab glyph. **Never** reach for SF Symbols, emoji/Unicode glyphs, an icon font, or a third‑party icon package. Keep every glyph minimal and geometric so the set stays coherent. Drawing our own in‑repo is **not** the same as importing a set. (`expo-symbols` is no longer used by the icon system and can be removed in a future deps cleanup.)
 
 ---
 
@@ -295,6 +291,7 @@ Animation is **purposeful and gentle** — entrance reveals and reward moments, 
 On each tap of the [TasbihCounter](src/components/tasbih-counter.tsx):
 1. **Ring fills** — `strokeDashoffset = C × (1 − count/target)`, `withTiming(…, { duration: 320 })`.
 2. **Haptic** — light impact (`Haptics.impactAsync(Light)`), iOS only.
+3. **Click sound** — a short bundled tap sound ([assets/sounds/click.wav](assets/sounds/click.wav)) via **`expo-audio`** (`useAudioPlayer` → `seekTo(0)` + `play()` per tap; `playsInSilentMode: true`). Local asset, no network. Cross-platform. **Toggleable from Profile** (`settings.soundEnabled`; legacy/undefined = on).
 
 On reaching the target:
 3. **Success haptic** — `notificationAsync(Success)`.
@@ -312,11 +309,13 @@ Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, t
 | Component | File | Notes |
 |-----------|------|-------|
 | `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, variant scale, RTL, theme color. |
-| `Icon` | [icon.tsx](src/components/icon.tsx) | SF Symbols + Unicode fallback. |
-| `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. Reused for built‑in adhkar **and** custom awrad. |
+| `Icon` | [icon.tsx](src/components/icon.tsx) | The shared hand‑drawn SVG glyph set (rounded 2px stroke, 24×24); RTL‑aware chevrons. |
+| `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. `target: number \| null` — `null` is a **free** tasbih (faint full ring, «تسبيح حر», no goal/celebration). Reused for built‑in adhkar, the session, and the single‑dhikr counter. |
+| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row. **Built-ins and user items render identically** — the dhikr text in Amiri/naskh (18/semibold). Gold count chip **only when the item has a target** (free items show no chip); a chevron only on the user's own items (built-ins have none). User items wrap `ReanimatedSwipeable` for تعديل (gold gradient, pencil icon) / حذف (terracotta gradient, trash icon). |
 | `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
+| `TabIcon` | [tab-icon.tsx](src/components/tab-icon.tsx) | Hand‑drawn SVG tab glyphs (house / misbaha / trophy / person); outline→fill on active. |
 | `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |
-| `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a custom wird. |
+| `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a ذِكر: title + text + category picker (inline‑create) + هدف محدد/تسبيح حر toggle + stepper. |
 | `Screen` | [screen.tsx](src/components/screen.tsx) | Gradient scaffold + safe-area; see §10. |
 | `Button` | [button.tsx](src/components/button.tsx) | Unified CTA: primary/ghost/link; see §10. |
 | `SectionHeader` | [section-header.tsx](src/components/section-header.tsx) | Title + optional trailing action; see §10. |
@@ -407,7 +406,7 @@ Props: `onPress`, `onLongPress` (optional), `accessory` (ReactNode — replaces 
 Routes use `expo-router`; the shell is custom (no default headers — `headerShown: false` globally, default `contentStyle` background `green800`).
 
 ### Navigation shell — [TabBar](src/components/tab-bar.tsx)
-Four tabs, RTL order: **الرئيسية · التسبيح · إنجازاتي · ملفي**. Translucent fill `rgba(14,45,34,0.96)`, `1px whiteAlpha08` top hairline, safe‑area aware bottom padding. Each tab = a **6px gold dot** (active only) + icon (`gold300` active / `muted2` inactive) + 11px label (`creamText`+semibold active / `muted2` regular inactive). The active state is the gold dot — quiet, not a pill.
+Four tabs, RTL order: **الرئيسية · أذكاري · إنجازاتي · ملفي** (the `tasbih` route keeps its name and misbaha glyph; only the label changed). Translucent fill `rgba(14,45,34,0.96)`, `1px whiteAlpha08` top hairline, safe‑area aware bottom padding. Each tab = a [`TabIcon`](src/components/tab-icon.tsx) glyph (filled `gold300` active / outline `muted2` inactive) + 11px label (`creamText`+semibold active / `muted2` regular inactive). The active state reads through the outline→fill flip plus the gold/cream colour shift — quiet, not a pill.
 
 ### Onboarding — [onboarding.tsx](src/app/onboarding.tsx)
 First run only. Asks the name, nothing else; stored locally. The tabs layout redirects here while `settings.name` is empty ([(tabs)/_layout.tsx](src/app/(tabs)/_layout.tsx)).
@@ -419,13 +418,22 @@ First run only. Asks the name, nothing else; stored locally. The tabs layout red
 3. **Week dots** — last 7 days as completion dots, today ringed.
 4. **Morning / Evening cards** — side‑by‑side; light gold‑bordered vs dark green; each shows a progress bar and "x من y" / "اكتمل ✓", taps into its session.
 5. **Level card** — raised translucent: "المستوى N · {title}" + points `inLevel/500` + gold progress bar.
-6. **أورادي (My Awrad)** — section header + "إضافة وِرد" link; either a dashed empty state or rows (tap → session, long‑press → edit).
 
-### Tasbih tab — [(tabs)/tasbih.tsx](src/app/(tabs)/tasbih.tsx)
-A **free** counter — the same ring, unbound to any list, for ad‑hoc dhikr.
+(The former **أورادي** home section was removed — its concept moved to the **أذكاري** tab.)
+
+### أذكاري tab — [(tabs)/tasbih.tsx](src/app/(tabs)/tasbih.tsx)
+The user's tasbih **library**: a categorized list of remembrances they count. Title + gold **+** add button → the create modal. A row of **filter chips** (`radii.pill`, gold‑fill active / `surfaceStrong` inactive): **الكل** + every category that has items. Under «الكل» the list is **grouped by category** (gold section labels); selecting a chip flattens to that category.
+
+Each row is an [`AdhkarRow`](src/components/adhkar-row.tsx): a gold count chip **only when the item has a target** (`٣٣` — free items show no chip), and a trailing chevron **only on the user's own items**. **Tap → `/dhikr/[id]`** to count. The user's own items are **swipeable** (`ReanimatedSwipeable`) to reveal **تعديل** (gold gradient) / **حذف** (terracotta gradient); the read‑only built‑in classics don't swipe and show no chevron (no lock badge needed). The list seeds the four post‑prayer classics (سبحان الله / الحمد لله / الله أكبر / لا إله إلا الله) and a few more as **read‑only built‑ins** ([data/adhkari.ts](src/data/adhkari.ts)).
+
+### Single‑dhikr counter — [dhikr/[id].tsx](src/app/dhikr/[id].tsx)
+Resolves one item (built‑in or custom) by id → dhikr card (Amiri) + [TasbihCounter](src/components/tasbih-counter.tsx) + «تصفير». A **target** item fills the ring, celebrates at the goal, then calls `completeWard()` (points + the daily‑ward challenge) and returns. A **free** item (`count === null`) shows a faint full ring + «تسبيح حر», counts up with no ceiling and awards nothing.
+
+### Manage categories — [settings/categories.tsx](src/app/settings/categories.tsx)
+Reached from **Profile**. Lists categories: the five locked defaults (**🔒 أساسي**) and the user's own (inline‑rename ✎ / delete 🗑 — deleting reassigns its أذكار to «عامة»), plus «+ تصنيف جديد».
 
 ### Session (the core) — [session/[category].tsx](src/app/session/[category].tsx)
-`darkScreen` gradient. **Header** (back ‹ / centered title + "الذكر i من n" / spacer) → **segmented progress bars** → centered **dhikr card** (gold‑hairline, Amiri 26/lh46, optional title in `gold300` + note in `muted3`) → **TasbihCounter** → hint "اضغط الدائرة للعدّ" → **controls** ("تصفير" neutral `flex:1` + "الذكر التالي ←" / "إنهاء ✓" primary `flex:2`). Resumes from the first incomplete dhikr; partial counts persist per‑dhikr so a tap‑count survives leaving the screen. Drives the same component for built‑in categories and single‑item custom awrad.
+`darkScreen` gradient. **Header** (back ‹ / centered title + "الذكر i من n" / spacer) → **segmented progress bars** → centered **dhikr card** (gold‑hairline, Amiri 26/lh46, optional title in `gold300` + note in `muted3`) → **TasbihCounter** → hint "اضغط الدائرة للعدّ" → **controls** ("تصفير" neutral `flex:1` + "الذكر التالي ←" / "إنهاء ✓" primary `flex:2`). Resumes from the first incomplete dhikr; partial counts persist per‑dhikr so a tap‑count survives leaving the screen. Serves the **built‑in morning/evening categories** only — a single user ذِكر is counted via `/dhikr/[id]` instead.
 
 ### Adhkar list — [list/[category].tsx](src/app/list/[category].tsx)
 Overview of a category: each row a status circle (sage ✓ done / gold number current / outlined upcoming) + Amiri title + repetition caption; current row emphasized (dark green gradient + ▶ glyph), completed rows dimmed (opacity ~0.7).
@@ -434,10 +442,10 @@ Overview of a category: each row a status circle (sage ✓ done / gold number cu
 Streak banner + simple stat chips (v1). The full badge grid & calendar are deferred — see §12.
 
 ### Profile — [(tabs)/profile.tsx](src/app/(tabs)/profile.tsx)
-Name, reminder access, awrad management, about.
+Name, reminder access, manage-categories link, a **tap-sound toggle** (gold `Switch` → `settings.soundEnabled`), and about.
 
-### Custom wird — [awrad/new.tsx](src/app/awrad/new.tsx) · [awrad/[id].tsx](src/app/awrad/[id].tsx)
-Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal wird (title + text + repeat count) via [WardForm](src/components/ward-form.tsx); it then runs through the shared session/counter.
+### Create / edit a ذِكر — [awrad/new.tsx](src/app/awrad/new.tsx) · [awrad/[id].tsx](src/app/awrad/[id].tsx)
+Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal ذِكر via [WardForm](src/components/ward-form.tsx): title + text + a **category picker** (chips + dashed «+ جديدة» inline‑create) + a **هدف محدد ⇆ تسبيح حر** toggle (free hides the stepper). It then runs through the shared `/dhikr/[id]` counter. (Route folder is still `awrad/` for continuity.)
 
 ### Reminders — [settings/reminders.tsx](src/app/settings/reminders.tsx)
 Morning (default **07:00**) / evening (default **18:30**) local‑notification times with iOS‑style toggles (on = `gold500` track). Scheduled via `expo-notifications`; re‑scheduled on launch ([app/_layout.tsx](src/app/_layout.tsx)). No push/server — fully local.
@@ -483,12 +491,20 @@ These were fully designed in the prototype and are preserved here so they can be
 The app is local‑only; persistence keys (AsyncStorage / local DB) and their shapes:
 
 ```ts
-settings    = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30" }
-progress    = { [date: "YYYY-MM-DD"]: { morningDone: bool, eveningDone: bool, completedIds: string[] } }
-streak      = { current: number, longest: number, lastCompletedDate: string }
-score       = { points: number, level: number }   // level bar fills every 500 pts
-customAwrad = [ { id, title, text, count, createdAt } ]
+settings        = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30", soundEnabled?: bool }  // soundEnabled undefined (legacy) = on
+progress        = { [date: "YYYY-MM-DD"]: { morningDone: bool, eveningDone: bool, completedIds: string[], wardDone?: bool } }
+streak          = { current: number, longest: number, lastCompletedDate: string }
+score           = { points: number, level: number }   // level bar fills every 500 pts
+customAwrad     = [ { id, title, text, count: number | null, category: string, createdAt } ]  // count null = free tasbih
+customCategories= [ { id, label, builtin: false } ]   // user-created only; locked defaults live in data/adhkari.ts
 ```
+
+### أذكاري library — [data/adhkari.ts](src/data/adhkari.ts)
+The أذكاري tab merges two read sources into one `AdhkariItem = { id, title?, text, count: number|null, category, locked }` list:
+- **`BUILTIN_ADHKAR`** — read‑only (`locked:true`) classics shipped in code (stable `bi-*` ids that double as per‑day count keys).
+- The user's **`customAwrad`** (`locked:false`), legacy items missing `category` normalize to `general`.
+
+Categories merge the same way: **`DEFAULT_CATEGORIES`** (5 locked: التسبيحات · الاستغفار · الصلاة على النبي · أدعية · عامة) + the user's `customCategories`. Pure helpers (`mergeAdhkariItems`, `groupByCategory`, `getAdhkariItemById`, `isFree`) are unit‑tested in [data/__tests__/adhkari.test.ts](src/data/__tests__/adhkari.test.ts).
 
 ### Dhikr shape — the unit every view renders
 Built‑in adhkar and custom awrad normalize to the **same** shape so [TasbihCounter](src/components/tasbih-counter.tsx) and the session screen treat them identically:

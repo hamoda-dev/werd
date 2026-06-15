@@ -55,6 +55,7 @@ export const StorageKeys = {
   streak: "werd.streak",
   score: "werd.score",
   customAwrad: "werd.customAwrad",
+  customCategories: "werd.customCategories",
   partialCounts: "werd.partialCounts",
   challenges: "werd.challenges",
 } as const;

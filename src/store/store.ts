@@ -13,7 +13,15 @@ import {
   weeklyProgress,
 } from "@/store/challenges";
 import { DAILY_CHALLENGES, WEEKLY_CHALLENGE } from "@/data/challenges";
+import {
+  GENERAL_CATEGORY_ID,
+  getAdhkariItemById,
+  mergeAdhkariItems,
+  mergeCategories,
+} from "@/data/adhkari";
 import type {
+  AdhkarCategory,
+  AdhkariItem,
   BadgeId,
   CategoryId,
   ChallengeState,
@@ -36,11 +44,13 @@ export const DEFAULT_SETTINGS: Settings = {
   remindersEnabled: false,
   morningTime: "07:00",
   eveningTime: "18:30",
+  soundEnabled: true,
 };
 const DEFAULT_PROGRESS: ProgressMap = {};
 const DEFAULT_STREAK: Streak = { current: 0, longest: 0, lastCompletedDate: null };
 const DEFAULT_SCORE: Score = { points: 0 };
 const DEFAULT_AWRAD: CustomWard[] = [];
+const DEFAULT_CUSTOM_CATEGORIES: AdhkarCategory[] = [];
 const EMPTY_DAY: DayProgress = {
   morningDone: false,
   eveningDone: false,
@@ -284,4 +294,66 @@ export function useCustomAwrad() {
   );
 
   return { list, add, update, remove };
+}
+
+/** User-created categories (the locked defaults live in data/adhkari.ts, not storage). */
+export function useCustomCategories() {
+  const [list, setList] = useStorage<AdhkarCategory[]>(
+    StorageKeys.customCategories,
+    DEFAULT_CUSTOM_CATEGORIES,
+  );
+
+  const add = useCallback(
+    (label: string): AdhkarCategory => {
+      const item: AdhkarCategory = {
+        id: `cat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        label: label.trim(),
+        builtin: false,
+      };
+      setList((prev) => [...prev, item]);
+      return item;
+    },
+    [setList],
+  );
+
+  const rename = useCallback(
+    (id: string, label: string) =>
+      setList((prev) => prev.map((c) => (c.id === id ? { ...c, label: label.trim() } : c))),
+    [setList],
+  );
+
+  // Removing a category reassigns its أذكار to «عامة» so no item is orphaned.
+  const remove = useCallback(
+    (id: string) => {
+      const awrad = storage.get<CustomWard[]>(StorageKeys.customAwrad, DEFAULT_AWRAD);
+      const reassigned = awrad.map((w) =>
+        w.category === id ? { ...w, category: GENERAL_CATEGORY_ID } : w,
+      );
+      if (reassigned.some((w, i) => w !== awrad[i])) {
+        storage.set(StorageKeys.customAwrad, reassigned);
+      }
+      setList((prev) => prev.filter((c) => c.id !== id));
+    },
+    [setList],
+  );
+
+  return { list, add, rename, remove };
+}
+
+/** Locked default categories + the user's own (reactive). */
+export function useAdhkariCategories(): AdhkarCategory[] {
+  const { list } = useCustomCategories();
+  return mergeCategories(list);
+}
+
+/** The merged أذكاري library: locked built-in classics + the user's own items (reactive). */
+export function useAdhkariItems(): AdhkariItem[] {
+  const { list } = useCustomAwrad();
+  return mergeAdhkariItems(list);
+}
+
+/** Non-reactive lookup of one item (built-in or custom) by id — for the counter route. */
+export function getAdhkariItem(id: string): AdhkariItem | undefined {
+  const awrad = storage.get<CustomWard[]>(StorageKeys.customAwrad, DEFAULT_AWRAD);
+  return getAdhkariItemById(id, awrad);
 }

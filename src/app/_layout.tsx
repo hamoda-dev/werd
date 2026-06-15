@@ -59,6 +59,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="session/[category]" />
+        <Stack.Screen name="dhikr/[id]" />
         <Stack.Screen name="list/[category]" />
         <Stack.Screen
           name="awrad/new"
@@ -69,6 +70,7 @@ export default function RootLayout() {
           options={{ presentation: "modal" }}
         />
         <Stack.Screen name="settings/reminders" />
+        <Stack.Screen name="settings/categories" />
         <Stack.Screen name="challenges" />
         <Stack.Screen name="stats" />
       </Stack>

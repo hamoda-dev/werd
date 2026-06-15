@@ -1,75 +1,129 @@
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, ScrollView, View } from "react-native";
+import { useRouter } from "expo-router";
 import { radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
-import { TasbihCounter } from "@/components/tasbih-counter";
-import { toArabicNumerals } from "@/utils/numerals";
+import { Icon } from "@/components/icon";
 import { Screen } from "@/components/screen";
-import { Button } from "@/components/button";
+import { AdhkarRow } from "@/components/adhkar-row";
+import { groupByCategory } from "@/data/adhkari";
+import { useAdhkariCategories, useAdhkariItems, useCustomAwrad } from "@/store/store";
+import type { AdhkariItem } from "@/types";
 
-const PRESETS = [33, 100, 1000];
-const PHRASES = ["سُبْحَانَ الله", "الحَمْدُ لله", "اللهُ أَكْبَر", "لَا إِلَهَ إِلَّا الله"];
+const ALL = "all";
 
-export default function TasbihTab() {
-  const [target, setTarget] = useState(33);
-  const [phraseIdx, setPhraseIdx] = useState(0);
-  const [resetSignal, setResetSignal] = useState(0);
+function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        paddingHorizontal: spacing.md,
+        paddingVertical: 8,
+        borderRadius: radii.pill,
+        borderCurve: "continuous",
+        backgroundColor: active ? semantic.accent : semantic.surfaceStrong,
+      }}
+    >
+      <Txt size={13} weight="semibold" color={active ? semantic.textOnCream : semantic.textSecondary}>
+        {label}
+      </Txt>
+    </Pressable>
+  );
+}
+
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.xs }}>
+      <Txt size={14} weight="bold" color={semantic.accentLight}>{children}</Txt>
+      <View style={{ flex: 1, height: 1, backgroundColor: semantic.goldHairline }} />
+    </View>
+  );
+}
+
+export default function AdhkariTab() {
+  const router = useRouter();
+  const items = useAdhkariItems();
+  const categories = useAdhkariCategories();
+  const { remove } = useCustomAwrad();
+  const [filter, setFilter] = useState<string>(ALL);
+
+  const groups = groupByCategory(items, categories);
+  const presentIds = new Set(groups.map((g) => g.category.id));
+  // If the selected category lost all its items, fall back to "الكل".
+  const effective = filter === ALL || presentIds.has(filter) ? filter : ALL;
+  const visibleGroups = effective === ALL ? groups : groups.filter((g) => g.category.id === effective);
+
+  function openItem(item: AdhkariItem) {
+    router.push({ pathname: "/dhikr/[id]", params: { id: item.id } });
+  }
+  function editItem(item: AdhkariItem) {
+    router.push({ pathname: "/awrad/[id]", params: { id: item.id } });
+  }
+  function deleteItem(item: AdhkariItem) {
+    Alert.alert("حذف الذِكر", `هل تريد حذف «${item.title ?? item.text}»؟`, [
+      { text: "إلغاء", style: "cancel" },
+      { text: "حذف", style: "destructive", onPress: () => remove(item.id) },
+    ]);
+  }
+
+  function rows(list: AdhkariItem[]) {
+    return list.map((it) => (
+      <AdhkarRow
+        key={it.id}
+        item={it}
+        onPress={() => openItem(it)}
+        onEdit={() => editItem(it)}
+        onDelete={() => deleteItem(it)}
+      />
+    ));
+  }
 
   return (
-    <Screen contentStyle={{ flexGrow: 1, alignItems: "center", gap: spacing.xl, paddingBottom: spacing.xl }}>
-      <Txt size={22} weight="bold" align="center">التسبيح</Txt>
+    <Screen contentStyle={{ gap: spacing.md }}>
+      {/* Header */}
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <Txt size={26} weight="bold">أذكاري</Txt>
+        <Pressable
+          onPress={() => router.push("/awrad/new")}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel="إضافة ذِكر"
+          style={{ width: 40, height: 40, borderRadius: 20, borderCurve: "continuous", backgroundColor: semantic.accent, alignItems: "center", justifyContent: "center" }}
+        >
+          <Icon name="plus" size={22} color={semantic.textOnCream} />
+        </Pressable>
+      </View>
 
-      {/* Phrase selection */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, justifyContent: "center" }}>
-        {PHRASES.map((p, i) => (
-          <Pressable
-            key={p}
-            onPress={() => { setPhraseIdx(i); setResetSignal((s) => s + 1); }}
-            style={{
-              paddingHorizontal: spacing.md,
-              paddingVertical: 8,
-              borderRadius: radii.pill,
-              borderCurve: "continuous",
-              backgroundColor: phraseIdx === i ? semantic.accent : semantic.surfaceStrong,
-            }}
-          >
-            <Txt naskh size={16} color={phraseIdx === i ? semantic.textOnCream : semantic.textPrimary}>{p}</Txt>
-          </Pressable>
+      {/* Filter chips */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: spacing.sm, paddingVertical: 2 }}
+      >
+        <Chip label="الكل" active={effective === ALL} onPress={() => setFilter(ALL)} />
+        {groups.map((g) => (
+          <Chip key={g.category.id} label={g.category.label} active={effective === g.category.id} onPress={() => setFilter(g.category.id)} />
         ))}
-      </View>
+      </ScrollView>
 
-      <View style={{ alignItems: "center", justifyContent: "center", flexGrow: 1 }}>
-        <TasbihCounter
-          itemKey={`free-${phraseIdx}-${target}`}
-          target={target}
-          resetSignal={resetSignal}
-        />
-      </View>
-
-      {/* Count selection */}
-      <View style={{ flexDirection: "row", gap: spacing.sm, justifyContent: "center" }}>
-        {PRESETS.map((t) => (
-          <Pressable
-            key={t}
-            onPress={() => { setTarget(t); setResetSignal((s) => s + 1); }}
-            style={{
-              paddingHorizontal: spacing.lg,
-              paddingVertical: 10,
-              borderRadius: radii.pill,
-              borderCurve: "continuous",
-              backgroundColor: target === t ? semantic.brandSurface : semantic.surfaceStrong,
-              borderWidth: target === t ? 1 : 0,
-              borderColor: semantic.accent,
-            }}
-          >
-            <Txt weight="semibold" color={semantic.textPrimary}>{toArabicNumerals(t)}</Txt>
-          </Pressable>
-        ))}
-      </View>
-
-      <Button variant="ghost" style={{ paddingHorizontal: spacing.xxl }} onPress={() => setResetSignal((s) => s + 1)}>
-        تصفير
-      </Button>
+      {/* List */}
+      {visibleGroups.length === 0 ? (
+        <Pressable
+          onPress={() => router.push("/awrad/new")}
+          style={{ borderWidth: 1, borderColor: semantic.border, borderStyle: "dashed", borderRadius: radii.card, borderCurve: "continuous", padding: spacing.xl, alignItems: "center" }}
+        >
+          <Txt size={14} color={semantic.textSecondary} align="center">أضِف ذِكرك الخاص لتبدأ تسبيحه</Txt>
+        </Pressable>
+      ) : effective === ALL ? (
+        visibleGroups.map((g) => (
+          <View key={g.category.id} style={{ gap: spacing.sm }}>
+            <SectionLabel>{g.category.label}</SectionLabel>
+            {rows(g.items)}
+          </View>
+        ))
+      ) : (
+        <View style={{ gap: spacing.sm }}>{rows(visibleGroups[0].items)}</View>
+      )}
     </Screen>
   );
 }

@@ -22,13 +22,38 @@ export interface AdhkarData {
   categories: Category[];
 }
 
-/** A user-created custom ward — same shape as Dhikr so the tasbih component can be reused. */
+/**
+ * A user-created custom dhikr (ذِكر) in the أذكاري library.
+ * `count` is the repetition target, or `null` for a free (open-ended) tasbih.
+ * `category` is an AdhkarCategory id (defaults to "general" for legacy items).
+ */
 export interface CustomWard {
   id: string;
   title: string;
   text: string;
-  count: number;
+  count: number | null;
+  category: string;
   createdAt: number;
+}
+
+/** A grouping for أذكاري items. The default set ships locked (`builtin`); users add their own. */
+export interface AdhkarCategory {
+  id: string;
+  label: string;
+  builtin: boolean;
+}
+
+/**
+ * The unified row shape the أذكاري list and the single-dhikr counter render.
+ * Built-in classics are `locked` (read-only); user items are not.
+ */
+export interface AdhkariItem {
+  id: string;
+  title?: string;
+  text: string;
+  count: number | null;
+  category: string;
+  locked: boolean;
 }
 
 export interface Settings {
@@ -36,6 +61,8 @@ export interface Settings {
   remindersEnabled: boolean;
   morningTime: string; // "HH:mm"
   eveningTime: string; // "HH:mm"
+  /** Play the click sound on each tasbih tap. Undefined (legacy) is treated as enabled. */
+  soundEnabled?: boolean;
 }
 
 export interface DayProgress {

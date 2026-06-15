@@ -52,10 +52,12 @@ export const fonts = {
 } as const;
 
 export const radii = {
-  tile: 18,
-  card: 24,
-  cardLg: 28,
-  pill: 30,
+  // Exploration: sharper corners (original was 18/24/28/30).
+  // Every rounded surface references these, so this block is the app-wide roundness knob.
+  tile: 10,
+  card: 12,
+  cardLg: 14,
+  pill: 14,
 } as const;
 
 export const spacing = {

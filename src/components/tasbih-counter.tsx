@@ -9,9 +9,11 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 import * as Haptics from "expo-haptics";
+import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { colors, fonts } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { toArabicNumerals } from "@/utils/numerals";
+import { useSettings } from "@/store/store";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -24,7 +26,8 @@ const ADVANCE_DELAY = 950;
 interface Props {
   /** Changes when switching dhikr; re-initializes the counter from initialCount. */
   itemKey: string;
-  target: number;
+  /** Repetition target, or `null` for a free (open-ended) tasbih — no goal, no completion. */
+  target: number | null;
   /** Saved count for the current dhikr (to resume the tasbih where it stopped). */
   initialCount?: number;
   resetSignal?: number;
@@ -53,10 +56,23 @@ export function TasbihCounter({
   onChange,
   onComplete,
 }: Props) {
+  // Free (open-ended) tasbih: no goal, never "done", and a faint full ring.
+  const free = target == null || target <= 0;
+  const ringRatio = (n: number) => (free ? 1 : n / (target as number));
+
   const [count, setCount] = useState(initialCount);
-  const progress = useSharedValue(target > 0 ? initialCount / target : 0);
+  const progress = useSharedValue(ringRatio(initialCount));
   const celebrate = useSharedValue(0);
-  const done = count >= target;
+  const done = !free && count >= (target as number);
+
+  // Tap sound (toggleable from Profile). Play even with the silent switch on,
+  // since the click is the point. Legacy settings (undefined) count as enabled.
+  const { settings } = useSettings();
+  const soundOn = settings.soundEnabled !== false;
+  const click = useAudioPlayer(require("../../assets/sounds/click.wav"));
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true });
+  }, []);
 
   // Keep the latest initialCount in a ref so we don't re-initialize on a mere value change
   // (we want to initialize only when switching dhikr via itemKey).
@@ -67,16 +83,18 @@ export function TasbihCounter({
   useEffect(() => {
     const init = initialRef.current;
     setCount(init);
-    progress.value = target > 0 ? init / target : 0;
+    progress.value = ringRatio(init);
     celebrate.value = 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemKey, target, progress, celebrate]);
 
   // Reset button: ignore the initial value (0) on first mount.
   useEffect(() => {
     if (resetSignal === 0) return;
     setCount(0);
-    progress.value = 0;
+    progress.value = ringRatio(0); // 1 (faint full ring) when free, else 0
     celebrate.value = 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetSignal, progress, celebrate]);
 
   const ringProps = useAnimatedProps(() => ({
@@ -90,12 +108,17 @@ export function TasbihCounter({
 
   function handleTap() {
     if (done) return;
+    if (soundOn) {
+      click.seekTo(0);
+      click.play();
+    }
     const next = count + 1;
     setCount(next);
     onChange?.(next);
-    progress.value = withTiming(next / target, { duration: 320 });
     hapticLight();
-    if (next >= target) {
+    if (free) return; // free tasbih: just tally, no ring fill or completion
+    progress.value = withTiming(ringRatio(next), { duration: 320 });
+    if (next >= (target as number)) {
       hapticSuccess();
       celebrate.value = 0;
       celebrate.value = withTiming(1, { duration: 900 });
@@ -137,6 +160,7 @@ export function TasbihCounter({
             r={R}
             stroke={accent}
             strokeWidth={STROKE}
+            strokeOpacity={free ? 0.3 : 1}
             fill="none"
             strokeDasharray={C}
             strokeLinecap="round"
@@ -156,7 +180,7 @@ export function TasbihCounter({
             {toArabicNumerals(count)}
           </Txt>
           <Txt size={15} color={colors.muted3} align="center">
-            من {toArabicNumerals(target)}
+            {free ? "تسبيح حر" : `من ${toArabicNumerals(target as number)}`}
           </Txt>
         </View>
       </View>
