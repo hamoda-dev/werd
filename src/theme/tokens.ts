@@ -52,12 +52,12 @@ export const fonts = {
 } as const;
 
 export const radii = {
-  // Exploration: dialed down from 18/24/28/30 for a slightly sharper, less-rounded feel.
+  // Exploration: sharper corners (original was 18/24/28/30).
   // Every rounded surface references these, so this block is the app-wide roundness knob.
-  tile: 14,
-  card: 18,
-  cardLg: 22,
-  pill: 22,
+  tile: 10,
+  card: 12,
+  cardLg: 14,
+  pill: 14,
 } as const;
 
 export const spacing = {
