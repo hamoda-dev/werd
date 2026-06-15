@@ -321,7 +321,7 @@ Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, t
 | `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, variant scale, RTL, theme color. |
 | `Icon` | [icon.tsx](src/components/icon.tsx) | SF Symbols + Unicode fallback. |
 | `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. `target: number \| null` — `null` is a **free** tasbih (faint full ring, «تسبيح حر», no goal/celebration). Reused for built‑in adhkar, the session, and the single‑dhikr counter. |
-| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row: gold count chip **only when the item has a target** (free items show no chip); a chevron only on the user's own items (built-ins have none). User items wrap `ReanimatedSwipeable` for تعديل (gold gradient) / حذف (terracotta gradient) — text-only, no icons. |
+| `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row. **Built-ins and user items render identically** — the dhikr text in Amiri/naskh (18/semibold). Gold count chip **only when the item has a target** (free items show no chip); a chevron only on the user's own items (built-ins have none). User items wrap `ReanimatedSwipeable` for تعديل (gold gradient) / حذف (terracotta gradient) — text-only, no icons. |
 | `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
 | `TabIcon` | [tab-icon.tsx](src/components/tab-icon.tsx) | Hand‑drawn SVG tab glyphs (house / misbaha / trophy / person); outline→fill on active. |
 | `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |

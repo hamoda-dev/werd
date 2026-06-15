@@ -49,22 +49,10 @@ function RowBody({ item }: { item: AdhkariItem }) {
         padding: spacing.lg,
       }}
     >
-      <View style={{ flex: 1, gap: 2 }}>
-        {item.title ? (
-          <>
-            <Txt size={16} weight="semibold" color={semantic.textPrimary} numberOfLines={1}>
-              {item.title}
-            </Txt>
-            <Txt naskh size={13} color={semantic.textTertiary} numberOfLines={1}>
-              {item.text}
-            </Txt>
-          </>
-        ) : (
-          <Txt naskh size={18} weight="semibold" color={semantic.textPrimary} numberOfLines={1}>
-            {item.text}
-          </Txt>
-        )}
-      </View>
+      {/* Built-in and user items render identically: the dhikr text in Amiri/naskh. */}
+      <Txt naskh size={18} weight="semibold" color={semantic.textPrimary} numberOfLines={1} style={{ flex: 1 }}>
+        {item.text}
+      </Txt>
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
         {isFree(item.count) ? null : <CountChip count={item.count as number} />}
         {/* Chevron only on the user's own (swipeable) items — built-ins have no row action. */}
