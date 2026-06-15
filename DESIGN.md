@@ -234,7 +234,7 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 ## 5. RTL & Internationalization
 
 - **Hard RTL.** [`app/_layout.tsx`](src/app/_layout.tsx) calls `I18nManager.allowRTL(true)` + `forceRTL(true)` at module load. The whole layout mirrors; design and review everything right‑to‑left. (RN applies a forced‑RTL flip after the first relaunch — expected behavior.)
-- **Directional glyphs flip meaning.** "Back" points **right** (`chevron.backward` → `›`), "next" points **left** (`←` in `الذكر التالي ←`). The [Icon](src/components/icon.tsx) fallbacks already encode this.
+- **Directional glyphs flip meaning.** "Back" points **right** (toward the start edge in RTL). Because the bidi engine mirrors angle-bracket glyphs (and `SymbolView` doesn't mirror `chevron.backward`), the [Icon](src/components/icon.tsx) component handles `chevron.backward` explicitly under RTL — `chevron.right` on iOS, a mirror-aware glyph on Android — so every header back button points right. Forward/disclosure chevrons (`chevron.forward`) are left as-is.
 - **All copy is Arabic.** No i18n framework — strings are inline Arabic literals. There is no English UI surface to maintain.
 - **Numerals** are Eastern‑Arabic everywhere (§3).
 
