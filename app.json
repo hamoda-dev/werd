@@ -44,6 +44,12 @@
             "imageWidth": 120
           }
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false
+        }
       ]
     ],
     "experiments": {

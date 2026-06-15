@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 import * as Haptics from "expo-haptics";
+import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { colors, fonts } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -63,6 +64,12 @@ export function TasbihCounter({
   const celebrate = useSharedValue(0);
   const done = !free && count >= (target as number);
 
+  // Tap sound. Play even with the silent switch on, since the click is the point.
+  const click = useAudioPlayer(require("../../assets/sounds/click.wav"));
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true });
+  }, []);
+
   // Keep the latest initialCount in a ref so we don't re-initialize on a mere value change
   // (we want to initialize only when switching dhikr via itemKey).
   const initialRef = useRef(initialCount);
@@ -97,6 +104,8 @@ export function TasbihCounter({
 
   function handleTap() {
     if (done) return;
+    click.seekTo(0);
+    click.play();
     const next = count + 1;
     setCount(next);
     onChange?.(next);

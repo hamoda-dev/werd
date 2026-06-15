@@ -290,6 +290,7 @@ Animation is **purposeful and gentle** — entrance reveals and reward moments, 
 On each tap of the [TasbihCounter](src/components/tasbih-counter.tsx):
 1. **Ring fills** — `strokeDashoffset = C × (1 − count/target)`, `withTiming(…, { duration: 320 })`.
 2. **Haptic** — light impact (`Haptics.impactAsync(Light)`), iOS only.
+3. **Click sound** — a short bundled tap sound ([assets/sounds/click.wav](assets/sounds/click.wav)) via **`expo-audio`** (`useAudioPlayer` → `seekTo(0)` + `play()` per tap; `playsInSilentMode: true`). Local asset, no network. Cross-platform (iOS + Android).
 
 On reaching the target:
 3. **Success haptic** — `notificationAsync(Success)`.
