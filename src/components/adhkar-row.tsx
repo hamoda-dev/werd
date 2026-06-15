@@ -1,5 +1,8 @@
 import { I18nManager, Pressable, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+// Gesture-handler's Pressable coordinates with the swipe pan gesture; a plain RN
+// Pressable inside the revealed action panel never receives the tap.
+import { Pressable as GHPressable } from "react-native-gesture-handler";
 import { gradients, radii, semantic, spacing } from "@/theme/tokens";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
@@ -77,7 +80,7 @@ function ActionButton({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <GHPressable
       onPress={onPress}
       style={{
         width: 72,
@@ -91,7 +94,7 @@ function ActionButton({
       }}
     >
       <Txt size={14} weight="bold" color={labelColor}>{label}</Txt>
-    </Pressable>
+    </GHPressable>
   );
 }
 
