@@ -206,7 +206,7 @@ A 6‑step scale. Use tokens, not raw numbers, for padding/gap/margins.
 Conventions: **screen horizontal padding = `xl` (22)**; **vertical gap between stacked sections = `lg` (18)**; small inline gaps use raw `4`/`6` where below the scale. (Prototype source ranges: card padding 16–26, card gaps 12–18, screen padding 22–30 — the tokens above are the codified subset.)
 
 ### Radius — `tokens.radii`
-`tile: 18` (list rows, buttons) · `card: 24` (standard cards) · `cardLg: 28` (hero cards) · `pill: 30` (pills). Full circles use `borderRadius: size/2`.
+`tile: 14` (list rows, buttons) · `card: 18` (standard cards) · `cardLg: 22` (hero cards) · `pill: 22` (pills). Full circles use `borderRadius: size/2` (independent of these tokens). _(Roundness was dialed down from 18/24/28/30 — adjust the single `radii` block in `tokens.ts` to retune.)_
 **Always pair a radius with `borderCurve: "continuous"`** for iOS‑smooth (squircle) corners — applied on every rounded surface in the app.
 
 ### Borders
