@@ -46,7 +46,8 @@ function RowBody({ item }: { item: AdhkariItem }) {
         backgroundColor: semantic.surface,
         borderRadius: radii.tile,
         borderCurve: "continuous",
-        padding: spacing.lg,
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.md,
       }}
     >
       {/* Built-in and user items render identically: the dhikr text in Amiri/naskh. */}
