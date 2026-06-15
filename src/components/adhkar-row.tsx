@@ -67,7 +67,8 @@ function RowBody({ item }: { item: AdhkariItem }) {
       </View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
         {isFree(item.count) ? null : <CountChip count={item.count as number} />}
-        <Icon name="chevron.forward" size={18} color={semantic.textTertiary} />
+        {/* Chevron only on the user's own (swipeable) items — built-ins have no row action. */}
+        {item.locked ? null : <Icon name="chevron.forward" size={18} color={semantic.textTertiary} />}
       </View>
     </View>
   );
