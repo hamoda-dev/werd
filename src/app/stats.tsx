@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, gradients, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
+import type { Theme } from "@/theme/types";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { Card } from "@/components/card";
@@ -22,24 +24,31 @@ import { useProgressMap } from "@/store/store";
 
 const WEEKDAY_HEADERS = ["س", "ح", "ن", "ث", "ر", "خ", "ج"]; // Saturday first
 
-const CELL: Record<DayCellState, { bg: string; fg: string }> = {
-  today: { bg: semantic.accent, fg: semantic.textOnCream },
-  future: { bg: colors.futureCell, fg: colors.futureCellText },
-  complete: { bg: semantic.brandSurface, fg: semantic.textOnColor },
-  partial: { bg: colors.partialCell, fg: colors.partialCellText },
-  missed: { bg: colors.missedCell, fg: colors.missedCellText },
-};
+function makeCell(t: Theme): Record<DayCellState, { bg: string; fg: string }> {
+  return {
+    today: { bg: t.semantic.accent, fg: t.semantic.textOnCream },
+    future: { bg: t.colors.futureCell, fg: t.colors.futureCellText },
+    complete: { bg: t.semantic.brandSurface, fg: t.semantic.textOnColor },
+    partial: { bg: t.colors.partialCell, fg: t.colors.partialCellText },
+    missed: { bg: t.colors.missedCell, fg: t.colors.missedCellText },
+  };
+}
 
 function Legend({ state, label }: { state: DayCellState; label: string }) {
+  const theme = useTheme();
+  const CELL = makeCell(theme);
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
       <View style={{ width: 12, height: 12, borderRadius: 4, backgroundColor: CELL[state].bg }} />
-      <Txt size={12} color={semantic.textSecondary}>{label}</Txt>
+      <Txt size={12} color={theme.semantic.textSecondary}>{label}</Txt>
     </View>
   );
 }
 
 export default function Stats() {
+  const theme = useTheme();
+  const { semantic, gradients } = theme;
+  const CELL = makeCell(theme);
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const progress = useProgressMap();

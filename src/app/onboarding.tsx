@@ -4,12 +4,14 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp, FadeOut } from "react-native-reanimated";
 import { Image } from "expo-image";
-import { colors, fonts, gradients, radii, shadows, semantic, spacing } from "@/theme/tokens";
+import { fonts, spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { useSettings } from "@/store/store";
 
 export default function Onboarding() {
+  const { colors, semantic, gradients, radii, shadows } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { update } = useSettings();

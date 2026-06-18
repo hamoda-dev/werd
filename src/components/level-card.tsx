@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { semantic } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Card } from "@/components/card";
 import { ProgressBar } from "@/components/progress-bar";
@@ -9,6 +9,7 @@ import type { Score } from "@/types";
 
 /** Unified level card (home + achievements). */
 export function LevelCard({ score, showToNext = false }: { score: Score; showToNext?: boolean }) {
+  const { semantic } = useTheme();
   const lvl = levelInfo(score);
   return (
     <Card>

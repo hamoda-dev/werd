@@ -1,12 +1,13 @@
 import { View } from "react-native";
-// `colors` retained for the `lockedTile` cell token (no semantic alias by design).
-import { colors, gradients, radii, semantic } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import type { BadgeDef } from "@/types";
 
 /** Badge tile — unlocked (gradient) or locked (gray + lock). */
 export function BadgeTile({ def, unlocked }: { def: BadgeDef; unlocked: boolean }) {
+  // `colors` retained for the `lockedTile` cell token (no semantic alias by design).
+  const { colors, gradients, radii, semantic } = useTheme();
   return (
     <View
       style={{

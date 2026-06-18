@@ -1,5 +1,6 @@
 import { Text, type TextProps, type TextStyle } from "react-native";
-import { colors, fonts, text as textScale } from "@/theme/tokens";
+import { fonts, text as textScale } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 
 type Weight = "regular" | "medium" | "semibold" | "bold";
 type Variant = keyof typeof textScale;
@@ -28,11 +29,13 @@ export function Txt({
   weight,
   naskh = false,
   size,
-  color = colors.creamText,
+  color,
   align = "auto",
   style,
   ...rest
 }: Props) {
+  const { semantic } = useTheme();
+  const resolvedColor = color ?? semantic.textPrimary;
   const preset = variant ? textScale[variant] : undefined;
   const resolvedWeight: Weight = weight ?? preset?.weight ?? "regular";
   const resolvedSize = size ?? preset?.size ?? 15;
@@ -50,7 +53,7 @@ export function Txt({
         {
           fontFamily,
           fontSize: resolvedSize,
-          color,
+          color: resolvedColor,
           textAlign: align,
           ...(preset ? { lineHeight: preset.lineHeight } : null),
         },

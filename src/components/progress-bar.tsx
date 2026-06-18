@@ -1,11 +1,11 @@
 import { View } from "react-native";
-import { semantic } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 
 /** Unified horizontal progress bar. */
 export function ProgressBar({
   ratio,
-  color = semantic.accent,
-  track = semantic.surfaceFaint,
+  color,
+  track,
   height = 8,
 }: {
   ratio: number;
@@ -13,14 +13,17 @@ export function ProgressBar({
   track?: string;
   height?: number;
 }) {
+  const { semantic } = useTheme();
+  const fillColor = color ?? semantic.accent;
+  const trackColor = track ?? semantic.surfaceFaint;
   const r = height / 2;
   return (
-    <View style={{ height, borderRadius: r, backgroundColor: track, overflow: "hidden" }}>
+    <View style={{ height, borderRadius: r, backgroundColor: trackColor, overflow: "hidden" }}>
       <View
         style={{
           height,
           width: `${Math.min(100, Math.max(0, ratio * 100))}%`,
-          backgroundColor: color,
+          backgroundColor: fillColor,
           borderRadius: r,
         }}
       />

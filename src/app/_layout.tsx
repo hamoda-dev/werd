@@ -11,7 +11,7 @@ import {
 } from "@expo-google-fonts/ibm-plex-sans-arabic";
 import { Amiri_400Regular, Amiri_700Bold } from "@expo-google-fonts/amiri";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { colors } from "@/theme/tokens";
+import { ThemeProvider, useTheme } from "@/theme/context";
 import { storage, StorageKeys } from "@/utils/storage";
 import { scheduleReminders } from "@/utils/notifications";
 import { DEFAULT_SETTINGS } from "@/store/store";
@@ -49,11 +49,23 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="light" />
+      <ThemeProvider>
+        <ThemedStack />
+      </ThemeProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+/** The navigator + status bar, themed from the active theme (must live under ThemeProvider). */
+function ThemedStack() {
+  const theme = useTheme();
+  return (
+    <>
+      <StatusBar style={theme.statusBarStyle} />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: colors.green800 },
+          contentStyle: { backgroundColor: theme.semantic.screen },
         }}
       >
         <Stack.Screen name="(tabs)" />
@@ -74,6 +86,6 @@ export default function RootLayout() {
         <Stack.Screen name="challenges" />
         <Stack.Screen name="stats" />
       </Stack>
-    </GestureHandlerRootView>
+    </>
   );
 }

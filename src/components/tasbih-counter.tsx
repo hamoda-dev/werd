@@ -5,13 +5,16 @@ import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 import * as Haptics from "expo-haptics";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
-import { colors, fonts } from "@/theme/tokens";
+import { fonts } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
+import { Confetti } from "@/components/confetti";
 import { toArabicNumerals } from "@/utils/numerals";
 import { useSettings } from "@/store/store";
 
@@ -52,17 +55,22 @@ export function TasbihCounter({
   target,
   initialCount = 0,
   resetSignal = 0,
-  accent = colors.gold500,
+  accent,
   onChange,
   onComplete,
 }: Props) {
+  const { colors, features } = useTheme();
+  const accentColor = accent ?? colors.gold500;
+
   // Free (open-ended) tasbih: no goal, never "done", and a faint full ring.
   const free = target == null || target <= 0;
   const ringRatio = (n: number) => (free ? 1 : n / (target as number));
 
   const [count, setCount] = useState(initialCount);
+  const [burst, setBurst] = useState(0);
   const progress = useSharedValue(ringRatio(initialCount));
   const celebrate = useSharedValue(0);
+  const tapScale = useSharedValue(1);
   const done = !free && count >= (target as number);
 
   // Tap sound (toggleable from Profile). Play even with the silent switch on,
@@ -106,6 +114,9 @@ export function TasbihCounter({
     transform: [{ scale: interpolate(celebrate.value, [0, 1], [0.9, 1.5]) }],
   }));
 
+  // Springy "squish" on every tap.
+  const tapStyle = useAnimatedStyle(() => ({ transform: [{ scale: tapScale.value }] }));
+
   function handleTap() {
     if (done) return;
     if (soundOn) {
@@ -116,12 +127,17 @@ export function TasbihCounter({
     setCount(next);
     onChange?.(next);
     hapticLight();
+    tapScale.value = withSequence(
+      withTiming(0.95, { duration: 80 }),
+      withTiming(1, { duration: 160 }),
+    );
     if (free) return; // free tasbih: just tally, no ring fill or completion
     progress.value = withTiming(ringRatio(next), { duration: 320 });
     if (next >= (target as number)) {
       hapticSuccess();
       celebrate.value = 0;
       celebrate.value = withTiming(1, { duration: 900 });
+      if (features.confetti) setBurst((b) => b + 1); // 🎉 sparkle burst
       setTimeout(() => onComplete?.(), ADVANCE_DELAY);
     }
   }
@@ -139,7 +155,7 @@ export function TasbihCounter({
               height: SIZE,
               borderRadius: SIZE / 2,
               borderWidth: 3,
-              borderColor: accent,
+              borderColor: accentColor,
             },
             celebrateStyle,
           ]}
@@ -158,7 +174,7 @@ export function TasbihCounter({
             cx={SIZE / 2}
             cy={SIZE / 2}
             r={R}
-            stroke={accent}
+            stroke={accentColor}
             strokeWidth={STROKE}
             strokeOpacity={free ? 0.3 : 1}
             fill="none"
@@ -169,8 +185,8 @@ export function TasbihCounter({
           />
         </Svg>
 
-        {/* Counter in the center */}
-        <View style={{ position: "absolute", alignItems: "center" }}>
+        {/* Counter in the center — squishes on each tap */}
+        <Animated.View style={[{ position: "absolute", alignItems: "center" }, tapStyle]}>
           <Txt
             style={{ fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] }}
             size={78}
@@ -182,7 +198,10 @@ export function TasbihCounter({
           <Txt size={15} color={colors.muted3} align="center">
             {free ? "تسبيح حر" : `من ${toArabicNumerals(target as number)}`}
           </Txt>
-        </View>
+        </Animated.View>
+
+        {/* Sparkle burst on completion (themes that enable it) */}
+        {features.confetti ? <Confetti burstKey={burst} /> : null}
       </View>
     </Pressable>
   );

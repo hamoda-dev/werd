@@ -1,7 +1,8 @@
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { TabIcon } from "@/components/tab-icon";
 
@@ -13,6 +14,7 @@ const TABS: Record<string, { label: string }> = {
 };
 
 export function TabBar({ state, navigation }: BottomTabBarProps) {
+  const { semantic, gradients, radii, shadows, features } = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
@@ -49,16 +51,51 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
             onPress={onPress}
             style={{ flex: 1, alignItems: "center", gap: 5, paddingVertical: 6 }}
           >
-            <TabIcon
-              name={route.name}
-              active={focused}
-              size={24}
-              color={focused ? semantic.accentLight : semantic.textTertiary}
-            />
+            {features.tabPill ? (
+              <View
+                style={{
+                  paddingHorizontal: 18,
+                  paddingVertical: 7,
+                  borderRadius: radii.pill,
+                  borderCurve: "continuous",
+                  // Always clip to the rounded shape so the gradient stays
+                  // pill-shaped even when applied on a later focus change (not
+                  // just on the tab that mounted focused). See streak-hero.
+                  overflow: "hidden",
+                  ...(focused
+                    ? {
+                        backgroundColor: semantic.accent,
+                        experimental_backgroundImage: gradients.gold,
+                        boxShadow: shadows.goldCard,
+                      }
+                    : null),
+                }}
+              >
+                <TabIcon
+                  name={route.name}
+                  active={focused}
+                  size={24}
+                  color={focused ? semantic.textOnColor : semantic.textTertiary}
+                />
+              </View>
+            ) : (
+              <TabIcon
+                name={route.name}
+                active={focused}
+                size={24}
+                color={focused ? semantic.accentLight : semantic.textTertiary}
+              />
+            )}
             <Txt
               size={11}
               weight={focused ? "semibold" : "regular"}
-              color={focused ? semantic.textPrimary : semantic.textTertiary}
+              color={
+                focused
+                  ? features.tabPill
+                    ? semantic.accentDeep
+                    : semantic.textPrimary
+                  : semantic.textTertiary
+              }
               align="center"
             >
               {meta.label}

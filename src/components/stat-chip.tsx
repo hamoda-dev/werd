@@ -1,9 +1,11 @@
 import { View } from "react-native";
-import { radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 
 /** Small stat chip (value + label). */
 export function StatChip({ value, label }: { value: string; label: string }) {
+  const { semantic, radii } = useTheme();
   return (
     <View
       style={{

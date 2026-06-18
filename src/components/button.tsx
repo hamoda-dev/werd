@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, type ViewStyle } from "react-native";
 import * as Haptics from "expo-haptics";
-import { gradients, radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 
@@ -19,33 +20,35 @@ interface Props {
   style?: ViewStyle;
 }
 
-const FILL: Record<ButtonVariant, ViewStyle> = {
-  primary: {
-    experimental_backgroundImage: gradients.gold,
-    backgroundColor: semantic.accent,
-    borderRadius: radii.pill,
-    borderCurve: "continuous",
-    paddingVertical: 16,
-    paddingHorizontal: spacing.xl,
-  },
-  ghost: {
-    backgroundColor: semantic.surfaceStrong,
-    borderRadius: radii.pill,
-    borderCurve: "continuous",
-    paddingVertical: 14,
-    paddingHorizontal: spacing.xl,
-  },
-  link: {},
-};
-
-const TEXT_COLOR: Record<ButtonVariant, string> = {
-  primary: semantic.textOnCream,
-  ghost: semantic.textGhost,
-  link: semantic.accentLight,
-};
-
 /** Unified button. Variants match the app's existing CTAs; text always renders through Txt. */
 export function Button({ children, onPress, variant = "primary", icon, haptic = true, disabled = false, hitSlop, style }: Props) {
+  const { gradients, radii, semantic } = useTheme();
+
+  const FILL: Record<ButtonVariant, ViewStyle> = {
+    primary: {
+      experimental_backgroundImage: gradients.gold,
+      backgroundColor: semantic.accent,
+      borderRadius: radii.pill,
+      borderCurve: "continuous",
+      paddingVertical: 16,
+      paddingHorizontal: spacing.xl,
+    },
+    ghost: {
+      backgroundColor: semantic.surfaceStrong,
+      borderRadius: radii.pill,
+      borderCurve: "continuous",
+      paddingVertical: 14,
+      paddingHorizontal: spacing.xl,
+    },
+    link: {},
+  };
+
+  const TEXT_COLOR: Record<ButtonVariant, string> = {
+    primary: semantic.textOnCream,
+    ghost: semantic.textGhost,
+    link: semantic.accentLight,
+  };
+
   function handlePress() {
     if (disabled) return;
     if (haptic && process.env.EXPO_OS === "ios") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -69,6 +72,7 @@ export function Button({ children, onPress, variant = "primary", icon, haptic = 
           justifyContent: "center",
           gap: 6,
           opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
+          transform: [{ scale: pressed && !disabled ? 0.97 : 1 }],
         },
         FILL[variant],
         style,

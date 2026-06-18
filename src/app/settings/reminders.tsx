@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DateTimePicker, {
   type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { gradients, radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -28,6 +29,7 @@ function dateToTime(d: Date): string {
 }
 
 export default function Reminders() {
+  const { semantic, radii, gradients } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { settings, update } = useSettings();

@@ -3,7 +3,8 @@ import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeabl
 // Gesture-handler's Pressable coordinates with the swipe pan gesture; a plain RN
 // Pressable inside the revealed action panel never receives the tap.
 import { Pressable as GHPressable } from "react-native-gesture-handler";
-import { gradients, radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -19,6 +20,7 @@ interface Props {
 
 /** Gold repetition chip — rendered only for items that have a target. */
 function CountChip({ count }: { count: number }) {
+  const { semantic, radii } = useTheme();
   return (
     <View
       style={{
@@ -39,6 +41,7 @@ function CountChip({ count }: { count: number }) {
 }
 
 function RowBody({ item }: { item: AdhkariItem }) {
+  const { semantic, radii } = useTheme();
   return (
     <View
       style={{
@@ -81,6 +84,7 @@ function ActionButton({
   label: string;
   onPress: () => void;
 }) {
+  const { radii } = useTheme();
   return (
     <GHPressable
       onPress={onPress}
@@ -107,6 +111,7 @@ function ActionButton({
  * own items are wrapped in a swipeable that reveals تعديل / حذف.
  */
 export function AdhkarRow({ item, onPress, onEdit, onDelete }: Props) {
+  const { gradients, semantic } = useTheme();
   if (item.locked) {
     return (
       <Pressable accessibilityRole="button" onPress={onPress}>

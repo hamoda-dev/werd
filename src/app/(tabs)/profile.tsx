@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Pressable, ScrollView, Switch, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { fonts, gradients, radii, semantic, spacing } from "@/theme/tokens";
+import { fonts, spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
+import { THEME_LIST } from "@/theme/registry";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -11,6 +13,8 @@ import { ensureReminders, cancelReminders } from "@/utils/notifications";
 import { useSettings } from "@/store/store";
 
 export default function Profile() {
+  const theme = useTheme();
+  const { semantic, radii, gradients } = theme;
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { settings, update } = useSettings();
@@ -75,6 +79,40 @@ export default function Profile() {
               writingDirection: "auto",
             }}
           />
+        </View>
+
+        {/* Appearance / theme */}
+        <View style={{ gap: spacing.sm }}>
+          <Txt size={14} weight="medium" color={semantic.textSecondary}>المظهر</Txt>
+          <View style={{ backgroundColor: semantic.surface, borderRadius: radii.card, borderCurve: "continuous", overflow: "hidden" }}>
+            {THEME_LIST.map((t, i) => {
+              const active = t.id === theme.id;
+              return (
+                <Pressable
+                  key={t.id}
+                  onPress={() => update({ themeId: t.id })}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: spacing.lg,
+                    borderTopWidth: i === 0 ? 0 : 1,
+                    borderTopColor: semantic.surfaceStrong,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
+                    <View style={{ flexDirection: "row", gap: 4 }}>
+                      {[t.semantic.screen, t.semantic.accent, t.semantic.success].map((c, j) => (
+                        <View key={j} style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: c }} />
+                      ))}
+                    </View>
+                    <Txt size={15} weight="medium">{t.label}</Txt>
+                  </View>
+                  {active ? <Icon name="checkmark" size={20} color={semantic.accentLight} /> : null}
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
 
         {/* Reminders */}

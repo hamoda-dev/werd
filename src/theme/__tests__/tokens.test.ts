@@ -1,4 +1,5 @@
-import { colors, gradients, semantic, shadows, text } from "@/theme/tokens";
+import { THEME_LIST } from "@/theme/registry";
+import { text } from "@/theme/tokens";
 
 describe("text scale", () => {
   const variants = ["title", "heading", "subheading", "body", "label", "caption", "micro"] as const;
@@ -11,27 +12,29 @@ describe("text scale", () => {
   });
 });
 
-describe("gradients", () => {
-  const keys = ["darkScreen", "brandCard", "gold", "sage", "terracotta", "onboardingGlow", "logoGlow"] as const;
-  it("are ready-to-use css gradient strings", () => {
-    for (const k of keys) {
-      expect(typeof gradients[k]).toBe("string");
-      expect(gradients[k]).toMatch(/gradient\(/);
+describe.each(THEME_LIST.map((t) => [t.id, t] as const))("theme: %s", (_id, theme) => {
+  it("paints every gradient as a css gradient string", () => {
+    for (const k of ["darkScreen", "brandCard", "gold", "sage", "terracotta", "onboardingGlow", "logoGlow"] as const) {
+      expect(typeof theme.gradients[k]).toBe("string");
+      expect(theme.gradients[k]).toMatch(/gradient\(/);
     }
   });
-});
 
-describe("shadows", () => {
-  it("are css box-shadow strings", () => {
+  it("defines every shadow as a css box-shadow string", () => {
     for (const k of ["cardOnCream", "darkElevated", "terracotta", "floatingButton", "goldCard", "sheet"] as const) {
-      expect(typeof shadows[k]).toBe("string");
-      expect(shadows[k]).toMatch(/px/);
+      expect(typeof theme.shadows[k]).toBe("string");
+      expect(theme.shadows[k]).toMatch(/px/);
     }
   });
-});
 
-describe("semantic colors alias the palette", () => {
-  it("maps representative roles to the right palette values", () => {
+  it("uses numeric radii", () => {
+    for (const k of ["tile", "card", "cardLg", "pill"] as const) {
+      expect(typeof theme.radii[k]).toBe("number");
+    }
+  });
+
+  it("aliases semantic roles to the palette", () => {
+    const { colors, semantic } = theme;
     expect(semantic.screen).toBe(colors.green800);
     expect(semantic.surface).toBe(colors.whiteAlpha06);
     expect(semantic.brandSurface).toBe(colors.green700);
@@ -42,13 +45,33 @@ describe("semantic colors alias the palette", () => {
     expect(semantic.success).toBe(colors.sage);
     expect(semantic.border).toBe(colors.whiteAlpha14);
   });
-  it("tokenizes the former literals", () => {
-    expect(semantic.textOnColor).toBe("#fff");
-    expect(semantic.textOnColorMuted).toBe("rgba(255,255,255,0.85)");
-    expect(semantic.textGhost).toBe("#cfe0d6");
-    expect(semantic.tabBar).toBe("rgba(14,45,34,0.96)");
-    expect(semantic.inkChip).toBe("rgba(14,45,34,0.15)");
-    expect(semantic.inkTrack).toBe("rgba(14,45,34,0.18)");
-    expect(semantic.surfaceWhite).toBe("#fff");
+
+  it("shares the white-on-color literals", () => {
+    expect(theme.semantic.textOnColor).toBe("#fff");
+    expect(theme.semantic.surfaceWhite).toBe("#fff");
+    expect(typeof theme.semantic.tabBar).toBe("string");
+    expect(typeof theme.semantic.inkChip).toBe("string");
+    expect(typeof theme.semantic.inkTrack).toBe("string");
+  });
+
+  it("defines the decorative tokens the cute components read", () => {
+    for (const k of ["mascotBody", "mascotFace", "mascotCheek", "blobPink", "blobPeach", "blobLilac", "heartEmpty"] as const) {
+      expect(typeof theme.semantic[k]).toBe("string");
+    }
+  });
+});
+
+describe("registry", () => {
+  it("has the default werd theme with the cute features off", () => {
+    const werd = THEME_LIST.find((t) => t.id === "werd")!;
+    expect(werd).toBeDefined();
+    expect(Object.values(werd.features).every((v) => v === false)).toBe(true);
+    expect(werd.statusBarStyle).toBe("light");
+  });
+  it("has the pink theme with the cute features on", () => {
+    const pink = THEME_LIST.find((t) => t.id === "pink")!;
+    expect(pink).toBeDefined();
+    expect(Object.values(pink.features).every((v) => v === true)).toBe(true);
+    expect(pink.statusBarStyle).toBe("dark");
   });
 });

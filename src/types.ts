@@ -1,3 +1,5 @@
+import type { ThemeId } from "@/theme/types";
+
 export interface Dhikr {
   id: string;
   text: string;
@@ -63,6 +65,8 @@ export interface Settings {
   eveningTime: string; // "HH:mm"
   /** Play the click sound on each tasbih tap. Undefined (legacy) is treated as enabled. */
   soundEnabled?: boolean;
+  /** Selected theme id. Undefined (legacy) falls back to the default theme. */
+  themeId?: ThemeId;
 }
 
 export interface DayProgress {

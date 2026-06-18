@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import { View, type ViewStyle } from "react-native";
-import { radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 
-/** Unified translucent dark-surface card (whiteAlpha06). */
+/** Unified translucent surface card with a soft (theme-tinted) shadow. */
 export function Card({ children, style }: { children: ReactNode; style?: ViewStyle }) {
+  const { radii, semantic, shadows } = useTheme();
   return (
     <View
       style={[
@@ -13,6 +15,7 @@ export function Card({ children, style }: { children: ReactNode; style?: ViewSty
           borderCurve: "continuous",
           padding: spacing.lg,
           gap: spacing.sm,
+          boxShadow: shadows.cardOnCream,
         },
         style,
       ]}

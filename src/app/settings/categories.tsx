@@ -2,37 +2,37 @@ import { useState } from "react";
 import { Alert, Pressable, ScrollView, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { fonts, gradients, radii, semantic, spacing } from "@/theme/tokens";
+import { fonts, spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { useAdhkariCategories, useCustomCategories } from "@/store/store";
 
-const rowStyle = {
-  flexDirection: "row" as const,
-  alignItems: "center" as const,
-  justifyContent: "space-between" as const,
-  gap: spacing.sm,
-  backgroundColor: semantic.surface,
-  borderRadius: radii.tile,
-  borderCurve: "continuous" as const,
-  paddingHorizontal: spacing.lg,
-  paddingVertical: 14,
-};
-
-const inputStyle = {
-  backgroundColor: semantic.surfaceStrong,
-  borderRadius: radii.tile,
-  borderCurve: "continuous" as const,
-  paddingHorizontal: spacing.md,
-  paddingVertical: 10,
-  fontFamily: fonts.sansMedium,
-  fontSize: 15,
-  color: semantic.textPrimary,
-  textAlign: "auto" as const,
-  writingDirection: "auto" as const,
-};
-
 export default function CategoriesScreen() {
+  const { semantic, radii, gradients } = useTheme();
+  const rowStyle = {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    justifyContent: "space-between" as const,
+    gap: spacing.sm,
+    backgroundColor: semantic.surface,
+    borderRadius: radii.tile,
+    borderCurve: "continuous" as const,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 14,
+  };
+  const inputStyle = {
+    backgroundColor: semantic.surfaceStrong,
+    borderRadius: radii.tile,
+    borderCurve: "continuous" as const,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    fontFamily: fonts.sansMedium,
+    fontSize: 15,
+    color: semantic.textPrimary,
+    textAlign: "auto" as const,
+    writingDirection: "auto" as const,
+  };
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const categories = useAdhkariCategories();

@@ -1,6 +1,7 @@
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
-import { radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { StatChip } from "@/components/stat-chip";
@@ -14,6 +15,7 @@ import { useBadges, useProgressMap, useScore, useStreak } from "@/store/store";
 import { Screen } from "@/components/screen";
 
 function NavRow({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) {
+  const { semantic, radii } = useTheme();
   return (
     <Pressable
       onPress={onPress}

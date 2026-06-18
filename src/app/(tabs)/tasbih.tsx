@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
-import { radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { Screen } from "@/components/screen";
@@ -13,6 +14,7 @@ import type { AdhkariItem } from "@/types";
 const ALL = "all";
 
 function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  const { semantic, radii } = useTheme();
   return (
     <Pressable
       onPress={onPress}
@@ -32,6 +34,7 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 }
 
 function SectionLabel({ children }: { children: string }) {
+  const { semantic } = useTheme();
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.xs }}>
       <Txt size={14} weight="bold" color={semantic.accentLight}>{children}</Txt>
@@ -41,6 +44,7 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export default function AdhkariTab() {
+  const { semantic, radii } = useTheme();
   const router = useRouter();
   const items = useAdhkariItems();
   const categories = useAdhkariCategories();

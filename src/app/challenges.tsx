@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { gradients, radii, semantic, shadows, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { ProgressBar } from "@/components/progress-bar";
@@ -18,6 +19,7 @@ import {
 } from "@/store/store";
 
 export default function Challenges() {
+  const { semantic, gradients, radii, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const progress = useProgressMap();

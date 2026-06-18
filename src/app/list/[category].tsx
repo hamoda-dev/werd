@@ -1,7 +1,8 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { gradients, radii, semantic, shadows, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -9,6 +10,7 @@ import { getCategory } from "@/data/adhkar";
 import { useTodayProgress } from "@/store/store";
 
 export default function ListScreen() {
+  const { semantic, gradients, radii, shadows } = useTheme();
   const { category } = useLocalSearchParams<{ category: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();

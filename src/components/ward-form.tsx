@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { fonts, gradients, radii, semantic, spacing } from "@/theme/tokens";
+import { fonts, spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { toArabicNumerals } from "@/utils/numerals";
@@ -28,19 +29,6 @@ interface Props {
   onDelete?: () => void;
 }
 
-const fieldStyle = {
-  backgroundColor: semantic.surfaceStrong,
-  borderRadius: radii.tile,
-  borderCurve: "continuous" as const,
-  paddingHorizontal: spacing.lg,
-  paddingVertical: 14,
-  fontFamily: fonts.sansMedium,
-  fontSize: 16,
-  color: semantic.textPrimary,
-  textAlign: "auto" as const,
-  writingDirection: "auto" as const,
-};
-
 const DEFAULT_TARGET = 33;
 
 export function WardForm({
@@ -53,6 +41,19 @@ export function WardForm({
   onCancel,
   onDelete,
 }: Props) {
+  const { semantic, radii, gradients } = useTheme();
+  const fieldStyle = {
+    backgroundColor: semantic.surfaceStrong,
+    borderRadius: radii.tile,
+    borderCurve: "continuous" as const,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 14,
+    fontFamily: fonts.sansMedium,
+    fontSize: 16,
+    color: semantic.textPrimary,
+    textAlign: "auto" as const,
+    writingDirection: "auto" as const,
+  };
   const insets = useSafeAreaInsets();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [text, setText] = useState(initial?.text ?? "");

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Pressable, type ViewStyle } from "react-native";
-import { radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Icon } from "@/components/icon";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 
 /** Translucent rounded pressable row (awrad items, category lists). */
 export function ListRow({ children, onPress, onLongPress, accessory, style }: Props) {
+  const { semantic, radii } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"

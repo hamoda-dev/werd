@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { I18nManager } from "react-native";
 import Svg, { Circle, G, Path } from "react-native-svg";
-import { semantic } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 
 /**
  * The single icon primitive. Every glyph is hand-drawn SVG in the same "Rounded" style
@@ -103,7 +103,9 @@ interface Props {
   color?: string;
 }
 
-export function Icon({ name, size = 22, color = semantic.textPrimary }: Props) {
+export function Icon({ name, size = 22, color }: Props) {
+  const { semantic } = useTheme();
+  const resolvedColor = color ?? semantic.textPrimary;
   // Resolve directional chevrons for the layout direction (RTL back → right).
   let key = name;
   if (name === "chevron.backward") key = I18nManager.isRTL ? "chevron.right" : "chevron.left";
@@ -113,8 +115,8 @@ export function Icon({ name, size = 22, color = semantic.textPrimary }: Props) {
 
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
-      <G fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        {glyph ?? <Circle cx={12} cy={12} r={1.6} fill={color} stroke="none" />}
+      <G fill="none" stroke={resolvedColor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        {glyph ?? <Circle cx={12} cy={12} r={1.6} fill={resolvedColor} stroke="none" />}
       </G>
     </Svg>
   );

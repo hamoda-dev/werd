@@ -3,7 +3,8 @@ import { Pressable, ScrollView, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
-import { gradients, radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { TasbihCounter } from "@/components/tasbih-counter";
@@ -12,6 +13,7 @@ import { completeWard, getAdhkariItem, getPartialCount, setPartialCount } from "
 
 /** Counts a single ذِكر (built-in or user-created). Target items award points on completion. */
 export default function DhikrCounterScreen() {
+  const { semantic, gradients, radii } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();

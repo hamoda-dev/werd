@@ -45,6 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   morningTime: "07:00",
   eveningTime: "18:30",
   soundEnabled: true,
+  themeId: "werd",
 };
 const DEFAULT_PROGRESS: ProgressMap = {};
 const DEFAULT_STREAK: Streak = { current: 0, longest: 0, lastCompletedDate: null };

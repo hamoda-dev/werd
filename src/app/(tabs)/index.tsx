@@ -1,9 +1,11 @@
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
-import { radii, semantic, spacing } from "@/theme/tokens";
+import { spacing } from "@/theme/tokens";
+import { useTheme } from "@/theme/context";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
 import { ProgressBar } from "@/components/progress-bar";
+import { HeartProgress } from "@/components/heart-progress";
 import { StreakHero } from "@/components/streak-hero";
 import { LevelCard } from "@/components/level-card";
 import { Screen } from "@/components/screen";
@@ -28,6 +30,7 @@ function greeting(): string {
 }
 
 export default function Home() {
+  const { semantic, radii, shadows, features } = useTheme();
   const router = useRouter();
   const { settings } = useSettings();
   const streak = useStreak();
@@ -48,13 +51,15 @@ export default function Home() {
 
   const morning = catProgress("morning");
   const evening = catProgress("evening");
+  const morningRatio = morning.total ? morning.done / morning.total : 0;
+  const eveningRatio = evening.total ? evening.done / evening.total : 0;
 
   return (
     <Screen>
       {/* Greeting */}
       <View>
-        <Txt size={14} color={semantic.textSecondary}>{greeting()}</Txt>
-        <Txt size={26} weight="bold" color={semantic.textPrimary}>{settings.name} 👋</Txt>
+        <Txt size={14} color={semantic.textSecondary}>{greeting()}{features.emojiAccents ? " ✨" : ""}</Txt>
+        <Txt size={26} weight="bold" color={semantic.textPrimary}>{settings.name} {features.emojiAccents ? "🎀" : "👋"}</Txt>
       </View>
 
       {/* Streak hero */}
@@ -110,15 +115,16 @@ export default function Home() {
             gap: spacing.sm,
             borderWidth: 1.5,
             borderColor: semantic.accent,
+            boxShadow: shadows.cardOnCream,
           }}
         >
           <Icon name="sun.max.fill" size={30} color={semantic.accentDeep} />
           <Txt size={16} weight="bold" color={semantic.textOnCream}>أذكار الصباح</Txt>
-          <ProgressBar
-            ratio={morning.total ? morning.done / morning.total : 0}
-            color={semantic.success}
-            track={semantic.borderCream}
-          />
+          {features.heartProgress ? (
+            <HeartProgress ratio={morningRatio} />
+          ) : (
+            <ProgressBar ratio={morningRatio} color={semantic.success} track={semantic.borderCream} />
+          )}
           <Txt size={12} color={semantic.textMutedCream}>
             {morning.isDone ? "اكتمل ✓" : `${toArabicNumerals(morning.done)} من ${toArabicNumerals(morning.total)}`}
           </Txt>
@@ -133,11 +139,16 @@ export default function Home() {
             borderCurve: "continuous",
             padding: spacing.lg,
             gap: spacing.sm,
+            boxShadow: shadows.cardOnCream,
           }}
         >
           <Icon name="moon.fill" size={28} color={semantic.accentLight} />
           <Txt size={16} weight="bold" color={semantic.textPrimary}>أذكار المساء</Txt>
-          <ProgressBar ratio={evening.total ? evening.done / evening.total : 0} color={semantic.accent} />
+          {features.heartProgress ? (
+            <HeartProgress ratio={eveningRatio} />
+          ) : (
+            <ProgressBar ratio={eveningRatio} color={semantic.accent} />
+          )}
           <Txt size={12} color={semantic.textSecondary}>
             {evening.isDone ? "اكتمل ✓" : `${toArabicNumerals(evening.done)} من ${toArabicNumerals(evening.total)}`}
           </Txt>
