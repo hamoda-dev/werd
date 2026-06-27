@@ -9,26 +9,30 @@ import { spacing } from "@/theme/tokens";
 const SPARKLE = "M0,-6 C0.7,-2 2,-0.7 6,0 C2,0.7 0.7,2 0,6 C-0.7,2 -2,0.7 -6,0 C-2,-0.7 -0.7,-2 0,-6Z";
 
 /**
- * Full-screen themed splash, shown over the app for one beat after fonts/data load,
- * then fades out. Themed from the active theme (the persisted themeId resolved by
- * ThemeProvider), so a pink user sees the pink splash. The OS native splash (app.json)
- * still flashes first and cannot be themed — this bridges into the themed app.
+ * Full-screen themed splash, shown over the app on cold start and faded out once load
+ * finishes. It's the brand moment that reflects the active theme (the native OS splash
+ * before it can't be themed): the logo settles in, holds, then the whole cover fades to
+ * reveal the app. Themed from the active theme via ThemeProvider, so a pink user sees
+ * the pink splash, a werd user the green one.
  */
 export function AppSplash({ onFinish }: { onFinish: () => void }) {
   const { gradients, semantic, logo, features } = useTheme();
   const { width, height } = useWindowDimensions();
-  const opacity = useRef(new Animated.Value(1)).current;
+  // `enter` drives the logo settling in; `cover` fades the whole splash out at the end.
+  const enter = useRef(new Animated.Value(0)).current;
+  const cover = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      Animated.timing(opacity, { toValue: 0, duration: 400, useNativeDriver: true }).start(
-        ({ finished }) => {
-          if (finished) onFinish();
-        },
-      );
-    }, 500);
-    return () => clearTimeout(t);
-  }, [opacity, onFinish]);
+    Animated.sequence([
+      Animated.timing(enter, { toValue: 1, duration: 440, useNativeDriver: true }),
+      Animated.delay(800),
+      Animated.timing(cover, { toValue: 0, duration: 480, useNativeDriver: true }),
+    ]).start(({ finished }) => {
+      if (finished) onFinish();
+    });
+  }, [enter, cover, onFinish]);
+
+  const scale = enter.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] });
 
   return (
     <Animated.View
@@ -39,10 +43,10 @@ export function AppSplash({ onFinish }: { onFinish: () => void }) {
         left: 0,
         right: 0,
         bottom: 0,
-        opacity,
+        opacity: cover,
         alignItems: "center",
         justifyContent: "center",
-        gap: spacing.lg,
+        backgroundColor: semantic.screen,
         experimental_backgroundImage: gradients.onboardingGlow,
       }}
     >
@@ -57,10 +61,12 @@ export function AppSplash({ onFinish }: { onFinish: () => void }) {
         </Svg>
       ) : null}
 
-      <Logo size={118} />
-      <Txt naskh size={18} color={semantic.textSecondary}>
-        وِرْدُكَ اليوميّ
-      </Txt>
+      <Animated.View style={{ opacity: enter, transform: [{ scale }], alignItems: "center", gap: spacing.lg }}>
+        <Logo size={128} />
+        <Txt naskh size={18} color={semantic.textSecondary}>
+          وِرْدُكَ اليوميّ
+        </Txt>
+      </Animated.View>
     </Animated.View>
   );
 }
