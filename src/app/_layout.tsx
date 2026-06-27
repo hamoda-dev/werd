@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,6 +12,7 @@ import {
 import { Amiri_400Regular, Amiri_700Bold } from "@expo-google-fonts/amiri";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useTheme } from "@/theme/context";
+import { AppSplash } from "@/components/app-splash";
 import { storage, StorageKeys } from "@/utils/storage";
 import { scheduleReminders } from "@/utils/notifications";
 import { DEFAULT_SETTINGS } from "@/store/store";
@@ -34,6 +35,7 @@ export default function RootLayout() {
     Amiri_400Regular,
     Amiri_700Bold,
   });
+  const [splashVisible, setSplashVisible] = useState(true);
 
   useEffect(() => {
     if (!loaded) return;
@@ -51,6 +53,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
         <ThemedStack />
+        {splashVisible ? <AppSplash onFinish={() => setSplashVisible(false)} /> : null}
       </ThemeProvider>
     </GestureHandlerRootView>
   );
@@ -85,6 +88,7 @@ function ThemedStack() {
         <Stack.Screen name="settings/categories" />
         <Stack.Screen name="challenges" />
         <Stack.Screen name="stats" />
+        <Stack.Screen name="about" />
       </Stack>
     </>
   );
