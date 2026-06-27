@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useTheme } from "@/theme/context";
 import { AppSplash } from "@/components/app-splash";
 import { storage, StorageKeys } from "@/utils/storage";
+import { syncAppIcon } from "@/utils/app-icon";
 import { scheduleReminders } from "@/utils/notifications";
 import { DEFAULT_SETTINGS } from "@/store/store";
 import { APP_LANGUAGE, applyLayoutDirection } from "@/i18n/direction";
@@ -62,6 +63,10 @@ export default function RootLayout() {
 /** The navigator + status bar, themed from the active theme (must live under ThemeProvider). */
 function ThemedStack() {
   const theme = useTheme();
+  // Keep the home-screen launcher icon in sync with the active theme.
+  useEffect(() => {
+    syncAppIcon(theme.id);
+  }, [theme.id]);
   return (
     <>
       <StatusBar style={theme.statusBarStyle} />
