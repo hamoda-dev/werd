@@ -79,6 +79,15 @@ const gradients: Gradients = {
   logoGlow: "radial-gradient(circle, rgba(216,180,106,0.30) 0%, transparent 62%)",
 };
 
+const logo: Theme["logo"] = {
+  ground: gradients.brandCard, // deep green squircle, matches the original logo ground
+  sunFrom: colors.gold500,
+  sunTo: colors.gold700,
+  rays: colors.gold500,
+  wordmark: colors.creamText,
+  spark: null,
+};
+
 const semantic: Semantic = {
   // Surfaces — dark
   screen:        colors.green800,
@@ -133,6 +142,7 @@ export const werd: Theme = {
   radii,
   shadows,
   gradients,
+  logo,
   features: {
     mascot: false,
     confetti: false,

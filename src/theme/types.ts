@@ -119,6 +119,22 @@ export interface Gradients {
   logoGlow: string;
 }
 
+/** Tokens for the themeable app logo (see components/logo.tsx). Every theme provides
+ *  its own sunrise + «وِرْد» colors so the logo always matches the active theme. */
+export interface LogoTokens {
+  /** CSS gradient for the squircle tile background (experimental_backgroundImage). */
+  ground: string;
+  /** Sunrise dome fill — vertical gradient stops (top → bottom). */
+  sunFrom: string;
+  sunTo: string;
+  /** Sunrise ray stroke color. */
+  rays: string;
+  /** «وِرْد» wordmark color. */
+  wordmark: string;
+  /** Sparkle fill. Sparkles render only when `features.sprinkles` is true; null = none. */
+  spark: string | null;
+}
+
 /** Theme-specific decorations. Off by default; the pink theme turns them all on. */
 export interface ThemeFeatures {
   /** Blob mascot on the streak hero. */
@@ -146,6 +162,7 @@ export interface Theme {
   radii: Radii;
   shadows: Shadows;
   gradients: Gradients;
+  logo: LogoTokens;
   features: ThemeFeatures;
   /** Native status-bar icon style appropriate for this theme's background. */
   statusBarStyle: "light" | "dark";

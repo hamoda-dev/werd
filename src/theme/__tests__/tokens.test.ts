@@ -59,6 +59,15 @@ describe.each(THEME_LIST.map((t) => [t.id, t] as const))("theme: %s", (_id, them
       expect(typeof theme.semantic[k]).toBe("string");
     }
   });
+
+  it("defines logo tokens for the themed app logo", () => {
+    const { logo } = theme;
+    expect(logo.ground).toMatch(/gradient\(/);
+    for (const k of ["sunFrom", "sunTo", "rays", "wordmark"] as const) {
+      expect(typeof logo[k]).toBe("string");
+    }
+    expect(logo.spark === null || typeof logo.spark === "string").toBe(true);
+  });
 });
 
 describe("registry", () => {
@@ -73,5 +82,9 @@ describe("registry", () => {
     expect(pink).toBeDefined();
     expect(Object.values(pink.features).every((v) => v === true)).toBe(true);
     expect(pink.statusBarStyle).toBe("dark");
+  });
+  it("turns logo sparkles off for werd and on for pink", () => {
+    expect(THEME_LIST.find((t) => t.id === "werd")!.logo.spark).toBeNull();
+    expect(typeof THEME_LIST.find((t) => t.id === "pink")!.logo.spark).toBe("string");
   });
 });
