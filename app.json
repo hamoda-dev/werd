@@ -51,7 +51,20 @@
           "microphonePermission": false
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-dynamic-app-icon",
+        {
+          "werd": {
+            "image": "./assets/images/wird-logo.png",
+            "prerendered": true
+          },
+          "pink": {
+            "image": "./assets/images/wird-logo-pink.png",
+            "prerendered": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

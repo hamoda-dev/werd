@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { fonts, spacing } from "@/theme/tokens";
 import { useTheme } from "@/theme/context";
@@ -59,6 +59,7 @@ export function WardForm({
   const [text, setText] = useState(initial?.text ?? "");
   const [free, setFree] = useState(initial ? initial.count == null : false);
   const [count, setCount] = useState(initial?.count ?? DEFAULT_TARGET);
+  const [countInput, setCountInput] = useState(toArabicNumerals(initial?.count ?? DEFAULT_TARGET));
   const [category, setCategory] = useState(
     // `||` (not `??`) so a legacy item with an empty-string category falls back too.
     (initial?.category && initial.category.trim()) || categories[0]?.id || "general",
@@ -71,6 +72,28 @@ export function WardForm({
     text.trim().length > 0 &&
     category.length > 0 &&
     (free || count >= 1);
+
+  // Accept typed input (Eastern or Western digits), keep digits only (no negatives), display Eastern.
+  function setCountFromText(t: string) {
+    const western = t.replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+    const digits = western.replace(/[^0-9]/g, "").slice(0, 5);
+    setCountInput(toArabicNumerals(digits));
+    setCount(digits ? parseInt(digits, 10) : 0);
+  }
+
+  function bumpCount(delta: number) {
+    const n = Math.min(99999, Math.max(1, count + delta));
+    setCount(n);
+    setCountInput(toArabicNumerals(n));
+  }
+
+  // Empty/zero field falls back to 1 when the user leaves it.
+  function normalizeCount() {
+    if (count < 1) {
+      setCount(1);
+      setCountInput("١");
+    }
+  }
 
   function submit() {
     if (!valid) return;
@@ -95,7 +118,8 @@ export function WardForm({
   }
 
   return (
-    <View
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{
         flex: 1,
         backgroundColor: semantic.screen,
@@ -208,7 +232,13 @@ export function WardForm({
           <Txt size={14} weight="medium">نوع العدّ</Txt>
           <View style={{ flexDirection: "row", gap: 4, backgroundColor: semantic.surfaceStrong, padding: 4, borderRadius: radii.pill, borderCurve: "continuous" }}>
             <Pressable
-              onPress={() => setFree(false)}
+              onPress={() => {
+                setFree(false);
+                if (count < 1) {
+                  setCount(DEFAULT_TARGET);
+                  setCountInput(toArabicNumerals(DEFAULT_TARGET));
+                }
+              }}
               style={{ flex: 1, paddingVertical: 10, borderRadius: radii.pill, borderCurve: "continuous", alignItems: "center", backgroundColor: free ? "transparent" : semantic.accent }}
             >
               <Txt size={14} weight="semibold" color={free ? semantic.textSecondary : semantic.textOnCream}>هدف محدد</Txt>
@@ -222,27 +252,47 @@ export function WardForm({
           </View>
         </View>
 
-        {/* Target stepper — only when a target is set */}
+        {/* Target — typeable field (with +/− for small tweaks), only when a target is set */}
         {free ? null : (
           <View style={{ gap: spacing.sm }}>
             <Txt size={14} weight="medium">عدد التكرار</Txt>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.xl }}>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.md }}>
               <Pressable
-                onPress={() => setCount((c) => Math.max(1, c - 1))}
+                onPress={() => bumpCount(-1)}
                 style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: semantic.surfaceStrong, alignItems: "center", justifyContent: "center" }}
               >
                 <Txt size={26} weight="bold" color={semantic.textPrimary}>−</Txt>
               </Pressable>
-              <Txt size={32} weight="bold" color={semantic.accentLight} style={{ minWidth: 70, fontVariant: ["tabular-nums"] }} align="center">
-                {toArabicNumerals(count)}
-              </Txt>
+              <TextInput
+                value={countInput}
+                onChangeText={setCountFromText}
+                onBlur={normalizeCount}
+                keyboardType="number-pad"
+                maxLength={5}
+                selectTextOnFocus
+                placeholder="٠"
+                placeholderTextColor={semantic.textTertiary}
+                style={{
+                  minWidth: 110,
+                  textAlign: "center",
+                  backgroundColor: semantic.surfaceStrong,
+                  borderRadius: radii.tile,
+                  borderCurve: "continuous",
+                  paddingVertical: 10,
+                  paddingHorizontal: spacing.md,
+                  fontFamily: fonts.sansBold,
+                  fontSize: 28,
+                  color: semantic.accentLight,
+                }}
+              />
               <Pressable
-                onPress={() => setCount((c) => c + 1)}
+                onPress={() => bumpCount(1)}
                 style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: semantic.surfaceStrong, alignItems: "center", justifyContent: "center" }}
               >
                 <Txt size={26} weight="bold" color={semantic.textPrimary}>+</Txt>
               </Pressable>
             </View>
+            <Txt size={12} color={semantic.textSecondary} align="center">اكتب العدد مباشرةً، أو استخدم + و −</Txt>
           </View>
         )}
 
@@ -267,6 +317,6 @@ export function WardForm({
           </Pressable>
         ) : null}
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

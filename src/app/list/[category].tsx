@@ -128,7 +128,7 @@ export default function ListScreen() {
             boxShadow: shadows.floatingButton,
           }}
         >
-          <Txt weight="bold" size={16} color={semantic.textOnCream}>ابدأ المسبحة</Txt>
+          <Txt weight="bold" size={16} color={semantic.textOnCream}>ابدأ الأذكار</Txt>
         </Pressable>
       </View>
     </View>

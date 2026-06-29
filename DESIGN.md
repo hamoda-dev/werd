@@ -4,7 +4,7 @@
 > This document fully absorbs the original `design_handoff_werd_app/` package (its README, the HTML prototypes, the logo system, and the prototype logic) and reconciles it with the **shipped** implementation in [src/](src/). The handoff folder has been retired — **nothing here depends on it**.
 > Code values below are real — lifted from the codebase, not the prototype. When the two disagree, **the code wins** and this file follows it.
 
-**Wird** is a **cross-platform mobile app (Android + iOS)**, fully **offline**, for morning & evening *adhkar* (Islamic remembrances). It's built with **Expo SDK 55 / React Native / TypeScript / expo-router**. It pairs a calm, spiritual surface with light gamification — an interactive digital tasbih (counter), a daily streak, points/levels, and gentle reminders — to help users keep their daily *wird* without breaking the chain. Everything is Arabic, right‑to‑left, with Eastern‑Arabic numerals.
+**Wird** is a **cross-platform mobile app (Android + iOS)**, fully **offline**, for morning & evening *adhkar* (Islamic remembrances). It's built with **Expo SDK 55 / React Native / TypeScript / expo-router**. It pairs a calm, spiritual surface with light gamification — two ways to count adhkar (on the fingers — the Sunnah — or a digital tasbih), a daily streak, points/levels, and gentle reminders — to help users keep their daily *wird* without breaking the chain. Everything is Arabic, right‑to‑left, with Eastern‑Arabic numerals.
 
 ---
 
@@ -21,7 +21,7 @@ This decision is final — do not re‑introduce A or C surfaces. See the record
 1. **Calm first, game second.** Gamification motivates; it never shouts. Warm gold rewards over a still green night, not confetti everywhere.
 2. **The word is sacred.** Dhikr text is set in Amiri (Naskh) with generous line‑height and breathing room — never cramped, never decorated.
 3. **Arabic‑native, not translated.** Hard RTL, Eastern‑Arabic numerals everywhere (٠١٢٣٤٥٦٧٨٩), Arabic‑first type. The layout was born right‑to‑left.
-4. **One core, reused.** The tasbih counter is the heart. Built‑in adhkar and the user's own *awrad* run through the **same** [TasbihCounter](src/components/tasbih-counter.tsx) with identical behavior.
+4. **One core, two count modes.** Counting is the heart; the user chooses *how* in Profile → «طريقة العدّ» (`settings.countMode`, applied app-wide). **العدّ على الأصابع** (the default — the Sunnah of counting on the hand) presents the dhikr with its repeat target as *guidance only* and advances by **swipe** ([AdhkarSwiper](src/components/adhkar-swiper.tsx)) with no on-screen tally; **المسبحة** keeps the tap [TasbihCounter](src/components/tasbih-counter.tsx). Built‑in adhkar and the user's own *awrad* run through the **same** surface in either mode, and progress (streak/points/badges) tracks *dhikr completed* rather than taps — so it is identical across modes.
 5. **Offline & instant.** No network in the core loop. Everything is local; the UI never waits on a request.
 6. **One app, both platforms.** Identical UX on Android and iOS, with platform‑native touches that degrade gracefully: SF Symbols + haptics on iOS, readable Unicode/flat equivalents on Android. Nothing iOS‑only is load‑bearing.
 
@@ -272,6 +272,7 @@ Depth on the dark theme comes **primarily from translucent white layers**, not s
 | Sound (speaker) | `speaker.wave.fill` | | |
 | Locked | `lock.fill` | Reset | `arrow.counterclockwise` |
 | Star / Seal‑check | `star.fill` / `checkmark.seal.fill` | More | `ellipsis` |
+| About (info) | `info.circle` | | |
 
 2. **Tab bar** → [`<TabIcon name active color size />`](src/components/tab-icon.tsx). The four tab glyphs (House, **Misbaha**, **Trophy**, Person) in the same style but **two‑state**: `2px` outline when inactive, **solid fill** when active (gold). The only outline↔fill state the app uses.
 
@@ -287,8 +288,8 @@ Animation is **purposeful and gentle** — entrance reveals and reward moments, 
 - Screens & cards reveal with `FadeInDown` / `FadeInUp` / `FadeIn`, **300–400 ms**. The streak hero uses `FadeInDown.duration(400)`; the dhikr card `FadeInUp.duration(350)`; the counter `FadeIn.duration(300)`.
 - The dhikr card is **re‑keyed by `current.id`** so it re‑animates on every advance — each new remembrance "rises" in.
 
-### Tasbih reward sequence (the signature interaction)
-On each tap of the [TasbihCounter](src/components/tasbih-counter.tsx):
+### Tasbih reward sequence (the المسبحة / beads mode)
+The signature interaction of the **المسبحة** count mode. (In **العدّ على الأصابع** mode there is no per-tap reward — the user counts on the hand and swipes between adhkar; see §9 `AdhkarSwiper` and §11.) On each tap of the [TasbihCounter](src/components/tasbih-counter.tsx):
 1. **Ring fills** — `strokeDashoffset = C × (1 − count/target)`, `withTiming(…, { duration: 320 })`.
 2. **Haptic** — light impact (`Haptics.impactAsync(Light)`), iOS only.
 3. **Click sound** — a short bundled tap sound ([assets/sounds/click.wav](assets/sounds/click.wav)) via **`expo-audio`** (`useAudioPlayer` → `seekTo(0)` + `play()` per tap; `playsInSilentMode: true`). Local asset, no network. Cross-platform. **Toggleable from Profile** (`settings.soundEnabled`; legacy/undefined = on).
@@ -310,12 +311,14 @@ Geometry (shipped): `SIZE 248`, `STROKE 12`, radius `(SIZE−STROKE)/2 = 118`, t
 |-----------|------|-------|
 | `Txt` | [txt.tsx](src/components/txt.tsx) | The only text primitive. Sans/Naskh, weights, variant scale, RTL, theme color. |
 | `Icon` | [icon.tsx](src/components/icon.tsx) | The shared hand‑drawn SVG glyph set (rounded 2px stroke, 24×24); RTL‑aware chevrons. |
-| `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The core. 248px tappable ring, count, celebration, auto‑advance, haptics. `target: number \| null` — `null` is a **free** tasbih (faint full ring, «تسبيح حر», no goal/celebration). Reused for built‑in adhkar, the session, and the single‑dhikr counter. |
+| `TasbihCounter` | [tasbih-counter.tsx](src/components/tasbih-counter.tsx) | The **المسبحة** (beads) mode counter. 248px tappable ring, count, celebration, auto‑advance, haptics. `target: number \| null` — `null` is a **free** tasbih (faint full ring, «تسبيح حر», no goal/celebration). Reused for built‑in adhkar, the session, and the single‑dhikr counter. |
+| `AdhkarSwiper` | [adhkar-swiper.tsx](src/components/adhkar-swiper.tsx) | The **العدّ على الأصابع** session view: dhikr centered, swipe right = next / left = previous (no counter, not text-selectable); a committed swipe slides the next dhikr in and a long du'a scrolls (`Gesture.Pan` with `activeOffsetX` + a nested RNGH `ScrollView`). |
+| `RepeatGuidance` | [repeat-guidance.tsx](src/components/repeat-guidance.tsx) | Non-interactive repeat guidance for fingers mode: «مرّة واحدة / مرّتان / N مرّات / N مرّة» (+ a small bead row for 2–7) and the Sunnah reminder «اعقِدها على أصابع يدك اليمنى». Never counts for the user. |
 | `AdhkarRow` | [adhkar-row.tsx](src/components/adhkar-row.tsx) | أذكاري list row. **Built-ins and user items render identically** — the dhikr text in Amiri/naskh (18/semibold). Gold count chip **only when the item has a target** (free items show no chip); a chevron only on the user's own items (built-ins have none). User items wrap `ReanimatedSwipeable` for تعديل (gold gradient, pencil icon) / حذف (terracotta gradient, trash icon). |
 | `TabBar` | [tab-bar.tsx](src/components/tab-bar.tsx) | Custom 4‑tab bar. |
 | `TabIcon` | [tab-icon.tsx](src/components/tab-icon.tsx) | Hand‑drawn SVG tab glyphs (house / misbaha / trophy / person); outline→fill on active. |
 | `ProgressBar` | inline in [index.tsx](src/app/(tabs)/index.tsx) | 8px track, rounded, configurable color/track. |
-| `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a ذِكر: title + text + category picker (inline‑create) + هدف محدد/تسبيح حر toggle + stepper. |
+| `WardForm` | [ward-form.tsx](src/components/ward-form.tsx) | Add/edit a ذِكر: title + text + category picker (inline‑create) + هدف محدد/تسبيح حر toggle + a **typeable** count field (digits only, no negatives, with +/− for small tweaks). |
 | `Screen` | [screen.tsx](src/components/screen.tsx) | Gradient scaffold + safe-area; see §10. |
 | `Button` | [button.tsx](src/components/button.tsx) | Unified CTA: primary/ghost/link; see §10. |
 | `SectionHeader` | [section-header.tsx](src/components/section-header.tsx) | Title + optional trailing action; see §10. |
@@ -409,7 +412,7 @@ Routes use `expo-router`; the shell is custom (no default headers — `headerSho
 Four tabs, RTL order: **الرئيسية · أذكاري · إنجازاتي · ملفي** (the `tasbih` route keeps its name and misbaha glyph; only the label changed). Translucent fill `rgba(14,45,34,0.96)`, `1px whiteAlpha08` top hairline, safe‑area aware bottom padding. Each tab = a [`TabIcon`](src/components/tab-icon.tsx) glyph (filled `gold300` active / outline `muted2` inactive) + 11px label (`creamText`+semibold active / `muted2` regular inactive). The active state reads through the outline→fill flip plus the gold/cream colour shift — quiet, not a pill.
 
 ### Onboarding — [onboarding.tsx](src/app/onboarding.tsx)
-First run only. Asks the name, nothing else; stored locally. The tabs layout redirects here while `settings.name` is empty ([(tabs)/_layout.tsx](src/app/(tabs)/_layout.tsx)).
+First run only — a **3-step** flow on the `onboardingGlow` field (dawn logo + the cream sheet with the `sheet` shadow): **① الاسم** (name) → **② المظهر** (theme — وِرْد / وِرْد بينك, picked from swatch cards and applied **live** so the UI recolors as you choose) → **③ طريقة العدّ** (counting mode — العدّ على الأصابع / المسبحة), whose «ابدأ وِردك» commits the name and opens the app. Progress dots + **back-only** navigation; `themeId`/`countMode` persist live as chosen, while `name` is committed last. The tabs layout redirects here while `settings.name` is empty ([(tabs)/_layout.tsx](src/app/(tabs)/_layout.tsx)).
 
 ### Home — [(tabs)/index.tsx](src/app/(tabs)/index.tsx)
 `darkScreen` gradient, vertical scroll, `xl` horizontal padding, `lg` gaps. Top‑down:
@@ -427,13 +430,13 @@ The user's tasbih **library**: a categorized list of remembrances they count. Ti
 Each row is an [`AdhkarRow`](src/components/adhkar-row.tsx): a gold count chip **only when the item has a target** (`٣٣` — free items show no chip), and a trailing chevron **only on the user's own items**. **Tap → `/dhikr/[id]`** to count. The user's own items are **swipeable** (`ReanimatedSwipeable`) to reveal **تعديل** (gold gradient) / **حذف** (terracotta gradient); the read‑only built‑in classics don't swipe and show no chevron (no lock badge needed). The list seeds the four post‑prayer classics (سبحان الله / الحمد لله / الله أكبر / لا إله إلا الله) and a few more as **read‑only built‑ins** ([data/adhkari.ts](src/data/adhkari.ts)).
 
 ### Single‑dhikr counter — [dhikr/[id].tsx](src/app/dhikr/[id].tsx)
-Resolves one item (built‑in or custom) by id → dhikr card (Amiri) + [TasbihCounter](src/components/tasbih-counter.tsx) + «تصفير». A **target** item fills the ring, celebrates at the goal, then calls `completeWard()` (points + the daily‑ward challenge) and returns. A **free** item (`count === null`) shows a faint full ring + «تسبيح حر», counts up with no ceiling and awards nothing.
+Resolves one item (built‑in or custom) by id → dhikr card (Amiri) + [TasbihCounter](src/components/tasbih-counter.tsx) + «تصفير». A **target** item fills the ring, celebrates at the goal, then calls `completeWard()` (points + the daily‑ward challenge) and returns. A **free** item (`count === null`) shows a faint full ring + «تسبيح حر», counts up with no ceiling and awards nothing. The above is **المسبحة** mode; in **العدّ على الأصابع** mode the screen shows the dhikr (Amiri 26/lh46) + [RepeatGuidance](src/components/repeat-guidance.tsx) + a «تمّ» button (the hand-drawn `checkmark` [Icon](src/components/icon.tsx)) that completes the ward and returns — no counter.
 
 ### Manage categories — [settings/categories.tsx](src/app/settings/categories.tsx)
 Reached from **Profile**. Lists categories: the five locked defaults (**🔒 أساسي**) and the user's own (inline‑rename ✎ / delete 🗑 — deleting reassigns its أذكار to «عامة»), plus «+ تصنيف جديد».
 
 ### Session (the core) — [session/[category].tsx](src/app/session/[category].tsx)
-`darkScreen` gradient. **Header** (back ‹ / centered title + "الذكر i من n" / spacer) → **segmented progress bars** → centered **dhikr card** (gold‑hairline, Amiri 26/lh46, optional title in `gold300` + note in `muted3`) → **TasbihCounter** → hint "اضغط الدائرة للعدّ" → **controls** ("تصفير" neutral `flex:1` + "الذكر التالي ←" / "إنهاء ✓" primary `flex:2`). Resumes from the first incomplete dhikr; partial counts persist per‑dhikr so a tap‑count survives leaving the screen. Serves the **built‑in morning/evening categories** only — a single user ذِكر is counted via `/dhikr/[id]` instead.
+`darkScreen` gradient. **Header** (back ‹ / centered title + "الذكر i من n" / spacer) → **segmented progress bars** → centered **dhikr card** (gold‑hairline, Amiri 26/lh46, optional title in `gold300` + note in `muted3`) → **TasbihCounter** → hint "اضغط الدائرة للعدّ" → **controls** ("تصفير" neutral `flex:1` + «الذكر التالي» / «إنهاء» primary, plus a «السابق» button alongside «تصفير» — each label pairs with a hand-drawn `<Icon>` (chevron / checkmark), no literal ←/✓ glyphs). In **العدّ على الأصابع** mode the body is the [AdhkarSwiper](src/components/adhkar-swiper.tsx) instead (dhikr centered, swipe to navigate, «السابق»/«التالي» hint, swipe past the last to finish), and «السابق» (button or swipe-back) un-marks the dhikr you return to so resume stays correct. Resumes from the first incomplete dhikr; partial counts persist per‑dhikr so a tap‑count survives leaving the screen. Serves the **built‑in morning/evening categories** only — a single user ذِكر is counted via `/dhikr/[id]` instead.
 
 ### Adhkar list — [list/[category].tsx](src/app/list/[category].tsx)
 Overview of a category: each row a status circle (sage ✓ done / gold number current / outlined upcoming) + Amiri title + repetition caption; current row emphasized (dark green gradient + ▶ glyph), completed rows dimmed (opacity ~0.7).
@@ -442,10 +445,15 @@ Overview of a category: each row a status circle (sage ✓ done / gold number cu
 Streak banner + simple stat chips (v1). The full badge grid & calendar are deferred — see §12.
 
 ### Profile — [(tabs)/profile.tsx](src/app/(tabs)/profile.tsx)
-Name, reminder access, manage-categories link, a **tap-sound toggle** (gold `Switch` → `settings.soundEnabled`), and about.
+Name, a **theme picker** (two side-by-side cards, each a live [ThemePreview](src/components/theme-preview.tsx) thumbnail in that theme's own tokens + a seal-check on the selected one), reminder access, manage-categories link, a **«طريقة العدّ» switcher** (العدّ على الأصابع / المسبحة → `settings.countMode`), a **tap-sound toggle** (gold `Switch` → `settings.soundEnabled`) shown **only in المسبحة mode**, and a row that opens the **عن وِرْد** page.
+
+### عن وِرْد (About) — [about.tsx](src/app/about.tsx)
+Full page reached from Profile. Logo hero (mark + «وِرْد» + tagline + version from `expo-constants`), an **عن التطبيق** card (what Werd is + offline/local note + the `adhkarData.source` attribution), and a **المطوِّر** card: «محمد حامد حموده / مهندس برمجيات» + a short bio, then a compact **icon-only row** of round buttons (الموقع / LinkedIn / GitHub / X) that `Linking.openURL` externally, rendered by [SocialIcon](src/components/social-icon.tsx).
+
+**Brand-mark exception:** those platform marks (LinkedIn / GitHub / X, + a stroke globe for the website) are recognizable filled logos, a deliberate **scoped exception** to §7's stroke-only rule — still hand-drawn in-repo in `social-icon.tsx`, never an imported icon package, and rendered monochrome in a theme color. The general UI keeps the stroke `Icon` set.
 
 ### Create / edit a ذِكر — [awrad/new.tsx](src/app/awrad/new.tsx) · [awrad/[id].tsx](src/app/awrad/[id].tsx)
-Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal ذِكر via [WardForm](src/components/ward-form.tsx): title + text + a **category picker** (chips + dashed «+ جديدة» inline‑create) + a **هدف محدد ⇆ تسبيح حر** toggle (free hides the stepper). It then runs through the shared `/dhikr/[id]` counter. (Route folder is still `awrad/` for continuity.)
+Presented as **modals** (`presentation: "modal"`). Add/edit/delete a personal ذِكر via [WardForm](src/components/ward-form.tsx): title + text + a **category picker** (chips + dashed «+ جديدة» inline‑create) + a **هدف محدد ⇆ تسبيح حر** toggle (free hides the count field). The target is a **typeable numeric field** (type e.g. ١٠٠٠ directly; digits only, no negatives) with +/− for small tweaks. It then runs through the shared `/dhikr/[id]` counter. (Route folder is still `awrad/` for continuity.)
 
 ### Reminders — [settings/reminders.tsx](src/app/settings/reminders.tsx)
 Morning (default **07:00**) / evening (default **18:30**) local‑notification times with iOS‑style toggles (on = `gold500` track). Scheduled via `expo-notifications`; re‑scheduled on launch ([app/_layout.tsx](src/app/_layout.tsx)). No push/server — fully local.
@@ -491,7 +499,7 @@ These were fully designed in the prototype and are preserved here so they can be
 The app is local‑only; persistence keys (AsyncStorage / local DB) and their shapes:
 
 ```ts
-settings        = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30", soundEnabled?: bool }  // soundEnabled undefined (legacy) = on
+settings        = { name: string, remindersEnabled: bool, morningTime: "07:00", eveningTime: "18:30", soundEnabled?: bool, countMode?: "fingers" | "beads", themeId?: ThemeId }  // undefined defaults: soundEnabled = on, countMode = "fingers", themeId = default theme
 progress        = { [date: "YYYY-MM-DD"]: { morningDone: bool, eveningDone: bool, completedIds: string[], wardDone?: bool } }
 streak          = { current: number, longest: number, lastCompletedDate: string }
 score           = { points: number, level: number }   // level bar fills every 500 pts
@@ -577,7 +585,7 @@ From [`app.json`](app.json) and `assets/`:
 - **Contrast** — `creamText` on the green night and `green800` on gold buttons both clear AA for body text. Keep captions at `muted3` or lighter only for non‑essential text.
 - **Tap targets** — interactive rows/buttons run full‑width or use `hitSlop` (10–12) for small controls; the counter is a 248px target.
 - **Haptics are additive** — every important state change pairs visual + haptic (iOS), but the UI is fully legible and functional without them (Android).
-- **Selectable scripture** — dhikr text is `selectable` so users can copy it.
+- **Scripture is not selectable** — dhikr text disables text selection so a long-press doesn't fight the swipe-to-navigate gesture in العدّ على الأصابع mode (applies in both modes for consistency).
 - **Reduced motion** — animations are short and non‑essential; the app is fully usable if they're skipped. Honor the OS reduce‑motion setting if you extend motion.
 
 ---

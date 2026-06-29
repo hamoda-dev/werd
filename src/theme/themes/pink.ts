@@ -79,6 +79,15 @@ const gradients: Gradients = {
   logoGlow: "radial-gradient(circle, rgba(255,111,145,0.30) 0%, transparent 62%)",
 };
 
+const logo: Theme["logo"] = {
+  ground: gradients.brandCard, // light blush squircle
+  sunFrom: "#ffc78a", // warm peach (top)
+  sunTo: "#ff9a7e", // coral (bottom)
+  rays: "#ffb07a",
+  wordmark: colors.creamText, // plum #6e3b4a
+  spark: "#ff9bb6",
+};
+
 const semantic: Semantic = {
   // Surfaces — main (light)
   screen:        colors.green800,
@@ -133,6 +142,7 @@ export const pink: Theme = {
   radii,
   shadows,
   gradients,
+  logo,
   features: {
     mascot: true,
     confetti: true,

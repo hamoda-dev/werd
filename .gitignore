@@ -44,4 +44,4 @@ app-example
 .gstack/
 .idea/
 .vscode/
-.superpowers/
+.superpowers/.playwright-mcp/

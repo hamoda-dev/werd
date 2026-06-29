@@ -45,6 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   morningTime: "07:00",
   eveningTime: "18:30",
   soundEnabled: true,
+  countMode: "fingers",
   themeId: "werd",
 };
 const DEFAULT_PROGRESS: ProgressMap = {};
@@ -130,6 +131,21 @@ export function markDhikrCompleted(dhikrId: string): void {
   storage.set(StorageKeys.progress, {
     ...progress,
     [today]: { ...day, completedIds: [...day.completedIds, dhikrId] },
+  });
+}
+
+/**
+ * Undo a single dhikr's completion for today. Used when navigating back to an earlier
+ * dhikr (السابق / swipe back) so the session resumes at the dhikr the user returned to.
+ */
+export function unmarkDhikrCompleted(dhikrId: string): void {
+  const today = todayKey();
+  const progress = storage.get<ProgressMap>(StorageKeys.progress, DEFAULT_PROGRESS);
+  const day = getDay(progress, today);
+  if (!day.completedIds.includes(dhikrId)) return;
+  storage.set(StorageKeys.progress, {
+    ...progress,
+    [today]: { ...day, completedIds: day.completedIds.filter((id) => id !== dhikrId) },
   });
 }
 
