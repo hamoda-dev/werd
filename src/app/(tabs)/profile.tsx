@@ -7,8 +7,8 @@ import { useTheme } from "@/theme/context";
 import { THEME_LIST } from "@/theme/registry";
 import { Txt } from "@/components/txt";
 import { Icon } from "@/components/icon";
+import { ThemePreview } from "@/components/theme-preview";
 import { toArabicNumerals } from "@/utils/numerals";
-import { adhkarData } from "@/data/adhkar";
 import { ensureReminders, cancelReminders } from "@/utils/notifications";
 import { useSettings } from "@/store/store";
 
@@ -19,6 +19,7 @@ export default function Profile() {
   const router = useRouter();
   const { settings, update } = useSettings();
   const [name, setName] = useState(settings.name);
+  const countMode = settings.countMode ?? "fingers";
 
   function saveName() {
     const t = name.trim();
@@ -84,31 +85,33 @@ export default function Profile() {
         {/* Appearance / theme */}
         <View style={{ gap: spacing.sm }}>
           <Txt size={14} weight="medium" color={semantic.textSecondary}>المظهر</Txt>
-          <View style={{ backgroundColor: semantic.surface, borderRadius: radii.card, borderCurve: "continuous", overflow: "hidden" }}>
-            {THEME_LIST.map((t, i) => {
+          <View style={{ flexDirection: "row", gap: spacing.md }}>
+            {THEME_LIST.map((t) => {
               const active = t.id === theme.id;
               return (
                 <Pressable
                   key={t.id}
                   onPress={() => update({ themeId: t.id })}
                   style={{
-                    flexDirection: "row",
+                    flex: 1,
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: spacing.lg,
-                    borderTopWidth: i === 0 ? 0 : 1,
-                    borderTopColor: semantic.surfaceStrong,
+                    gap: spacing.sm,
+                    backgroundColor: semantic.surface,
+                    borderWidth: 1.5,
+                    borderColor: active ? semantic.accent : semantic.border,
+                    borderRadius: radii.card,
+                    borderCurve: "continuous",
+                    paddingVertical: spacing.lg,
+                    paddingHorizontal: spacing.md,
                   }}
                 >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
-                    <View style={{ flexDirection: "row", gap: 4 }}>
-                      {[t.semantic.screen, t.semantic.accent, t.semantic.success].map((c, j) => (
-                        <View key={j} style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: c }} />
-                      ))}
-                    </View>
-                    <Txt size={15} weight="medium">{t.label}</Txt>
+                  <ThemePreview theme={t} />
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+                    {active ? <Icon name="checkmark.seal.fill" size={16} color={semantic.accent} /> : null}
+                    <Txt size={14} weight="bold" color={active ? semantic.accentLight : semantic.textPrimary}>
+                      {t.label}
+                    </Txt>
                   </View>
-                  {active ? <Icon name="checkmark" size={20} color={semantic.accentLight} /> : null}
                 </Pressable>
               );
             })}
@@ -177,8 +180,91 @@ export default function Profile() {
           <Icon name="chevron.forward" size={16} color={semantic.textTertiary} />
         </Pressable>
 
-        {/* Tap sound */}
-        <View
+        {/* Counting method */}
+        <View style={{ gap: spacing.sm }}>
+          <Txt size={14} weight="medium" color={semantic.textSecondary}>طريقة العدّ في الأذكار</Txt>
+          <View
+            style={{
+              flexDirection: "row",
+              gap: spacing.xs,
+              backgroundColor: semantic.surface,
+              borderRadius: radii.card,
+              borderCurve: "continuous",
+              padding: spacing.xs,
+            }}
+          >
+            {(
+              [
+                { id: "fingers", label: "العدّ على الأصابع", sub: "سحب · موافق للسنّة" },
+                { id: "beads", label: "المسبحة", sub: "عدّاد بالنقر" },
+              ] as const
+            ).map((opt) => {
+              const active = countMode === opt.id;
+              return (
+                <Pressable
+                  key={opt.id}
+                  onPress={() => update({ countMode: opt.id })}
+                  style={{
+                    flex: 1,
+                    alignItems: "center",
+                    paddingVertical: spacing.md,
+                    paddingHorizontal: spacing.sm,
+                    borderRadius: radii.tile,
+                    borderCurve: "continuous",
+                    backgroundColor: active ? semantic.accent : "transparent",
+                  }}
+                >
+                  <Txt
+                    size={14}
+                    weight="bold"
+                    color={active ? semantic.textOnCream : semantic.textPrimary}
+                    align="center"
+                  >
+                    {opt.label}
+                  </Txt>
+                  <Txt
+                    size={11}
+                    color={active ? semantic.textOnCream : semantic.textSecondary}
+                    align="center"
+                    style={{ marginTop: 2 }}
+                  >
+                    {opt.sub}
+                  </Txt>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Tap sound — only relevant for the المسبحة (beads) counter */}
+        {countMode === "beads" ? (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              backgroundColor: semantic.surface,
+              borderRadius: radii.card,
+              borderCurve: "continuous",
+              padding: spacing.lg,
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
+              <Icon name="speaker.wave.fill" size={20} color={semantic.accentLight} />
+              <Txt size={15} weight="medium">صوت النقر عند التسبيح</Txt>
+            </View>
+            <Switch
+              value={settings.soundEnabled !== false}
+              onValueChange={(v) => update({ soundEnabled: v })}
+              trackColor={{ true: semantic.accent, false: semantic.surfaceFaint }}
+              thumbColor={semantic.textOnColor}
+            />
+          </View>
+        ) : null}
+
+        {/* About — full page with app info + creator */}
+        <Pressable
+          onPress={() => router.push("/about")}
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -190,35 +276,11 @@ export default function Profile() {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
-            <Icon name="speaker.wave.fill" size={20} color={semantic.accentLight} />
-            <Txt size={15} weight="medium">صوت النقر عند التسبيح</Txt>
+            <Icon name="info.circle" size={20} color={semantic.accentLight} />
+            <Txt size={15} weight="medium">عن وِرْد والمطوِّر</Txt>
           </View>
-          <Switch
-            value={settings.soundEnabled !== false}
-            onValueChange={(v) => update({ soundEnabled: v })}
-            trackColor={{ true: semantic.accent, false: semantic.surfaceFaint }}
-            thumbColor={semantic.textOnColor}
-          />
-        </View>
-
-        {/* About the app */}
-        <View
-          style={{
-            backgroundColor: semantic.surface,
-            borderRadius: radii.card,
-            borderCurve: "continuous",
-            padding: spacing.lg,
-            gap: spacing.sm,
-          }}
-        >
-          <Txt size={15} weight="bold">عن وِرْد</Txt>
-          <Txt size={13} color={semantic.textSecondary} style={{ lineHeight: 24 }}>
-            المصدر: {adhkarData.source}
-          </Txt>
-          <Txt size={13} color={semantic.textSecondary} style={{ lineHeight: 24 }}>
-            كل بياناتك محفوظة على جهازك فقط — لا اتصال بالشبكة.
-          </Txt>
-        </View>
+          <Icon name="chevron.forward" size={16} color={semantic.textTertiary} />
+        </Pressable>
       </ScrollView>
     </View>
   );

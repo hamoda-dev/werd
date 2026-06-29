@@ -95,6 +95,14 @@ const GLYPHS: Record<string, ReactNode> = {
       <Path d="M5.2 14.6 a8 8 0 1 0 1.8 -8.4 L3 10" />
     </>
   ),
+
+  "info.circle": (
+    <>
+      <Circle cx={12} cy={12} r={9} />
+      <Path d="M12 11 V16" />
+      <Path d="M12 8 H12.01" />
+    </>
+  ),
 };
 
 interface Props {

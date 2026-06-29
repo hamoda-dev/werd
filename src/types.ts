@@ -65,6 +65,13 @@ export interface Settings {
   eveningTime: string; // "HH:mm"
   /** Play the click sound on each tasbih tap. Undefined (legacy) is treated as enabled. */
   soundEnabled?: boolean;
+  /**
+   * How repetitions are counted in the adhkar screens:
+   *  - "fingers": count on the fingers (the Sunnah), no on-screen counter; navigate by swipe.
+   *  - "beads": the on-screen tap counter (المسبحة).
+   * Undefined falls back to "fingers".
+   */
+  countMode?: "fingers" | "beads";
   /** Selected theme id. Undefined (legacy) falls back to the default theme. */
   themeId?: ThemeId;
 }
