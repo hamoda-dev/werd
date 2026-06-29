@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import { requireOptionalNativeModule } from "expo-modules-core";
 import type { ThemeId } from "@/theme/types";
 
 /**
@@ -8,25 +9,24 @@ import type { ThemeId } from "@/theme/types";
  * `activity-alias`, which the OS applies when the app next goes to the background). Every
  * theme is registered as an alternate icon in app.json, so we always set the icon by name.
  *
- * This is wrapped defensively: the native module only exists in a dev/release build that
- * was rebuilt after adding the plugin. In a stale dev client (not yet rebuilt) or on web,
- * the require/call throws — we swallow it so the app keeps running and the icon simply
- * doesn't change until the next native build.
+ * The native module only exists in a build that was rebuilt after adding the plugin.
+ * We resolve it with `requireOptionalNativeModule`, which returns `null` (no throw, no
+ * error log) when it's missing — so a stale dev client that hasn't been rebuilt, or web,
+ * simply no-ops and the icon stays put until the next native build. (The library's own
+ * entrypoint calls `requireNativeModule`, which throws, so we deliberately bypass it.)
  */
+type AppIconModule = {
+  getAppIcon: () => string;
+  setAppIcon: (name: string) => string | false;
+};
+
 export function syncAppIcon(themeId: ThemeId): void {
   if (Platform.OS === "web") return;
+  const native = requireOptionalNativeModule<AppIconModule>("ExpoDynamicAppIcon");
+  if (!native) return; // not in this binary yet — rebuild the dev client to enable
   try {
-    // Lazy require (not a static import) so a not-yet-rebuilt dev client doesn't crash
-    // on module load — the native module only exists after a rebuild.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require("expo-dynamic-app-icon") as {
-      getAppIcon?: () => string;
-      setAppIcon?: (name: string) => string | false;
-    };
-    if (mod.getAppIcon?.() !== themeId) {
-      mod.setAppIcon?.(themeId);
-    }
+    if (native.getAppIcon() !== themeId) native.setAppIcon(themeId);
   } catch {
-    // Native module not present (stale dev client / web) — leave the icon unchanged.
+    // Defensive: never let an icon swap take down the app.
   }
 }
