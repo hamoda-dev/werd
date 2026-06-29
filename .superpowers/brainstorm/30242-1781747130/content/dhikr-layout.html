@@ -1,0 +1,206 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap');
+
+.werd-wrap { direction: rtl; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; }
+.werd-wrap h2 { text-align: right; }
+.werd-wrap .subtitle { text-align: right; max-width: 60ch; }
+.werd-note { background: rgba(216,180,106,.12); border:1px solid rgba(216,180,106,.35); color: var(--text-primary); border-radius:12px; padding:.7rem .9rem; font-size:.82rem; margin-bottom:1.5rem; line-height:1.6; }
+
+.werd-cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:1.4rem; }
+.werd-card { background: var(--bg-secondary); border:1px solid var(--border); border-radius:18px; overflow:hidden; cursor:pointer; transition: all .15s ease; }
+.werd-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow:0 12px 26px rgba(0,0,0,.18); }
+.werd-card.selected { border-color: var(--selected-border); border-width:2px; }
+.werd-card .pad { padding: 1.1rem 1.1rem 0; display:flex; justify-content:center; }
+.werd-card .cap { padding: .9rem 1.15rem 1.2rem; }
+.werd-card .cap .tag { font-size:.7rem; letter-spacing:.04em; color: var(--accent); font-weight:600; }
+.werd-card .cap h3 { font-size:1.02rem; margin:.1rem 0 .25rem; }
+.werd-card .cap p { color: var(--text-secondary); font-size:.82rem; line-height:1.5; }
+
+/* ===== phone shell ===== */
+.phone { width:100%; max-width:300px; min-height:560px; border-radius:30px; background: linear-gradient(180deg,#16352a 0%, #0e2d22 100%); color:#f4ede0; padding:16px 15px 18px; box-shadow: 0 22px 44px -18px rgba(0,0,0,.65), inset 0 0 0 1px rgba(255,255,255,.05); display:flex; flex-direction:column; overflow:hidden; position:relative; }
+.ph-top { display:flex; align-items:center; justify-content:space-between; font-size:11px; color:#9fb3a8; margin-bottom:8px; padding:0 4px; }
+.ph-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.ph-title { font-weight:700; font-size:15px; }
+.ph-ic { width:30px; height:30px; border-radius:10px; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; }
+
+/* dhikr card */
+.dcard { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px 15px; }
+.dtitle { color:#f4d68a; font-weight:700; font-size:13px; margin-bottom:8px; }
+.dtext { font-family:'Amiri', serif; font-size:21px; line-height:1.95; color:#f4ede0; }
+.dtext.big { font-size:25px; line-height:2.05; }
+
+/* repeat guidance pill */
+.repeat { display:inline-flex; align-items:center; gap:7px; background: rgba(216,180,106,.16); border:1px solid rgba(216,180,106,.4); color:#f4d68a; border-radius:13px; padding:7px 13px; font-size:12.5px; font-weight:600; }
+.hint { color:#9fb3a8; font-size:11.5px; display:flex; align-items:center; gap:6px; }
+
+/* buttons */
+.btns { display:flex; gap:9px; margin-top:auto; }
+.btn { flex:1; border-radius:14px; padding:13px 0; text-align:center; font-weight:700; font-size:13.5px; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-gold { background: linear-gradient(150deg,#d8b46a,#bf9648); color:#16352a; box-shadow:0 10px 22px -12px rgba(191,150,72,.7); }
+.btn-ghost { background: rgba(255,255,255,.08); color:#f4ede0; }
+
+/* bead strand */
+.strand { display:flex; align-items:center; gap:5px; justify-content:center; margin-bottom:7px; flex-wrap:wrap; }
+.bead { width:9px; height:9px; border-radius:50%; }
+.bead.done { background:#d8b46a; }
+.bead.cur { width:13px; height:13px; background:#f4d68a; box-shadow:0 0 0 3px rgba(244,214,138,.25); }
+.bead.todo { background:transparent; border:1.5px solid rgba(255,255,255,.18); }
+.count-lbl { text-align:center; font-size:11.5px; color:#9fb3a8; margin-bottom:14px; }
+
+/* dots progress (calm) */
+.dots { display:flex; gap:5px; justify-content:center; }
+.dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); }
+.dot.done { background:#d8b46a; }
+.dot.cur { background:#f4d68a; transform:scale(1.4); }
+
+/* journey path */
+.journey { display:flex; gap:12px; flex:1; }
+.trail { width:26px; display:flex; flex-direction:column; align-items:center; padding-top:6px; }
+.tdot { width:11px; height:11px; border-radius:50%; background:rgba(255,255,255,.16); position:relative; z-index:1; }
+.tdot.done { background:#3f8268; }
+.tdot.cur { background:#f4d68a; box-shadow:0 0 0 4px rgba(244,214,138,.22); }
+.tline { width:2px; flex:1; background:rgba(255,255,255,.12); margin:2px 0; }
+.tline.done { background:#3f8268; }
+.svgico { display:block; }
+</style>
+
+<div class="werd-wrap" dir="rtl">
+  <h2>اتجاه تخطيط شاشة الذِّكر</h2>
+  <p class="subtitle">نفس الذِّكر معروض بثلاث طرق مختلفة — بلا عدّاد نقر. التكرار يظهر كإرشاد فقط، والتنقّل بأزرار/سحب. اختر الإحساس العام الأقرب لك (يمكن مزج التفاصيل لاحقًا).</p>
+  <div class="werd-note">📿 في الثلاثة: لا يوجد عدّاد بالنقر. تعدّ التكرار على أصابعك، والتطبيق يتتبّع فقط «أين أنت في الجلسة». معروضة بثيم «وِرْد» الداكن.</div>
+
+  <div class="werd-cards">
+
+    <!-- ================= A: خيط المسبحة ================= -->
+    <div class="werd-card" data-choice="strand" onclick="toggleSelect(this)">
+      <div class="pad">
+        <div class="phone">
+          <div class="ph-top"><span>٩:٤١</span><span>● ● ●</span></div>
+          <div class="ph-head">
+            <div class="ph-ic"><svg class="svgico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fb3a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="ph-title">أذكار الصباح</div>
+            <div class="ph-ic"><svg class="svgico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fb3a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5L19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5L19 5"/></svg></div>
+          </div>
+
+          <div class="strand">
+            <span class="bead done"></span><span class="bead done"></span><span class="bead done"></span><span class="bead done"></span>
+            <span class="bead cur"></span>
+            <span class="bead todo"></span><span class="bead todo"></span><span class="bead todo"></span><span class="bead todo"></span><span class="bead todo"></span><span class="bead todo"></span><span class="bead todo"></span><span class="bead todo"></span>
+          </div>
+          <div class="count-lbl">الذِّكر ٥ من ١٣</div>
+
+          <div class="dcard">
+            <div class="dtitle">الرضا بالله</div>
+            <div class="dtext">رَضِيتُ بِاللهِ رَبًّا، وَبِالإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا</div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin:14px 0 4px;">
+            <span class="repeat">📿 كرّرها ٣ مرّات</span>
+          </div>
+          <div class="hint" style="margin-bottom:14px;">اعقِدها على أصابع يدك اليمنى</div>
+
+          <div class="btns">
+            <div class="btn btn-ghost">السابق</div>
+            <div class="btn btn-gold">التالي <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16352a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">
+        <div class="tag">A</div>
+        <h3>خيط المسبحة</h3>
+        <p>شريط خرزات أعلى الشاشة يمثّل أذكار الجلسة — تمتلئ خرزة لكل ذِكر تُكمله (رحلة، لا نقرات). يحافظ على هويّة المسبحة في التطبيق. أزرار «السابق/التالي».</p>
+      </div>
+    </div>
+
+    <!-- ================= B: البطاقة الهادئة ================= -->
+    <div class="werd-card" data-choice="calm" onclick="toggleSelect(this)">
+      <div class="pad">
+        <div class="phone">
+          <div class="ph-top"><span>٩:٤١</span><span>● ● ●</span></div>
+          <div class="ph-head">
+            <div class="ph-ic"><svg class="svgico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9fb3a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            <div class="count-lbl" style="margin:0; font-size:12px;">٥ / ١٣</div>
+            <div class="ph-ic" style="opacity:0;"></div>
+          </div>
+
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 6px;">
+            <div class="dtitle" style="margin-bottom:18px;">الرضا بالله</div>
+            <div class="dtext big" style="text-align:center;">رَضِيتُ بِاللهِ رَبًّا، وَبِالإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا</div>
+            <div style="margin-top:26px; display:flex; flex-direction:column; align-items:center; gap:9px;">
+              <div style="display:flex; gap:7px;"><span class="bead done" style="background:#d8b46a"></span><span class="bead done" style="background:#d8b46a"></span><span class="bead done" style="background:#d8b46a"></span></div>
+              <div class="hint">ثلاث مرّات · عُدّها على أصابعك</div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:auto;">
+            <div class="hint">اسحب للذِّكر التالي ←</div>
+            <div class="dots">
+              <span class="dot done"></span><span class="dot done"></span><span class="dot done"></span><span class="dot done"></span><span class="dot cur"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">
+        <div class="tag">B</div>
+        <h3>البطاقة الهادئة</h3>
+        <p>شاشة صافية بلا تشويش: نصّ الذِّكر كبيرٌ في الوسط، التكرار كنقاط صغيرة تحته، والتنقّل بالسحب يمينًا/يسارًا. نقاط رفيعة أسفل الشاشة لموضعك. تركيز كامل على التلاوة.</p>
+      </div>
+    </div>
+
+    <!-- ================= C: الرحلة ================= -->
+    <div class="werd-card" data-choice="journey" onclick="toggleSelect(this)">
+      <div class="pad">
+        <div class="phone">
+          <div class="ph-top"><span>٩:٤١</span><span>✦ ✦</span></div>
+          <div class="ph-head">
+            <div class="ph-ic"><svg class="svgico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fb3a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="ph-title">أذكار الصباح</div>
+            <!-- growing crescent -->
+            <div style="display:flex; align-items:center; gap:5px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M16.5 12a6 6 0 1 1-4.2-5.7A4.7 4.7 0 0 0 16.5 12z" fill="#f4d68a"/></svg>
+              <span style="font-size:11px; color:#f4d68a; font-weight:600;">٣٨٪</span>
+            </div>
+          </div>
+
+          <div class="journey">
+            <div class="trail">
+              <div class="tdot done"></div><div class="tline done"></div>
+              <div class="tdot done"></div><div class="tline done"></div>
+              <div class="tdot done"></div><div class="tline done"></div>
+              <div class="tdot done"></div><div class="tline"></div>
+              <div class="tdot cur"></div><div class="tline"></div>
+              <div class="tdot"></div><div class="tline"></div>
+              <div class="tdot"></div>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <div class="dcard" style="margin-top:2px;">
+                <div class="dtitle">الرضا بالله</div>
+                <div class="dtext">رَضِيتُ بِاللهِ رَبًّا، وَبِالإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا</div>
+              </div>
+              <span class="repeat" style="margin-top:14px; align-self:flex-start;">📿 كرّرها ٣ مرّات</span>
+              <div class="hint" style="margin-top:10px;">عُدّ على أصابعك ثمّ تابِع</div>
+
+              <div class="btns" style="margin-top:auto;">
+                <div class="btn btn-ghost">السابق</div>
+                <div class="btn btn-gold">التالي</div>
+              </div>
+            </div>
+          </div>
+          <!-- mascot peeking -->
+          <svg width="46" height="46" viewBox="0 0 100 100" style="position:absolute; bottom:78px; left:10px; opacity:.95;">
+            <path d="M50 14c-4 0-6 3-6 6-10 2-20 11-20 26 0 16 11 26 26 26s26-10 26-26c0-15-10-24-20-26 0-3-2-6-6-6z" fill="#fffdf7"/>
+            <circle cx="40" cy="50" r="3.4" fill="#16352a"/><circle cx="60" cy="50" r="3.4" fill="#16352a"/>
+            <circle cx="34" cy="58" r="4" fill="#c8784e" opacity=".55"/><circle cx="66" cy="58" r="4" fill="#c8784e" opacity=".55"/>
+            <path d="M44 60q6 5 12 0" stroke="#16352a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="cap">
+        <div class="tag">C</div>
+        <h3>الرحلة</h3>
+        <p>مسار رأسي يتقدّم خطوة بكل ذِكر، مع هلال ينمو ونِسبة إنجاز، ولمسات مرِحة (شخصية «ميلكي» والاحتفال عند الختم). الأقرب لروح ثيم «الفراولة» الوردي والتحفيز.</p>
+      </div>
+    </div>
+
+  </div>
+</div>

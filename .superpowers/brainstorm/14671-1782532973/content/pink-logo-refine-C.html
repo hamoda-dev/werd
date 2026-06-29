@@ -1,0 +1,108 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+
+.logo-row { display:flex; flex-wrap:wrap; gap:30px; justify-content:center; margin:18px 0 6px; }
+.logo-cell { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.logo-tile {
+  width:150px; height:150px; border-radius:34px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; position:relative; overflow:hidden;
+  box-shadow:0 10px 26px rgba(225,120,160,0.28);
+}
+.glow { position:absolute; width:120px; height:120px; left:50%; top:34%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle, rgba(255,111,145,0.30) 0%, transparent 62%); pointer-events:none; }
+.deco { position:absolute; inset:0; pointer-events:none; }
+.wordmark { font-family:'Amiri', serif; font-weight:700; font-size:54px; line-height:1; direction:rtl; position:relative; }
+.cap { font-size:13px; color:var(--muted,#8a9389); text-align:center; }
+.cap b { color:var(--text,#222); font-weight:600; display:block; font-size:14px; margin-bottom:2px; }
+</style>
+
+<h2>Strawberry Milk — refine the details</h2>
+<p class="subtitle">All three are light + playful with the plum «وِرْد». They differ only in the <b>sun</b> and the <b>decoration</b>. Pick the treatment you like (sun warmth + sparkle vs sprinkle), and I'll lock it.</p>
+
+<div class="logo-row">
+
+  <!-- C1: Pink sun + sparkles -->
+  <div class="logo-cell option" data-choice="c1" onclick="toggleSelect(this)" style="cursor:pointer">
+    <div class="logo-tile" style="background:linear-gradient(150deg,#fff1f4,#ffd9e6)">
+      <div class="glow"></div>
+      <svg class="deco" viewBox="0 0 150 150" fill="none">
+        <g fill="#ff9bb6">
+          <g transform="translate(30,42) scale(1.7)"><path d="M0,-6 C0.7,-2 2,-0.7 6,0 C2,0.7 0.7,2 0,6 C-0.7,2 -2,0.7 -6,0 C-2,-0.7 -0.7,-2 0,-6Z"/></g>
+          <g transform="translate(120,54) scale(1.15)"><path d="M0,-6 C0.7,-2 2,-0.7 6,0 C2,0.7 0.7,2 0,6 C-0.7,2 -2,0.7 -6,0 C-2,-0.7 -0.7,-2 0,-6Z"/></g>
+          <g transform="translate(116,110) scale(1.3)"><path d="M0,-6 C0.7,-2 2,-0.7 6,0 C2,0.7 0.7,2 0,6 C-0.7,2 -2,0.7 -6,0 C-2,-0.7 -0.7,-2 0,-6Z"/></g>
+        </g>
+      </svg>
+      <svg width="66" height="44" viewBox="0 0 66 44" fill="none">
+        <g stroke="#ff6f91" stroke-width="3" stroke-linecap="round">
+          <line x1="33" y1="16" x2="33" y2="7"/><line x1="39.7" y1="17.3" x2="43.1" y2="9.0"/>
+          <line x1="45.5" y1="21.1" x2="51.8" y2="14.6"/><line x1="49.4" y1="26.7" x2="57.7" y2="23.0"/>
+          <line x1="26.3" y1="17.3" x2="22.9" y2="9.0"/><line x1="20.5" y1="21.1" x2="14.2" y2="14.6"/>
+          <line x1="16.6" y1="26.7" x2="8.3" y2="23.0"/>
+        </g>
+        <path d="M20 34 A13 13 0 0 1 46 34 Z" fill="#ff6f91"/>
+      </svg>
+      <div class="wordmark" style="color:#6e3b4a">وِرْد</div>
+    </div>
+    <div class="cap"><b>C1 · Pink Sun + Sparkles</b>Monochrome pink. Tightest on-brand,<br>three soft 4-point sparkles.</div>
+  </div>
+
+  <!-- C2: Peach sunrise + sparkles -->
+  <div class="logo-cell option" data-choice="c2" onclick="toggleSelect(this)" style="cursor:pointer">
+    <div class="logo-tile" style="background:linear-gradient(150deg,#fff1f4,#ffd9e6)">
+      <div class="glow" style="background:radial-gradient(circle, rgba(255,170,120,0.32) 0%, transparent 62%)"></div>
+      <svg class="deco" viewBox="0 0 150 150" fill="none">
+        <g fill="#ff9bb6">
+          <g transform="translate(30,42) scale(1.7)"><path d="M0,-6 C0.7,-2 2,-0.7 6,0 C2,0.7 0.7,2 0,6 C-0.7,2 -2,0.7 -6,0 C-2,-0.7 -0.7,-2 0,-6Z"/></g>
+          <g transform="translate(120,54) scale(1.15)"><path d="M0,-6 C0.7,-2 2,-0.7 6,0 C2,0.7 0.7,2 0,6 C-0.7,2 -2,0.7 -6,0 C-2,-0.7 -0.7,-2 0,-6Z"/></g>
+          <g transform="translate(116,110) scale(1.3)"><path d="M0,-6 C0.7,-2 2,-0.7 6,0 C2,0.7 0.7,2 0,6 C-0.7,2 -2,0.7 -6,0 C-2,-0.7 -0.7,-2 0,-6Z"/></g>
+        </g>
+      </svg>
+      <svg width="66" height="44" viewBox="0 0 66 44" fill="none">
+        <defs><linearGradient id="peach" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffc78a"/><stop offset="1" stop-color="#ff9a7e"/>
+        </linearGradient></defs>
+        <g stroke="#ffb07a" stroke-width="3" stroke-linecap="round">
+          <line x1="33" y1="16" x2="33" y2="7"/><line x1="39.7" y1="17.3" x2="43.1" y2="9.0"/>
+          <line x1="45.5" y1="21.1" x2="51.8" y2="14.6"/><line x1="49.4" y1="26.7" x2="57.7" y2="23.0"/>
+          <line x1="26.3" y1="17.3" x2="22.9" y2="9.0"/><line x1="20.5" y1="21.1" x2="14.2" y2="14.6"/>
+          <line x1="16.6" y1="26.7" x2="8.3" y2="23.0"/>
+        </g>
+        <path d="M20 34 A13 13 0 0 1 46 34 Z" fill="url(#peach)"/>
+      </svg>
+      <div class="wordmark" style="color:#6e3b4a">وِرْد</div>
+    </div>
+    <div class="cap"><b>C2 · Peach Sunrise</b>Keeps the sun warm (like the gold<br>original) — a real sunrise over pink.</div>
+  </div>
+
+  <!-- C3: Sprinkles (strawberry-milk confetti) -->
+  <div class="logo-cell option" data-choice="c3" onclick="toggleSelect(this)" style="cursor:pointer">
+    <div class="logo-tile" style="background:linear-gradient(150deg,#fff1f4,#ffd9e6)">
+      <div class="glow"></div>
+      <svg class="deco" viewBox="0 0 150 150" fill="none">
+        <g>
+          <rect x="-5" y="-1.6" width="10" height="3.2" rx="1.6" fill="#ff9bb6" transform="translate(28,40) rotate(-25)"/>
+          <rect x="-5" y="-1.6" width="10" height="3.2" rx="1.6" fill="#ffb98a" transform="translate(122,50) rotate(35)"/>
+          <rect x="-5" y="-1.6" width="10" height="3.2" rx="1.6" fill="#c9a6ff" transform="translate(118,112) rotate(-15)"/>
+          <rect x="-5" y="-1.6" width="10" height="3.2" rx="1.6" fill="#ff9bb6" transform="translate(34,112) rotate(50)"/>
+          <rect x="-5" y="-1.6" width="10" height="3.2" rx="1.6" fill="#7fd9c4" transform="translate(20,78) rotate(10)"/>
+        </g>
+      </svg>
+      <svg width="66" height="44" viewBox="0 0 66 44" fill="none">
+        <g stroke="#ff6f91" stroke-width="3" stroke-linecap="round">
+          <line x1="33" y1="16" x2="33" y2="7"/><line x1="39.7" y1="17.3" x2="43.1" y2="9.0"/>
+          <line x1="45.5" y1="21.1" x2="51.8" y2="14.6"/><line x1="49.4" y1="26.7" x2="57.7" y2="23.0"/>
+          <line x1="26.3" y1="17.3" x2="22.9" y2="9.0"/><line x1="20.5" y1="21.1" x2="14.2" y2="14.6"/>
+          <line x1="16.6" y1="26.7" x2="8.3" y2="23.0"/>
+        </g>
+        <path d="M20 34 A13 13 0 0 1 46 34 Z" fill="#ff6f91"/>
+      </svg>
+      <div class="wordmark" style="color:#6e3b4a">وِرْد</div>
+    </div>
+    <div class="cap"><b>C3 · Sprinkles</b>Pink sun + scattered candy sprinkles<br>(the theme's blob palette). Most<br>"strawberry-milk", most decorated.</div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:18px">Click your favorite. Two small follow-ups in the terminal once you do: (1) plum «وِرْد» vs a brighter branded pink for the word, and (2) whether the <b>werd</b> theme should share this exact component (clean sunrise, no sparkles) so the whole system stays one logo.</p>

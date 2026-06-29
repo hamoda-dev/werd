@@ -1,0 +1,9 @@
+{"type":"server-started","port":62515,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:62515","screen_dir":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content","state_dir":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/state"}
+{"type":"screen-added","file":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content/dhikr-layout.html"}
+{"type":"screen-added","file":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content/dhikr-layout-b-v2.html"}
+{"type":"screen-added","file":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content/dhikr-layout-b-v3.html"}
+{"type":"screen-added","file":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content/dhikr-layout-b-v4.html"}
+{"type":"screen-added","file":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content/dhikr-layout-b-v5.html"}
+{"type":"screen-added","file":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content/dhikr-layout-b-v6.html"}
+{"type":"screen-added","file":"/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/30242-1781747130/content/dhikr-layout-b-v7.html"}
+{"type":"server-stopped","reason":"idle timeout"}

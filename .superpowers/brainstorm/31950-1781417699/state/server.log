@@ -1,0 +1,23 @@
+node:internal/fs/watchers:324
+    throw error;
+    ^
+
+Error: ENOSPC: System limit for number of file watchers reached, watch '/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/31950-1781417699/content'
+    at FSWatcher.<computed> (node:internal/fs/watchers:316:19)
+    at Object.watch (node:fs:2538:36)
+    at startServer (/home/hamoda/.claude/plugins/cache/superpowers-dev/superpowers/5.1.0/skills/brainstorming/scripts/server.cjs:276:22)
+    at Object.<anonymous> (/home/hamoda/.claude/plugins/cache/superpowers-dev/superpowers/5.1.0/skills/brainstorming/scripts/server.cjs:351:3)
+    at Module._compile (node:internal/modules/cjs/loader:1830:14)
+    at Object..js (node:internal/modules/cjs/loader:1961:10)
+    at Module.load (node:internal/modules/cjs/loader:1553:32)
+    at Module._load (node:internal/modules/cjs/loader:1355:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5) {
+  errno: -28,
+  syscall: 'watch',
+  code: 'ENOSPC',
+  path: '/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/31950-1781417699/content',
+  filename: '/home/hamoda/Work/mobile/werd/.superpowers/brainstorm/31950-1781417699/content'
+}
+
+Node.js v24.15.0

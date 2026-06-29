@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>وِرْد — Option B, sheet contrast variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green900:#0e2d22; --green800:#16352a; --green700:#1c4a3a; --sage:#3f8268;
+    --gold500:#d8b46a; --gold300:#f4d68a; --gold700:#bf9648;
+    --cream50:#fffdf7; --cream100:#faf7f0; --creamText:#f4ede0; --borderWarm:#e7e0d0;
+    --muted1:#6b7a72; --muted2:#8a9389; --muted3:#9fb3a8;
+    --goldAlpha25:rgba(216,180,106,.25); --whiteA08:rgba(255,255,255,.08); --whiteA14:rgba(255,255,255,.14);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#11161c;color:#e7ecf0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:40px 24px 80px;}
+  .page-head{max-width:1100px;margin:0 auto 36px;text-align:center;}
+  .page-head h1{font-size:23px;margin:0 0 8px;font-weight:700;}
+  .page-head p{margin:0;color:#93a0ac;font-size:14.5px;line-height:1.6;}
+  .row{display:flex;gap:34px;justify-content:center;align-items:flex-start;flex-wrap:wrap;max-width:1180px;margin:0 auto;}
+  .col{width:300px;display:flex;flex-direction:column;align-items:center;}
+  .tag{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+  .tag .letter{width:34px;height:30px;border-radius:9px;background:#1f2730;color:var(--gold300);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:1px solid #2c3742;padding:0 4px;}
+  .tag .name{font-weight:600;font-size:15px;}
+  .sans{font-family:'IBM Plex Sans Arabic',sans-serif;}
+  .naskh{font-family:'Amiri',serif;}
+  .phone{width:300px;height:632px;border-radius:44px;padding:11px;background:#05080a;box-shadow:0 36px 70px -24px rgba(0,0,0,.7),0 0 0 2px #1c242c;position:relative;cursor:pointer;transition:transform .18s,box-shadow .18s;}
+  .phone:hover{transform:translateY(-4px);}
+  .col.selected .phone{box-shadow:0 0 0 3px var(--gold500),0 36px 70px -24px rgba(0,0,0,.7);}
+  .screen{width:100%;height:100%;border-radius:34px;overflow:hidden;position:relative;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#05080a;border-radius:0 0 16px 16px;z-index:5;}
+  .bg-werd{background:radial-gradient(circle at 50% 18%,rgba(216,180,106,0.28) 0%,transparent 55%),linear-gradient(180deg,#16352a 0%,#0e2d22 100%);}
+  .rationale{margin-top:18px;color:#9aa6b1;font-size:12.5px;line-height:1.65;text-align:center;width:284px;}
+  .rationale b{color:#d9e2ea;font-weight:600;}
+  .rationale .tok{color:#e2c98a;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;}
+  .btn-gold{background:linear-gradient(150deg,var(--gold500),var(--gold700));color:var(--green900);font-weight:700;text-align:center;}
+  .selnote{text-align:center;color:#93a0ac;font-size:13px;margin:32px auto 0;max-width:640px;}
+
+  /* shared hero (identical across all three) */
+  .hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+  .hero .glow{position:absolute;top:74px;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(216,180,106,.30),transparent 62%);}
+  .hero img{position:relative;width:100px;height:100px;border-radius:24px;box-shadow:0 18px 30px -12px rgba(0,0,0,.5);}
+  .hero .tagline{position:relative;color:var(--gold300);font-size:13px;letter-spacing:.04em;margin-top:16px;opacity:.92;}
+
+  /* sheet base */
+  .sheet{border-radius:32px 32px 0 0;padding:28px 26px 24px;}
+  .sheet h3{margin:0;font-size:26px;font-weight:700;text-align:right;}
+  .sheet .sub{font-size:13px;text-align:right;margin-top:6px;line-height:1.8;}
+  .sheet .lbl{font-size:12px;font-weight:600;text-align:right;margin-top:20px;margin-bottom:8px;}
+  .sheet .field{border-radius:18px;padding:14px 15px;text-align:right;font-size:15px;}
+  .sheet .btn{margin-top:16px;font-size:16px;padding:15px;border-radius:18px;}
+  .sheet .priv{display:flex;align-items:center;justify-content:center;gap:6px;flex-direction:row-reverse;font-size:11px;margin-top:14px;}
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Option B — three on-system sheet treatments (privacy line kept)</h1>
+  <p>Same hero + bottom-sheet structure. Only the <b>sheet surface &amp; its contrast against the green night</b> changes — each pulled straight from DESIGN.md tokens.<br>Click your favourite, then tell me in the terminal.</p>
+</div>
+
+<div class="row">
+
+  <!-- ===== B1 : DARK BRAND SHEET (lowest contrast, most on-brand) ===== -->
+  <div class="col" data-choice="B1" onclick="pick(this)">
+    <div class="tag"><div class="letter">B1</div><div class="name">Dark brand sheet</div></div>
+    <div class="phone"><div class="screen bg-werd" dir="rtl">
+      <div class="notch"></div>
+      <div class="hero"><div class="glow"></div>
+        <img src="../../assets/images/wird-logo.png">
+        <div class="naskh tagline">أذكار الصباح والمساء</div>
+      </div>
+      <div class="sheet" style="background:linear-gradient(155deg,#1c4a3a,#0e2d22);border-top:1px solid var(--goldAlpha25);box-shadow:0 -16px 36px -18px rgba(0,0,0,.55);">
+        <h3 class="naskh" style="color:var(--creamText);">أهلاً بك</h3>
+        <div class="sans sub" style="color:var(--muted3);">لِنبدأ بالتعرّف عليك ونخصّص لك يومك.</div>
+        <div class="sans lbl" style="color:var(--creamText);">ما اسمك؟</div>
+        <div class="sans field" style="background:var(--whiteA08);border:1px solid var(--whiteA14);color:var(--muted2);">اكتب اسمك</div>
+        <div class="sans btn btn-gold">ابدأ</div>
+        <div class="sans priv" style="color:var(--muted2);">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8a9389" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          <span>بياناتك تبقى على جهازك</span>
+        </div>
+      </div>
+    </div></div>
+    <div class="rationale"><b>Stays on the night surface.</b> Sheet = <span class="tok">brandCard</span> gradient (#1c4a3a→#0e2d22) with a <span class="tok">goldAlpha25</span> hairline. Softest hero→sheet contrast; most aligned with "deep-green night, depth from translucent layers."</div>
+  </div>
+
+  <!-- ===== B2 : CREAM MORNING-CARD SHEET (high contrast, sanctioned) ===== -->
+  <div class="col" data-choice="B2" onclick="pick(this)">
+    <div class="tag"><div class="letter">B2</div><div class="name">Cream + gold border</div></div>
+    <div class="phone"><div class="screen bg-werd" dir="rtl">
+      <div class="notch"></div>
+      <div class="hero"><div class="glow"></div>
+        <img src="../../assets/images/wird-logo.png">
+        <div class="naskh tagline">أذكار الصباح والمساء</div>
+      </div>
+      <div class="sheet" style="background:var(--cream50);border:1.5px solid var(--gold500);border-bottom:none;box-shadow:0 -12px 30px -14px rgba(20,57,46,.35);">
+        <h3 class="naskh" style="color:var(--green900);">أهلاً بك</h3>
+        <div class="sans sub" style="color:var(--muted1);">لِنبدأ بالتعرّف عليك ونخصّص لك يومك.</div>
+        <div class="sans lbl" style="color:var(--green700);">ما اسمك؟</div>
+        <div class="sans field" style="background:#fff;border:1px solid var(--borderWarm);color:#a7b0a6;">اكتب اسمك</div>
+        <div class="sans btn btn-gold">ابدأ</div>
+        <div class="sans priv" style="color:var(--muted1);">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6b7a72" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          <span>بياناتك تبقى على جهازك</span>
+        </div>
+      </div>
+    </div></div>
+    <div class="rationale"><b>The sanctioned cream treatment.</b> Sheet = <span class="tok">cream50</span> (#fffdf7) + the <span class="tok">1.5px gold500</span> "morning card" border. Highest contrast — bright, warm, premium — and 100% a DESIGN.md card.</div>
+  </div>
+
+  <!-- ===== B3 : GREEN700 SHEET (mid contrast, evening-card tone) ===== -->
+  <div class="col" data-choice="B3" onclick="pick(this)">
+    <div class="tag"><div class="letter">B3</div><div class="name">Solid green700</div></div>
+    <div class="phone"><div class="screen bg-werd" dir="rtl">
+      <div class="notch"></div>
+      <div class="hero"><div class="glow"></div>
+        <img src="../../assets/images/wird-logo.png">
+        <div class="naskh tagline">أذكار الصباح والمساء</div>
+      </div>
+      <div class="sheet" style="background:var(--green700);border-top:1px solid var(--goldAlpha25);box-shadow:0 -16px 36px -18px rgba(0,0,0,.5);">
+        <h3 class="naskh" style="color:var(--creamText);">أهلاً بك</h3>
+        <div class="sans sub" style="color:var(--muted3);">لِنبدأ بالتعرّف عليك ونخصّص لك يومك.</div>
+        <div class="sans lbl" style="color:var(--gold300);">ما اسمك؟</div>
+        <div class="sans field" style="background:var(--whiteA08);border:1px solid var(--whiteA14);color:var(--muted2);">اكتب اسمك</div>
+        <div class="sans btn btn-gold">ابدأ</div>
+        <div class="sans priv" style="color:var(--muted2);">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8a9389" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          <span>بياناتك تبقى على جهازك</span>
+        </div>
+      </div>
+    </div></div>
+    <div class="rationale"><b>Quiet middle ground.</b> Sheet = solid <span class="tok">green700</span> (#1c4a3a, the "evening card" green) lifted off the gradient with a gold hairline. Clearly a panel, still firmly in the night palette.</div>
+  </div>
+
+</div>
+
+<div class="selnote">Click a phone to mark it, then tell me <b>B1 / B2 / B3</b> in the terminal (or ask for a tweak — e.g. "B1 but a warmer hairline").</div>
+
+<script>
+  function pick(el){
+    document.querySelectorAll('.col').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap');
+
+.werd-wrap { direction: rtl; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; }
+.werd-wrap h2 { text-align: right; }
+.werd-wrap .subtitle { text-align: right; max-width: 64ch; }
+.werd-note { background: rgba(216,180,106,.12); border:1px solid rgba(216,180,106,.35); color: var(--text-primary); border-radius:12px; padding:.75rem .95rem; font-size:.84rem; margin-bottom:1.6rem; line-height:1.65; }
+
+.stage { display:flex; justify-content:center; }
+.werd-card { background: var(--bg-secondary); border:1px solid var(--border); border-radius:20px; padding:1.4rem; cursor:pointer; transition: all .15s ease; max-width:430px; }
+.werd-card:hover { border-color: var(--accent); }
+.werd-card.selected { border-color: var(--selected-border); border-width:2px; }
+.cap { margin-top:1rem; }
+.cap h3 { font-size:1.05rem; margin-bottom:.3rem; }
+.cap p { color: var(--text-secondary); font-size:.85rem; line-height:1.55; }
+
+/* phone */
+.phone { width:330px; min-height:610px; border-radius:34px; background: linear-gradient(180deg,#16352a 0%, #0e2d22 100%); color:#f4ede0; padding:18px 16px 20px; box-shadow: 0 26px 50px -18px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.05); display:flex; flex-direction:column; overflow:hidden; position:relative; margin:0 auto; }
+.ph-top { display:flex; align-items:center; justify-content:space-between; font-size:11px; color:#9fb3a8; margin-bottom:6px; padding:0 6px; }
+.ph-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.ph-ic { width:30px; height:30px; border-radius:10px; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; }
+.count-lbl { font-size:12.5px; color:#9fb3a8; font-weight:600; }
+
+/* swipe viewport: prev/cur/next */
+.viewport { flex:1; display:flex; align-items:stretch; position:relative; margin:6px 0 4px; }
+.peek { width:34px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; z-index:3; }
+.peek .chev { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; }
+.peek .lbl { font-size:9.5px; color:#9fb3a8; font-weight:600; }
+.slab { position:absolute; top:0; bottom:0; width:54px; overflow:hidden; font-family:'Amiri',serif; font-size:18px; line-height:1.9; color:rgba(244,237,224,.14); padding-top:100px; z-index:1; }
+.slab.right { right:34px; text-align:right; }
+.slab.left { left:34px; text-align:left; }
+
+.cur-card { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 4px; z-index:2; }
+.dtitle { color:#f4d68a; font-weight:700; font-size:13px; letter-spacing:.02em; }
+.dtext { font-family:'Amiri', serif; font-size:26px; line-height:2.1; color:#f4ede0; }
+.rep { margin-top:26px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.beadrow { display:flex; gap:8px; }
+.bead { width:11px; height:11px; border-radius:50%; background:#d8b46a; }
+.hint { color:#9fb3a8; font-size:12px; }
+
+/* bottom */
+.bottom { margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:13px; }
+.swipe-hint { display:flex; align-items:center; justify-content:space-between; width:100%; padding:0 10px; color:#9fb3a8; font-size:12px; }
+.swipe-hint b { color:#f4d68a; font-weight:700; }
+.swipe-hint .pair { display:flex; align-items:center; gap:6px; }
+.swipe-hint .mid { opacity:.55; font-size:11px; }
+
+.dots { display:flex; gap:5px; justify-content:center; }
+.dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); }
+.dot.done { background:#d8b46a; }
+.dot.cur { background:#f4d68a; transform:scale(1.45); }
+
+/* mini gesture row */
+.how { display:flex; gap:10px; margin-top:1.3rem; flex-wrap:wrap; }
+.how .step { flex:1; min-width:150px; background: var(--bg-secondary); border:1px solid var(--border); border-radius:14px; padding:.85rem .9rem; }
+.how .step .k { display:flex; align-items:center; gap:8px; font-weight:700; font-size:.88rem; color: var(--text-primary); margin-bottom:.3rem; }
+.how .step .k .ktext { }
+.how .step p { color: var(--text-secondary); font-size:.78rem; line-height:1.45; margin:0; }
+.chip { width:28px; height:28px; border-radius:9px; background:rgba(216,180,106,.18); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.chip.green { background:rgba(63,130,104,.22); }
+</style>
+
+<div class="werd-wrap" dir="rtl">
+  <h2>B · البطاقة الهادئة — النصّ قبل السهم</h2>
+  <p class="subtitle">رتّبت كل تسمية لتكون <b>الكلمة أوّلاً ثمّ السهم</b> (الأنسب للعربية): «التالي ←» و«السابق →». التالي يطلّ من اليسار، والسابق من اليمين.</p>
+  <div class="werd-note">📿 بلا عدّاد: نصّ الذِّكر كبيرٌ في الوسط، والتكرار نقاطٌ إرشادية فقط (تعدّه على أصابعك). النقاط أسفل الشاشة = موضعك في الجلسة.</div>
+
+  <div class="stage">
+    <div class="werd-card selected" data-choice="calm-swipe" onclick="toggleSelect(this)">
+      <div class="phone">
+        <div class="ph-top"><span>٩:٤١</span><span>● ● ●</span></div>
+        <div class="ph-head">
+          <div class="ph-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9fb3a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          <div class="count-lbl">أذكار الصباح · ٥ / ١٣</div>
+          <div class="ph-ic" style="opacity:0;"></div>
+        </div>
+
+        <div class="viewport">
+          <!-- RIGHT edge = السابق -->
+          <div class="slab right">وَبِمُحَمَّدٍ نَبِيًّا الإِسْلَامِ دِينًا</div>
+          <div class="peek">
+            <div class="lbl">السابق</div>
+            <div class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9fb3a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+          </div>
+
+          <div class="cur-card">
+            <div class="dtitle">الرضا بالله</div>
+            <div class="dtext">رَضِيتُ بِاللهِ رَبًّا، وَبِالإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا</div>
+            <div class="rep">
+              <div class="beadrow"><span class="bead"></span><span class="bead"></span><span class="bead"></span></div>
+              <div class="hint">ثلاث مرّات · اعقِدها على أصابع يدك اليمنى</div>
+            </div>
+          </div>
+
+          <!-- LEFT edge = التالي -->
+          <div class="peek">
+            <div class="lbl">التالي</div>
+            <div class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9fb3a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+          </div>
+          <div class="slab left">اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ</div>
+        </div>
+
+        <div class="bottom">
+          <div class="swipe-hint">
+            <!-- first child = right side under RTL -->
+            <span class="pair"><b>السابق</b> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f4d68a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            <span class="mid">اسحب للتنقّل</span>
+            <span class="pair"><b>التالي</b> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f4d68a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+          </div>
+          <div class="dots">
+            <span class="dot done"></span><span class="dot done"></span><span class="dot done"></span><span class="dot done"></span><span class="dot cur"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cap">
+        <h3>تنقّل بالسحب في الاتجاهين</h3>
+        <p>النصّ أوّلاً ثمّ السهم في كل تسمية. اسحب نحو ← للتالي، ونحو → للسابق (أو المس السهم على الحافة). لا عدّاد — تعدّ على أصابعك.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="how">
+    <div class="step">
+      <div class="k"><span class="ktext">التالي</span><span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8b46a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span></div>
+      <p>الذِّكر التالي يطلّ من <b>اليسار</b>. اسحب نحو اليسار أو المس السهم الأيسر.</p>
+    </div>
+    <div class="step">
+      <div class="k"><span class="ktext">السابق</span><span class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8b46a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <p>الذِّكر السابق يطلّ من <b>اليمين</b>. اسحب نحو اليمين أو المس السهم الأيمن.</p>
+    </div>
+    <div class="step">
+      <div class="k"><span class="ktext">آخر ذِكر</span><span class="chip green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3f8268" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span></div>
+      <p>عند آخر ذِكر يظهر زر <b>«تمّ ✓»</b> لختام الجلسة (مع احتفال خفيف).</p>
+    </div>
+  </div>
+</div>
